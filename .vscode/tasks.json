@@ -1,0 +1,10 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"command": "npm install @mui/material @emotion/react @emotion/styled",
+			"label": "Install Material UI and peer dependencies"
+		}
+	]
+}

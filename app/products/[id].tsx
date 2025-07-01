@@ -1,7 +1,14 @@
 "use client";
+
 import { notFound } from "next/navigation";
 import { products, Product } from "../data/products";
 import { useCart } from "../context/CartContext";
+import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import Rating from "@mui/material/Rating";
 
 type Props = { params: { id: string } };
 
@@ -11,41 +18,46 @@ export default function ProductDetail({ params }: Props) {
   if (!product) return notFound();
   const imageUrl = product.image.startsWith('http') ? product.image : 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80';
   return (
-    <main style={{ maxWidth: 900, margin: "0 auto", padding: 32 }}>
-      <div style={{ display: "flex", gap: 40, alignItems: "flex-start", flexWrap: "wrap" }}>
-        <img src={imageUrl} alt={product.name} style={{ width: 340, height: 260, objectFit: "cover", borderRadius: 12, background: "#f3f4f6" }} />
-        <div style={{ flex: 1 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 800, marginBottom: 12 }}>{product.name}</h1>
-          <p style={{ color: "#666", fontSize: 16 }}>{product.description}</p>
-          <p style={{ fontSize: 22, fontWeight: 700, margin: "18px 0 8px 0" }}>
-            <span style={{ color: "#10b981" }}>Rs. {product.salePrice ?? product.price}</span>{" "}
-            {product.salePrice && <span style={{ textDecoration: "line-through", color: "#888", fontSize: 17, marginLeft: 8 }}>Rs. {product.price}</span>}
-          </p>
-          <div style={{ margin: "10px 0 18px 0", color: "#444" }}>
-            <div>Category: {product.category}</div>
-            <div>Stock: {product.stock > 0 ? "In Stock" : "Out of Stock"}</div>
-            <div>SKU: {product.sku}</div>
-            <div>Rating: {product.rating ?? "N/A"}</div>
-          </div>
-          <button
+    <Container maxWidth="md" sx={{ minHeight: "80vh", py: { xs: 2, sm: 4 } }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: { xs: 3, md: 6 }, alignItems: { xs: "center", md: "flex-start" }, background: "#fff", borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", p: { xs: 2, sm: 4 } }}>
+        <Box sx={{ minWidth: 260, maxWidth: 340, width: "100%", mb: { xs: 2, md: 0 } }}>
+          <img src={imageUrl} alt={product.name} style={{ width: "100%", height: 240, objectFit: "cover", borderRadius: 12, background: "#f3f4f6" }} />
+        </Box>
+        <Box sx={{ flex: 1, width: "100%" }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>{product.name}</Typography>
+          <Typography sx={{ color: "#666", fontSize: 16, mb: 2 }}>{product.description}</Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+            <Typography sx={{ fontSize: 22, fontWeight: 700, color: "#10b981" }}>Rs. {product.salePrice ?? product.price}</Typography>
+            {product.salePrice && (
+              <Typography sx={{ textDecoration: "line-through", color: "#888", fontSize: 17, ml: 1 }}>Rs. {product.price}</Typography>
+            )}
+          </Box>
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
+            <Chip label={product.category} color="primary" size="small" sx={{ fontWeight: 600 }} />
+            <Chip label={product.stock > 0 ? "In Stock" : "Out of Stock"} color={product.stock > 0 ? "success" : "error"} size="small" />
+            <Chip label={`SKU: ${product.sku}`} size="small" />
+            <Rating value={product.rating ?? 0} precision={0.1} readOnly size="small" sx={{ ml: 1 }} />
+          </Box>
+          <Button
             onClick={() => addToCart(product)}
-            style={{
-              padding: "12px 36px",
+            variant="contained"
+            sx={{
               background: "#10b981",
               color: "#fff",
-              borderRadius: 8,
-              border: "none",
+              borderRadius: 2,
               fontWeight: 700,
               fontSize: 18,
-              cursor: "pointer",
+              px: 5,
+              py: 1.5,
               boxShadow: "0 1px 4px rgba(16,185,129,0.08)",
-              transition: "background 0.2s"
+              mt: 2,
+              '&:hover': { background: "#059669" }
             }}
           >
             Add to Cart
-          </button>
-        </div>
-      </div>
-    </main>
+          </Button>
+        </Box>
+      </Box>
+    </Container>
   );
 }

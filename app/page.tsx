@@ -3,31 +3,53 @@
 import { products } from "./data/products";
 import ProductCard from "./components/ProductCard";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import { Grid } from "@mui/material";
 
 export default function Home() {
   const [search, setSearch] = useState("");
-  const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    p.description.toLowerCase().includes(search.toLowerCase())
-  );
+  const [loading, setLoading] = useState(true);
+  const [filteredProducts, setFilteredProducts] = useState(products);
+
+  useEffect(() => {
+    setLoading(true);
+    const timeout = setTimeout(() => {
+      setFilteredProducts(
+        products.filter(p =>
+          p.name.toLowerCase().includes(search.toLowerCase()) ||
+          p.description.toLowerCase().includes(search.toLowerCase())
+        )
+      );
+      setLoading(false);
+    }, 400); // Simulate loading and debounce search
+    return () => clearTimeout(timeout);
+  }, [search]);
+
   return (
-    <main style={{ maxWidth: 1300, margin: "0 auto", padding: "0 0 48px 0", background: "#f8fafc" }}>
-      <section
-        style={{
+    <Container maxWidth="lg" sx={{ background: "#f8fafc", minHeight: "100vh", p: { xs: 0.5, sm: 2, md: 4 } }}>
+      <Box
+        sx={{
           background: "linear-gradient(100deg, #1e293b 0%, #2563eb 100%)",
           color: "#fff",
-          borderRadius: 24,
-          padding: "32px 8px 32px 8px",
-          margin: "20px 0 32px 0",
+          borderRadius: { xs: 2, sm: 3 },
+          p: { xs: 2, sm: 6 },
+          mt: { xs: 1, sm: 4 },
+          mb: { xs: 2, sm: 6 },
           textAlign: "center",
-          boxShadow: "0 8px 32px rgba(37,99,235,0.10)",
+          boxShadow: { xs: "0 2px 8px rgba(37,99,235,0.10)", sm: "0 8px 32px rgba(37,99,235,0.10)" },
           position: "relative",
-          overflow: "hidden"
+          overflow: "hidden",
+          transition: "box-shadow 0.3s",
+          '&:hover': { boxShadow: { xs: "0 4px 16px rgba(37,99,235,0.18)", sm: "0 12px 40px rgba(37,99,235,0.18)" } }
         }}
       >
-        <div
-          style={{
+        <Box
+          sx={{
             position: "absolute",
             top: 0,
             left: 0,
@@ -38,130 +60,137 @@ export default function Home() {
             zIndex: 0
           }}
         />
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <h1
-            style={{
-              fontSize: 28,
+        <Box sx={{ position: "relative", zIndex: 1 }}>
+          <Typography
+            variant="h3"
+            sx={{
+              fontSize: { xs: 20, sm: 32, md: 40 },
               fontWeight: 900,
-              margin: 0,
+              m: 0,
               letterSpacing: 1,
               lineHeight: 1.1,
               maxWidth: 400,
-              marginLeft: "auto",
-              marginRight: "auto"
+              mx: "auto"
             }}
           >
             Unstitched Luxury Fabrics
-          </h1>
-          <p style={{ fontSize: 18, margin: "18px 0 0 0", fontWeight: 500, color: "#e0e7ff" }}>
+          </Typography>
+          <Typography sx={{ fontSize: { xs: 16, sm: 18 }, mt: 2, fontWeight: 500, color: "#e0e7ff" }}>
             Premium Men’s & Women’s Unstitched Clothes
-          </p>
-          <p style={{ fontSize: 15, margin: "12px 0 0 0", color: "#c7d2fe" }}>
+          </Typography>
+          <Typography sx={{ fontSize: { xs: 13, sm: 15 }, mt: 1.5, color: "#c7d2fe" }}>
             Shop the latest collections. Fast delivery, easy returns, and the best prices in Pakistan.
-          </p>
-          <Link
+          </Typography>
+          <Button
+            component={Link}
             href="/products"
-            style={{
-              display: "inline-block",
-              marginTop: 24,
-              padding: "12px 32px",
+            variant="contained"
+            sx={{
+              mt: { xs: 2, sm: 3 },
+              px: { xs: 2.5, sm: 4 },
+              py: { xs: 1, sm: 1.5 },
               background: "#fff",
               color: "#2563eb",
-              borderRadius: 8,
+              borderRadius: 2,
               fontWeight: 700,
-              fontSize: 16,
-              textDecoration: "none",
-              boxShadow: "0 2px 12px rgba(37,99,235,0.10)",
-              transition: "background 0.2s, color 0.2s"
+              fontSize: { xs: 15, sm: 16 },
+              boxShadow: { xs: "0 1px 6px rgba(37,99,235,0.10)", sm: "0 2px 12px rgba(37,99,235,0.10)" },
+              textTransform: "none",
+              letterSpacing: 1,
+              transition: "background 0.2s, color 0.2s",
+              '&:hover': { background: "#e0e7ff", color: "#1e293b" }
             }}
+            aria-label="Shop all products"
           >
             Shop Now
-          </Link>
-        </div>
-      </section>
-      <div style={{ width: "100%", textAlign: "center", margin: "0 0 32px 0" }}>
-        <hr
-          style={{
-            border: 0,
-            borderTop: "2px solid #e0e7ef",
-            width: "90%",
-            margin: "0 auto"
+          </Button>
+        </Box>
+      </Box>
+      <Box sx={{ width: "100%", textAlign: "center", mb: { xs: 2, sm: 4 }, mt: { xs: 1, sm: 2 } }}>
+        <Box component="hr" sx={{ border: 0, borderTop: "2px solid #e0e7ef", width: { xs: "98%", sm: "90%" }, mx: "auto", opacity: 0.5 }} />
+      </Box>
+      <Box sx={{ display: "flex", alignItems: { xs: "flex-start", sm: "center" }, flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between", mb: { xs: 2, sm: 3 }, flexWrap: "wrap", gap: 2 }}>
+        <Typography
+          variant="h4"
+          sx={{
+            fontSize: { xs: 18, sm: 28, md: 36 },
+            fontWeight: 800,
+            color: "#222",
+            textAlign: { xs: "left", sm: "left" },
+            letterSpacing: 1,
+            ml: { xs: 0, sm: 1 },
+            mb: { xs: 1, sm: 0 }
           }}
-        />
-      </div>
-      <h2
-        style={{
-          fontSize: 22,
-          fontWeight: 800,
-          marginBottom: 24,
-          color: "#222",
-          textAlign: "center",
-          letterSpacing: 1
-        }}
-      >
-        Featured Products
-      </h2>
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: 24, padding: "0 8px" }}>
-        <input
+        >
+          Featured Products
+        </Typography>
+        <Button
+          component={Link}
+          href="/products"
+          variant="outlined"
+          sx={{
+            borderRadius: 2,
+            fontWeight: 600,
+            fontSize: { xs: 14, sm: 15 },
+            px: { xs: 2, sm: 3 },
+            py: { xs: 0.8, sm: 1 },
+            color: "#2563eb",
+            borderColor: "#2563eb",
+            textTransform: "none",
+            letterSpacing: 0.5,
+            transition: "background 0.2s, color 0.2s",
+            minWidth: { xs: 120, sm: 0 },
+            alignSelf: { xs: "stretch", sm: "auto" },
+            '&:hover': { background: "#e0e7ff", borderColor: "#2563eb" }
+          }}
+          aria-label="View all products"
+        >
+          View All
+        </Button>
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "center", mb: { xs: 2, sm: 3 }, px: 1 }}>
+        <TextField
           type="text"
           placeholder="Search products..."
           value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{
-            padding: "10px 14px",
-            borderRadius: 8,
-            border: "1px solid #cbd5e1",
-            fontSize: 15,
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+          size="small"
+          inputProps={{ 'aria-label': 'Search products' }}
+          sx={{
+            borderRadius: 2,
+            fontSize: { xs: 14, sm: 15 },
             width: "100%",
-            maxWidth: 340,
-            outline: "none"
+            maxWidth: { xs: 260, sm: 340 },
+            background: "#fff",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+            transition: "box-shadow 0.2s",
+            '&:focus-within': { boxShadow: "0 2px 8px rgba(37,99,235,0.10)" }
           }}
         />
-      </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr",
-          gap: 24,
-          justifyContent: "center",
-          margin: "0 8px"
-        }}
-      >
-        {filteredProducts.length === 0 ? (
-          <div
-            style={{
-              gridColumn: "1/-1",
-              textAlign: "center",
-              color: "#888",
-              fontSize: 18,
-              padding: 32
-            }}
-          >
-            No products found.
-          </div>
+      </Box>
+      <Grid container spacing={{ xs: 1.5, sm: 3 }} justifyContent="center" sx={{ px: { xs: 0.5, sm: 3 } }}>
+        {loading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
+              <Box sx={{ height: { xs: 320, sm: 420 }, borderRadius: 3, background: '#e0e7ef', width: '100%', maxWidth: 320, mx: 'auto', animation: 'pulse 1.5s infinite', '@keyframes pulse': { '0%': { opacity: 1 }, '50%': { opacity: 0.5 }, '100%': { opacity: 1 } } }} />
+            </Grid>
+          ))
+        ) : filteredProducts.length === 0 ? (
+          <Grid item xs={12} sx={{ textAlign: "center" }}>
+            <Typography sx={{ color: "#888", fontSize: 18, py: 4 }}>
+              No products found.
+            </Typography>
+          </Grid>
         ) : (
           filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
+              <Box sx={{ transition: 'transform 0.18s', '&:hover': { transform: 'translateY(-6px) scale(1.03)' } }}>
+                <ProductCard product={product} />
+              </Box>
+            </Grid>
           ))
         )}
-      </div>
-      <style>{`
-        @media (min-width: 600px) {
-          main > section {
-            padding: 48px 24px 48px 24px !important;
-            margin: 32px 16px 48px 16px !important;
-          }
-          main > div[style*='grid'] {
-            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)) !important;
-            gap: 40px !important;
-            margin: 0 24px !important;
-          }
-          main > h2 {
-            font-size: 36px !important;
-            margin-bottom: 32px !important;
-          }
-        }
-      `}</style>
-    </main>
+      </Grid>
+    </Container>
   );
 }
