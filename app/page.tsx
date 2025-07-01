@@ -1,9 +1,16 @@
+
+"use client";
 import { products } from "./data/products";
 import ProductCard from "./components/ProductCard";
-
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Home() {
+  const [search, setSearch] = useState("");
+  const filteredProducts = products.filter(p =>
+    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    p.description.toLowerCase().includes(search.toLowerCase())
+  );
   return (
     <main style={{ maxWidth: 1300, margin: "0 auto", padding: "0 0 48px 0", background: "#f8fafc" }}>
       <section style={{
@@ -50,6 +57,22 @@ export default function Home() {
         <hr style={{ border: 0, borderTop: "2px solid #e0e7ef", width: "80%", margin: "0 auto" }} />
       </div>
       <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 32, color: "#222", textAlign: "center", letterSpacing: 1 }}>Featured Products</h2>
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{
+            padding: "10px 18px",
+            borderRadius: 8,
+            border: "1px solid #cbd5e1",
+            fontSize: 17,
+            width: 320,
+            outline: "none"
+          }}
+        />
+      </div>
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))",
@@ -57,9 +80,15 @@ export default function Home() {
         justifyContent: "center",
         margin: "0 24px"
       }}>
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+        {filteredProducts.length === 0 ? (
+          <div style={{ gridColumn: "1/-1", textAlign: "center", color: "#888", fontSize: 20, padding: 40 }}>
+            No products found.
+          </div>
+        ) : (
+          filteredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))
+        )}
       </div>
     </main>
   );
