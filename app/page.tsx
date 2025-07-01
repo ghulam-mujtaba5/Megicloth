@@ -31,20 +31,32 @@ export default function Home() {
   }, [search]);
 
   return (
-    <Container maxWidth="lg" sx={{ background: "#f8fafc", minHeight: "100vh", p: { xs: 0.5, sm: 2, md: 4 } }}>
+    <Container
+      maxWidth="sm"
+      disableGutters
+      sx={{
+        background: "#f8fafc",
+        minHeight: "100vh",
+        px: { xs: 1.5, sm: 2, md: 4 },
+        py: { xs: 1.5, sm: 2, md: 4 },
+        mx: "auto"
+      }}
+    >
+      {/* Hero Section */}
       <Box
         sx={{
           background: "linear-gradient(100deg, #1e293b 0%, #2563eb 100%)",
           color: "#fff",
           borderRadius: { xs: 2, sm: 3 },
-          p: { xs: 2, sm: 6 },
+          p: { xs: 2.5, sm: 5 },
           mt: { xs: 1, sm: 4 },
-          mb: { xs: 2, sm: 6 },
+          mb: { xs: 2, sm: 5 },
           textAlign: "center",
           boxShadow: { xs: "0 2px 8px rgba(37,99,235,0.10)", sm: "0 8px 32px rgba(37,99,235,0.10)" },
           position: "relative",
           overflow: "hidden",
           transition: "box-shadow 0.3s",
+          mx: { xs: 0, sm: 0 },
           '&:hover': { boxShadow: { xs: "0 4px 16px rgba(37,99,235,0.18)", sm: "0 12px 40px rgba(37,99,235,0.18)" } }
         }}
       >
@@ -64,21 +76,21 @@ export default function Home() {
           <Typography
             variant="h3"
             sx={{
-              fontSize: { xs: 20, sm: 32, md: 40 },
+              fontSize: { xs: 22, sm: 30, md: 38 },
               fontWeight: 900,
               m: 0,
               letterSpacing: 1,
               lineHeight: 1.1,
-              maxWidth: 400,
+              maxWidth: 340,
               mx: "auto"
             }}
           >
             Unstitched Luxury Fabrics
           </Typography>
-          <Typography sx={{ fontSize: { xs: 16, sm: 18 }, mt: 2, fontWeight: 500, color: "#e0e7ff" }}>
+          <Typography sx={{ fontSize: { xs: 15, sm: 17 }, mt: 1.5, fontWeight: 500, color: "#e0e7ff" }}>
             Premium Men’s & Women’s Unstitched Clothes
           </Typography>
-          <Typography sx={{ fontSize: { xs: 13, sm: 15 }, mt: 1.5, color: "#c7d2fe" }}>
+          <Typography sx={{ fontSize: { xs: 12, sm: 14 }, mt: 1.2, color: "#c7d2fe" }}>
             Shop the latest collections. Fast delivery, easy returns, and the best prices in Pakistan.
           </Typography>
           <Button
@@ -87,13 +99,13 @@ export default function Home() {
             variant="contained"
             sx={{
               mt: { xs: 2, sm: 3 },
-              px: { xs: 2.5, sm: 4 },
+              px: { xs: 2, sm: 4 },
               py: { xs: 1, sm: 1.5 },
               background: "#fff",
               color: "#2563eb",
               borderRadius: 2,
               fontWeight: 700,
-              fontSize: { xs: 15, sm: 16 },
+              fontSize: { xs: 14, sm: 16 },
               boxShadow: { xs: "0 1px 6px rgba(37,99,235,0.10)", sm: "0 2px 12px rgba(37,99,235,0.10)" },
               textTransform: "none",
               letterSpacing: 1,
@@ -106,20 +118,34 @@ export default function Home() {
           </Button>
         </Box>
       </Box>
+
+      {/* Divider */}
       <Box sx={{ width: "100%", textAlign: "center", mb: { xs: 2, sm: 4 }, mt: { xs: 1, sm: 2 } }}>
-        <Box component="hr" sx={{ border: 0, borderTop: "2px solid #e0e7ef", width: { xs: "98%", sm: "90%" }, mx: "auto", opacity: 0.5 }} />
+        <Box component="hr" sx={{ border: 0, borderTop: "2px solid #e0e7ef", width: { xs: "100%", sm: "90%" }, mx: "auto", opacity: 0.5 }} />
       </Box>
-      <Box sx={{ display: "flex", alignItems: { xs: "flex-start", sm: "center" }, flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between", mb: { xs: 2, sm: 3 }, flexWrap: "wrap", gap: 2 }}>
+
+      {/* Section Title and View All */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "space-between",
+          mb: { xs: 2, sm: 3 },
+          gap: { xs: 1, sm: 2 },
+          px: { xs: 0.5, sm: 1 },
+        }}
+      >
         <Typography
           variant="h4"
           sx={{
-            fontSize: { xs: 18, sm: 28, md: 36 },
+            fontSize: { xs: 17, sm: 26, md: 32 },
             fontWeight: 800,
             color: "#222",
-            textAlign: { xs: "left", sm: "left" },
+            textAlign: "left",
             letterSpacing: 1,
-            ml: { xs: 0, sm: 1 },
-            mb: { xs: 1, sm: 0 }
+            mb: { xs: 1, sm: 0 },
+            flex: 1
           }}
         >
           Featured Products
@@ -131,15 +157,14 @@ export default function Home() {
           sx={{
             borderRadius: 2,
             fontWeight: 600,
-            fontSize: { xs: 14, sm: 15 },
+            fontSize: { xs: 13, sm: 15 },
             px: { xs: 2, sm: 3 },
             py: { xs: 0.8, sm: 1 },
             color: "#2563eb",
             borderColor: "#2563eb",
             textTransform: "none",
             letterSpacing: 0.5,
-            transition: "background 0.2s, color 0.2s",
-            minWidth: { xs: 120, sm: 0 },
+            minWidth: { xs: 100, sm: 0 },
             alignSelf: { xs: "stretch", sm: "auto" },
             '&:hover': { background: "#e0e7ff", borderColor: "#2563eb" }
           }}
@@ -148,7 +173,9 @@ export default function Home() {
           View All
         </Button>
       </Box>
-      <Box sx={{ display: "flex", justifyContent: "center", mb: { xs: 2, sm: 3 }, px: 1 }}>
+
+      {/* Search Bar */}
+      <Box sx={{ display: "flex", justifyContent: "center", mb: { xs: 2, sm: 3 }, px: 0 }}>
         <TextField
           type="text"
           placeholder="Search products..."
@@ -158,7 +185,7 @@ export default function Home() {
           inputProps={{ 'aria-label': 'Search products' }}
           sx={{
             borderRadius: 2,
-            fontSize: { xs: 14, sm: 15 },
+            fontSize: { xs: 13, sm: 15 },
             width: "100%",
             maxWidth: { xs: 260, sm: 340 },
             background: "#fff",
@@ -168,16 +195,38 @@ export default function Home() {
           }}
         />
       </Box>
-      <Grid container spacing={{ xs: 1.5, sm: 3 }} justifyContent="center" sx={{ px: { xs: 0.5, sm: 3 } }}>
+
+      {/* Products Grid */}
+      <Grid
+        container
+        spacing={{ xs: 1.2, sm: 2.5 }}
+        justifyContent="center"
+        sx={{ px: { xs: 0, sm: 1 } }}
+      >
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
-              <Box sx={{ height: { xs: 320, sm: 420 }, borderRadius: 3, background: '#e0e7ef', width: '100%', maxWidth: 320, mx: 'auto', animation: 'pulse 1.5s infinite', '@keyframes pulse': { '0%': { opacity: 1 }, '50%': { opacity: 0.5 }, '100%': { opacity: 1 } } }} />
+              <Box
+                sx={{
+                  height: { xs: 220, sm: 320 },
+                  borderRadius: 3,
+                  background: '#e0e7ef',
+                  width: '100%',
+                  maxWidth: 320,
+                  mx: 'auto',
+                  animation: 'pulse 1.5s infinite',
+                  '@keyframes pulse': {
+                    '0%': { opacity: 1 },
+                    '50%': { opacity: 0.5 },
+                    '100%': { opacity: 1 }
+                  }
+                }}
+              />
             </Grid>
           ))
         ) : filteredProducts.length === 0 ? (
           <Grid item xs={12} sx={{ textAlign: "center" }}>
-            <Typography sx={{ color: "#888", fontSize: 18, py: 4 }}>
+            <Typography sx={{ color: "#888", fontSize: 16, py: 4 }}>
               No products found.
             </Typography>
           </Grid>

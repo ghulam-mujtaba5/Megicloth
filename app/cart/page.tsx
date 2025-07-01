@@ -41,67 +41,67 @@ export default function Cart() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ minHeight: "80vh", py: { xs: 2, sm: 4 } }}>
-      <Typography variant="h3" sx={{ fontWeight: 900, fontSize: { xs: 24, sm: 32, md: 40 }, mb: { xs: 3, sm: 5 }, mt: { xs: 2, sm: 4 }, textAlign: "center" }}>
+    <Container maxWidth="md" sx={{ minHeight: "80vh", py: { xs: 1, sm: 4 }, px: { xs: 0.5, sm: 2 } }}>
+      <Typography variant="h3" sx={{ fontWeight: 900, fontSize: { xs: 20, sm: 32, md: 40 }, mb: { xs: 2, sm: 5 }, mt: { xs: 1, sm: 4 }, textAlign: "center" }}>
         Your Cart
       </Typography>
       {cart.length === 0 ? (
-        <Box sx={{ color: "#888", fontSize: 20, textAlign: "center", my: 8 }}>
+        <Box sx={{ color: "#888", fontSize: { xs: 16, sm: 20 }, textAlign: "center", my: { xs: 4, sm: 8 } }}>
           Your cart is empty.<br />
           <Link href="/products" style={{ color: "#2563eb", textDecoration: "underline" }}>Browse products</Link>
         </Box>
       ) : (
         <>
-          <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.04)", mb: 4 }}>
-            <Table>
+          <TableContainer component={Paper} sx={{ borderRadius: { xs: 2, sm: 3 }, boxShadow: { xs: "0 1px 4px rgba(0,0,0,0.04)", sm: "0 2px 8px rgba(0,0,0,0.04)" }, mb: { xs: 2, sm: 4 } }}>
+            <Table size={window.innerWidth < 600 ? "small" : "medium"}>
               <TableHead>
                 <TableRow sx={{ background: "#f1f5f9" }}>
-                  <TableCell sx={{ fontWeight: 700 }}>Product</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 700 }}>Price</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 700 }}>Quantity</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 700 }}>Total</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: { xs: 13, sm: 16 } }}>Product</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 700, fontSize: { xs: 13, sm: 16 } }}>Price</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 700, fontSize: { xs: 13, sm: 16 } }}>Quantity</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 700, fontSize: { xs: 13, sm: 16 } }}>Total</TableCell>
                   <TableCell align="center"></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {cart.map(item => (
                   <TableRow key={item.id} sx={{ borderBottom: "1px solid #e5e7eb" }}>
-                    <TableCell>
+                    <TableCell sx={{ py: { xs: 1, sm: 2 } }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Avatar
                           src={item.image?.startsWith('http') ? item.image : 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80'}
                           alt={item.name}
-                          sx={{ width: 40, height: 40, bgcolor: '#f3f4f6', mr: 1 }}
+                          sx={{ width: { xs: 32, sm: 40 }, height: { xs: 32, sm: 40 }, bgcolor: '#f3f4f6', mr: 1 }}
                         />
-                        <Link href={`/products/${item.id}`} style={{ color: "#2563eb", textDecoration: "none", fontWeight: 600 }}>{item.name}</Link>
+                        <Link href={`/products/${item.id}`} style={{ color: "#2563eb", textDecoration: "none", fontWeight: 600, fontSize: 15 }}>{item.name}</Link>
                       </Box>
                     </TableCell>
-                    <TableCell align="center">Rs. {item.salePrice ?? item.price}</TableCell>
+                    <TableCell align="center" sx={{ fontSize: { xs: 14, sm: 16 } }}>Rs. {item.salePrice ?? item.price}</TableCell>
                     <TableCell align="center">
                       <TextField
                         type="number"
                         size="small"
-                        inputProps={{ min: 1, style: { textAlign: "center", width: 50 } }}
+                        inputProps={{ min: 1, style: { textAlign: "center", width: 40 } }}
                         value={item.quantity}
                         onChange={e => updateQuantity(item.id, Number(e.target.value))}
-                        sx={{ width: 60 }}
+                        sx={{ width: { xs: 44, sm: 60 } }}
                         aria-label={`Change quantity for ${item.name}`}
                       />
                     </TableCell>
-                    <TableCell align="center">Rs. {(item.salePrice ?? item.price) * item.quantity}</TableCell>
+                    <TableCell align="center" sx={{ fontSize: { xs: 14, sm: 16 } }}>Rs. {(item.salePrice ?? item.price) * item.quantity}</TableCell>
                     <TableCell align="center">
-                      <Button onClick={() => handleRemove(item.id)} color="error" size="small" sx={{ fontWeight: 600 }} aria-label={`Remove ${item.name} from cart`}>Remove</Button>
+                      <Button onClick={() => handleRemove(item.id)} color="error" size="small" sx={{ fontWeight: 600, fontSize: { xs: 13, sm: 15 }, px: { xs: 1, sm: 2 } }} aria-label={`Remove ${item.name} from cart`}>Remove</Button>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
-          <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between", alignItems: "center", mb: 4, gap: 2 }}>
-            <Button onClick={() => setDialogOpen(true)} color="error" variant="contained" sx={{ borderRadius: 2, fontWeight: 600, px: 4, py: 1.5 }}>Clear Cart</Button>
-            <Typography sx={{ fontSize: 22, fontWeight: 700, mt: { xs: 2, sm: 0 } }}>Total: Rs. {total}</Typography>
+          <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between", alignItems: "center", mb: { xs: 2, sm: 4 }, gap: 2 }}>
+            <Button onClick={() => setDialogOpen(true)} color="error" variant="contained" sx={{ borderRadius: 2, fontWeight: 600, px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 }, fontSize: { xs: 14, sm: 16 } }}>Clear Cart</Button>
+            <Typography sx={{ fontSize: { xs: 18, sm: 22 }, fontWeight: 700, mt: { xs: 2, sm: 0 } }}>Total: Rs. {total}</Typography>
           </Box>
-          <Link href="/checkout" style={{ background: "#10b981", color: "#fff", padding: "14px 40px", borderRadius: 8, fontWeight: 700, fontSize: 18, textDecoration: "none", display: "inline-block", textAlign: "center" }}>Proceed to Checkout</Link>
+          <Link href="/checkout" style={{ background: "#10b981", color: "#fff", padding: "12px 0", borderRadius: 8, fontWeight: 700, fontSize: 17, textDecoration: "none", display: "block", textAlign: "center", width: "100%", maxWidth: 320, margin: '0 auto' }}>Proceed to Checkout</Link>
           <Snackbar
             open={snackbar.open}
             autoHideDuration={2500}
