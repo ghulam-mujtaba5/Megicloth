@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { useWishlist } from "../context/WishlistContext";
 import { useState, useEffect, useCallback } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -32,16 +34,28 @@ import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import EmailIcon from "@mui/icons-material/Email";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Tooltip from "@mui/material/Tooltip";
+import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Divider from "@mui/material/Divider";
+import LogoutIcon from "@mui/icons-material/Logout";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 
 export default function Header() {
   const { cart } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
+  const { wishlist } = useWishlist();
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce((sum, item) => sum + (item.salePrice ?? item.price) * item.quantity, 0);
+  const wishlistCount = wishlist.length;
   
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   // Handle scroll effect
   useEffect(() => {
@@ -63,6 +77,19 @@ export default function Header() {
   const handleDrawerToggle = useCallback(() => {
     setDrawerOpen(!drawerOpen);
   }, [drawerOpen]);
+
+  const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    handleUserMenuClose();
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-PK', {
@@ -289,9 +316,11 @@ export default function Header() {
               </IconButton>
             </Tooltip>
 
-            {/* Favorites */}
-            <Tooltip title="Favorites">
+            {/* Wishlist */}
+            <Tooltip title="Wishlist">
               <IconButton
+                component={Link}
+                href="/wishlist"
                 sx={{
                   color: scrolled ? '#475569' : '#ffffff',
                   '&:hover': {
@@ -299,7 +328,20 @@ export default function Header() {
                   },
                 }}
               >
-                <FavoriteIcon />
+                <Badge 
+                  badgeContent={wishlistCount} 
+                  color="error"
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      fontWeight: 700,
+                      fontSize: '0.75rem',
+                      minWidth: 20,
+                      height: 20,
+                    },
+                  }}
+                >
+                  <FavoriteIcon />
+                </Badge>
               </IconButton>
             </Tooltip>
 
@@ -334,18 +376,45 @@ export default function Header() {
             </Tooltip>
 
             {/* Account */}
-            <Tooltip title="Account">
-              <IconButton
-                sx={{
-                  color: scrolled ? '#475569' : '#ffffff',
-                  '&:hover': {
+            {isAuthenticated ? (
+              <Tooltip title="Account">
+                <IconButton
+                  onClick={handleUserMenuOpen}
+                  sx={{
+                    color: scrolled ? '#475569' : '#ffffff',
+                    '&:hover': {
+                      background: scrolled ? 'rgba(37,99,235,0.1)' : 'rgba(255,255,255,0.1)',
+                    },
+                  }}
+                >
+                  <Avatar
+                    src={user?.avatar}
+                    sx={{ width: 32, height: 32 }}
+                  >
+                    {user?.firstName?.[0]}{user?.lastName?.[0]}
+                  </Avatar>
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Button
+                component={Link}
+                href="/auth/login"
+                variant="outlined"
+                color="inherit"
+                startIcon={<PersonIcon />}
+                sx={{ 
+                  ml: 1, 
+                  borderColor: scrolled ? 'rgba(37,99,235,0.3)' : 'rgba(255,255,255,0.3)', 
+                  color: scrolled ? '#2563eb' : '#ffffff',
+                  '&:hover': { 
+                    borderColor: scrolled ? 'rgba(37,99,235,0.5)' : 'rgba(255,255,255,0.5)',
                     background: scrolled ? 'rgba(37,99,235,0.1)' : 'rgba(255,255,255,0.1)',
-                  },
+                  } 
                 }}
               >
-                <PersonIcon />
-              </IconButton>
-            </Tooltip>
+                Sign In
+              </Button>
+            )}
 
             {/* Mobile Menu Button */}
             {isMobile && (

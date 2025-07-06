@@ -1,11 +1,14 @@
 "use client";
 import { CartProvider } from "./context/CartContext";
+import { AuthProvider } from "./context/AuthContext";
+import { WishlistProvider } from "./context/WishlistContext";
 import Header from "./components/Header";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ReactNode, useMemo } from "react";
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
+import { Toaster } from 'react-hot-toast';
 
 // Create emotion cache
 const createEmotionCache = () => {
@@ -243,14 +246,40 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
     <CacheProvider value={emotionCache}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <CartProvider>
-          <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <Header />
-            <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              {children}
-            </main>
-          </div>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+                <Header />
+                <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  {children}
+                </main>
+              </div>
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
+                  style: {
+                    background: '#363636',
+                    color: '#fff',
+                    borderRadius: '12px',
+                    fontSize: '14px',
+                  },
+                  success: {
+                    style: {
+                      background: '#10b981',
+                    },
+                  },
+                  error: {
+                    style: {
+                      background: '#ef4444',
+                    },
+                  },
+                }}
+              />
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
       </ThemeProvider>
     </CacheProvider>
   );

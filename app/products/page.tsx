@@ -1,190 +1,184 @@
 "use client";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { products } from "../data/products";
 import ProductCard from "../components/ProductCard";
-import Link from "next/link";
-import { useState, useEffect, useMemo, useCallback } from "react";
-import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Grid from "@mui/material/Grid";
-import InputAdornment from "@mui/material/InputAdornment";
-import SearchIcon from "@mui/icons-material/Search";
-import ClearIcon from "@mui/icons-material/Clear";
-import IconButton from "@mui/material/IconButton";
-import Chip from "@mui/material/Chip";
-import Skeleton from "@mui/material/Skeleton";
-import Fade from "@mui/material/Fade";
-import Slide from "@mui/material/Slide";
-import Pagination from "@mui/material/Pagination";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import type { Product } from "../data/products";
+import {
+  Container,
+  Typography,
+  Box,
+  Grid,
+  TextField,
+  Button,
+  Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Slider,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Drawer,
+  IconButton,
+  useTheme,
+  useMediaQuery,
+  Skeleton,
+  Alert,
+  Pagination,
+} from "@mui/material";
+import {
+  Search,
+  FilterList,
+  Sort,
+  Clear,
+  ExpandMore,
+  ViewList,
+  ViewModule,
+  GridView,
+} from "@mui/icons-material";
+import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 
-// Enhanced product data with more realistic information
-const enhancedProducts = products.map((product) => ({
-  ...product,
-  tags: product.category === 'Men' ? ['Premium', 'Comfortable'] : ['Elegant', 'Stylish'],
-  fabricType: product.category === 'Men' ? 'Lawn' : 'Embroidered Lawn',
-  measurements: product.category === 'Men' ? '3.5 meters' : '3-piece set',
-  deliveryTime: '2-3 days',
-  returnPolicy: '7 days',
-}));
+type SortOption = "name" | "price-low" | "price-high" | "rating" | "newest";
+type ViewMode = "grid" | "list";
 
-// Type for enhanced products
-type EnhancedProduct = Product & {
-  tags: string[];
-  fabricType: string;
-  measurements: string;
-  deliveryTime: string;
-  returnPolicy: string;
-};
-
-type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'newest';
+interface FilterState {
+  search: string;
+  category: string;
+  priceRange: [number, number];
+  rating: number;
+  inStock: boolean;
+}
 
 export default function ProductsPage() {
-  const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<SortOption>('newest');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(12);
-  
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  
+  const [filterState, setFilterState] = useState<FilterState>({
+    search: "",
+    category: "",
+    priceRange: [0, 10000],
+    rating: 0,
+    inStock: false,
+  });
+  
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
-  // Memoized filtered and sorted products for better performance
-  const filteredProducts = useMemo(() => {
-    let filtered = enhancedProducts.filter(product => {
-      const matchesSearch = search === "" || 
-        product.name.toLowerCase().includes(search.toLowerCase()) ||
-        product.description.toLowerCase().includes(search.toLowerCase()) ||
-        product.fabricType.toLowerCase().includes(search.toLowerCase());
-      
-      const matchesCategory = !selectedCategory || product.category === selectedCategory;
-      
-      const matchesPriceRange = !selectedPriceRange || (() => {
-        const price = product.salePrice ?? product.price;
-        switch (selectedPriceRange) {
-          case 'under-1000':
-            return price < 1000;
-          case '1000-2000':
-            return price >= 1000 && price < 2000;
-          case '2000-5000':
-            return price >= 2000 && price < 5000;
-          case 'over-5000':
-            return price >= 5000;
-          default:
-            return true;
-        }
-      })();
-      
-      return matchesSearch && matchesCategory && matchesPriceRange;
-    });
-    
-    // Sort products
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'name-asc':
-          return a.name.localeCompare(b.name);
-        case 'name-desc':
-          return b.name.localeCompare(a.name);
-        case 'price-asc':
-          return (a.salePrice ?? a.price) - (b.salePrice ?? b.price);
-        case 'price-desc':
-          return (b.salePrice ?? b.price) - (a.salePrice ?? a.price);
-        case 'newest':
-        default:
-          return b.id.localeCompare(a.id);
-      }
-    });
-    
-    return filtered;
-  }, [search, selectedCategory, selectedPriceRange, sortBy]);
+  const itemsPerPage = 12;
 
-  // Pagination
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredProducts, currentPage, itemsPerPage]);
-
-  // Simulate loading with better UX
+  // Simulate loading
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 800);
+    const timer = setTimeout(() => setLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
 
-  // Reset to first page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, selectedCategory, selectedPriceRange, sortBy]);
-
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-  }, []);
-
-  const handleClearSearch = useCallback(() => {
-    setSearch("");
-  }, []);
-
-  const handleCategorySelect = useCallback((category: string | null) => {
-    setSelectedCategory(category);
-  }, []);
-
-  const handlePriceRangeSelect = useCallback((range: string | null) => {
-    setSelectedPriceRange(range);
-  }, []);
-
-  const handleSortChange = useCallback((sort: SortOption) => {
-    setSortBy(sort);
-  }, []);
-
-  const handlePageChange = useCallback((event: React.ChangeEvent<unknown>, page: number) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
+  // Get unique categories
   const categories = useMemo(() => {
-    const uniqueCategories = [...new Set(enhancedProducts.map(p => p.category))];
-    return uniqueCategories;
+    return ["All", ...Array.from(new Set(products.map(p => p.category)))];
   }, []);
 
-  const priceRanges = [
-    { value: 'under-1000', label: 'Under Rs. 1,000' },
-    { value: '1000-2000', label: 'Rs. 1,000 - 2,000' },
-    { value: '2000-5000', label: 'Rs. 2,000 - 5,000' },
-    { value: 'over-5000', label: 'Over Rs. 5,000' },
-  ];
+  // Get price range
+  const priceRange = useMemo(() => {
+    const prices = products.map(p => p.salePrice || p.price);
+    return [Math.min(...prices), Math.max(...prices)];
+  }, []);
 
-  const sortOptions = [
-    { value: 'newest', label: 'Newest First' },
-    { value: 'name-asc', label: 'Name A-Z' },
-    { value: 'name-desc', label: 'Name Z-A' },
-    { value: 'price-asc', label: 'Price Low to High' },
-    { value: 'price-desc', label: 'Price High to Low' },
-  ];
+  // Filter and sort products
+  const filteredProducts = useMemo(() => {
+    let filtered = products.filter(product => {
+      // Search filter
+      const searchMatch = !filterState.search || 
+        product.name.toLowerCase().includes(filterState.search.toLowerCase()) ||
+        product.description.toLowerCase().includes(filterState.search.toLowerCase());
 
-  // Loading skeleton component
+      // Category filter
+      const categoryMatch = !filterState.category || 
+        filterState.category === "All" || 
+        product.category === filterState.category;
+
+      // Price filter
+      const productPrice = product.salePrice || product.price;
+      const priceMatch = productPrice >= filterState.priceRange[0] && 
+                        productPrice <= filterState.priceRange[1];
+
+      // Rating filter
+      const ratingMatch = !filterState.rating || 
+        (product.rating && product.rating >= filterState.rating);
+
+      // Stock filter
+      const stockMatch = !filterState.inStock || product.stock > 0;
+
+      return searchMatch && categoryMatch && priceMatch && ratingMatch && stockMatch;
+    });
+
+    // Sort products
+    switch (sortBy) {
+      case "name":
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "price-low":
+        filtered.sort((a, b) => (a.salePrice || a.price) - (b.salePrice || b.price));
+        break;
+      case "price-high":
+        filtered.sort((a, b) => (b.salePrice || b.price) - (a.salePrice || a.price));
+        break;
+      case "rating":
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        break;
+      case "newest":
+        // Assuming newer products have higher IDs
+        filtered.sort((a, b) => parseInt(b.id) - parseInt(a.id));
+        break;
+    }
+
+    return filtered;
+  }, [filterState, sortBy]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handleFilterChange = (key: keyof FilterState, value: any) => {
+    setFilterState(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  const handleClearFilters = () => {
+    setFilterState({
+      search: "",
+      category: "",
+      priceRange: [0, 10000],
+      rating: 0,
+      inStock: false,
+    });
+    setSortBy("newest");
+    setCurrentPage(1);
+    toast.success("Filters cleared");
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-PK', {
+      style: 'currency',
+      currency: 'PKR',
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+
+  // Loading skeleton
   const ProductSkeleton = () => (
     <Grid item xs={12} sm={6} md={4} lg={3}>
       <Box sx={{ p: 1 }}>
-        <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 2, mb: 1 }} />
+        <Skeleton variant="rectangular" height={250} sx={{ borderRadius: 2, mb: 1 }} />
         <Skeleton variant="text" width="80%" height={24} sx={{ mb: 0.5 }} />
         <Skeleton variant="text" width="60%" height={20} sx={{ mb: 1 }} />
         <Skeleton variant="text" width="40%" height={16} sx={{ mb: 1 }} />
-        <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-          <Skeleton variant="rectangular" width={60} height={24} sx={{ borderRadius: 1 }} />
-          <Skeleton variant="rectangular" width={80} height={24} sx={{ borderRadius: 1 }} />
-        </Box>
         <Skeleton variant="rectangular" width="100%" height={40} sx={{ borderRadius: 2 }} />
       </Box>
     </Grid>
@@ -192,270 +186,213 @@ export default function ProductsPage() {
 
   return (
     <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
-      {/* Hero Section */}
-      <Box
-        sx={{
-          background: 'linear-gradient(135deg, #1e293b 0%, #2563eb 50%, #3b82f6 100%)',
-          color: '#fff',
-          position: 'relative',
-          overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-            opacity: 0.3,
-          },
-        }}
-      >
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-          <Box
+      <Container maxWidth="xl" sx={{ py: { xs: 3, md: 4 } }}>
+        {/* Page Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Typography
+            variant="h1"
             sx={{
-              py: { xs: 6, md: 8 },
-              px: { xs: 2, md: 4 },
+              fontSize: { xs: '2rem', md: '3rem' },
+              fontWeight: 800,
               textAlign: 'center',
+              mb: 2,
+              background: 'linear-gradient(45deg, #1e293b 30%, #2563eb 90%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
             }}
           >
-            <Slide direction="up" in={true} timeout={800}>
-              <Box>
-                <Typography
-                  variant="h1"
-                  sx={{
-                    fontSize: { xs: '2rem', sm: '2.5rem', md: '3.5rem' },
-                    fontWeight: 800,
-                    mb: 2,
-                    background: 'linear-gradient(45deg, #ffffff 30%, #e0e7ff 90%)',
-                    backgroundClip: 'text',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    textShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  }}
-                >
-                  All Products
-                </Typography>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' },
-                    fontWeight: 500,
-                    mb: 3,
-                    color: '#e0e7ff',
-                    maxWidth: '600px',
-                    mx: 'auto',
-                    lineHeight: 1.4,
-                  }}
-                >
-                  Discover our complete collection of premium unstitched fabrics
-                </Typography>
-                <Typography
-                  variant="body1"
-                  sx={{
-                    fontSize: { xs: '0.875rem', sm: '1rem' },
-                    color: '#c7d2fe',
-                    mb: 4,
-                    maxWidth: '500px',
-                    mx: 'auto',
-                    lineHeight: 1.6,
-                  }}
-                >
-                  Browse through our extensive collection of lawn, cotton, and embroidered fabrics for men and women.
-                </Typography>
-              </Box>
-            </Slide>
-          </Box>
-        </Container>
-      </Box>
+            Our Products
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              textAlign: 'center',
+              color: '#64748b',
+              mb: 4,
+              maxWidth: 600,
+              mx: 'auto',
+            }}
+          >
+            Discover our premium collection of unstitched fabrics for men and women
+          </Typography>
+        </motion.div>
 
-      <Container maxWidth="xl" sx={{ py: { xs: 4, md: 6 } }}>
-        {/* Search and Filter Section */}
-        <Box sx={{ mb: { xs: 4, md: 6 } }}>
-          {/* Search Bar */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-            <TextField
-              placeholder="Search products, fabrics, or categories..."
-              value={search}
-              onChange={handleSearchChange}
-              size="medium"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: 'text.secondary' }} />
-                  </InputAdornment>
-                ),
-                endAdornment: search && (
-                  <InputAdornment position="end">
-                    <IconButton onClick={handleClearSearch} size="small">
-                      <ClearIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                maxWidth: 600,
-                width: '100%',
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
-                  background: '#ffffff',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                  '&:hover': {
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                  },
-                  '&.Mui-focused': {
-                    boxShadow: '0 4px 12px rgba(37,99,235,0.15)',
-                  },
-                },
-              }}
-            />
-          </Box>
-
-          {/* Filters and Sort */}
-          <Grid container spacing={2} sx={{ mb: 4 }}>
-            {/* Category Filters */}
+        {/* Search and Filters Bar */}
+        <Box sx={{ mb: 4 }}>
+          <Grid container spacing={2} alignItems="center">
+            {/* Search */}
             <Grid item xs={12} md={4}>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                <Chip
-                  label="All Categories"
-                  onClick={() => handleCategorySelect(null)}
-                  color={selectedCategory === null ? 'primary' : 'default'}
-                  sx={{ fontWeight: 600 }}
-                />
-                {categories.map((category: string) => (
-                  <Chip
-                    key={category}
-                    label={category}
-                    onClick={() => handleCategorySelect(category)}
-                    color={selectedCategory === category ? 'primary' : 'default'}
-                    sx={{ fontWeight: 600 }}
-                  />
-                ))}
-              </Box>
+              <TextField
+                fullWidth
+                placeholder="Search products..."
+                value={filterState.search}
+                onChange={(e) => handleFilterChange("search", e.target.value)}
+                InputProps={{
+                  startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} />,
+                }}
+                sx={{ background: '#ffffff', borderRadius: 2 }}
+              />
             </Grid>
 
-            {/* Price Range Filters */}
-            <Grid item xs={12} md={4}>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                <Chip
-                  label="All Prices"
-                  onClick={() => handlePriceRangeSelect(null)}
-                  color={selectedPriceRange === null ? 'primary' : 'default'}
-                  sx={{ fontWeight: 600 }}
-                />
-                {priceRanges.map((range) => (
-                  <Chip
-                    key={range.value}
-                    label={range.label}
-                    onClick={() => handlePriceRangeSelect(range.value)}
-                    color={selectedPriceRange === range.value ? 'primary' : 'default'}
-                    sx={{ fontWeight: 600 }}
-                  />
-                ))}
-              </Box>
-            </Grid>
-
-            {/* Sort Options */}
-            <Grid item xs={12} md={4}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Sort By</InputLabel>
+            {/* Category Filter */}
+            <Grid item xs={12} sm={6} md={2}>
+              <FormControl fullWidth sx={{ background: '#ffffff', borderRadius: 2 }}>
+                <InputLabel>Category</InputLabel>
                 <Select
-                  value={sortBy}
-                  label="Sort By"
-                  onChange={(e) => handleSortChange(e.target.value as SortOption)}
-                  sx={{ borderRadius: 2 }}
+                  value={filterState.category}
+                  label="Category"
+                  onChange={(e) => handleFilterChange("category", e.target.value)}
                 >
-                  {sortOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
+                  {categories.map((category) => (
+                    <MenuItem key={category} value={category}>
+                      {category}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Grid>
-          </Grid>
 
-          {/* Results Count */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Typography variant="body1" color="text.secondary">
-              Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, filteredProducts.length)} of {filteredProducts.length} products
-            </Typography>
-            
-            {/* Clear Filters Button */}
-            {(selectedCategory || selectedPriceRange || search) && (
+            {/* Sort */}
+            <Grid item xs={12} sm={6} md={2}>
+              <FormControl fullWidth sx={{ background: '#ffffff', borderRadius: 2 }}>
+                <InputLabel>Sort By</InputLabel>
+                <Select
+                  value={sortBy}
+                  label="Sort By"
+                  onChange={(e) => setSortBy(e.target.value as SortOption)}
+                >
+                  <MenuItem value="newest">Newest</MenuItem>
+                  <MenuItem value="name">Name A-Z</MenuItem>
+                  <MenuItem value="price-low">Price: Low to High</MenuItem>
+                  <MenuItem value="price-high">Price: High to Low</MenuItem>
+                  <MenuItem value="rating">Highest Rated</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {/* View Mode */}
+            <Grid item xs={6} md={1}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <IconButton
+                  onClick={() => setViewMode("grid")}
+                  color={viewMode === "grid" ? "primary" : "default"}
+                  sx={{ background: '#ffffff' }}
+                >
+                  <GridView />
+                </IconButton>
+                <IconButton
+                  onClick={() => setViewMode("list")}
+                  color={viewMode === "list" ? "primary" : "default"}
+                  sx={{ background: '#ffffff' }}
+                >
+                  <ViewList />
+                </IconButton>
+              </Box>
+            </Grid>
+
+            {/* Filter Button */}
+            <Grid item xs={6} md={2}>
               <Button
-                onClick={() => {
-                  setSearch('');
-                  setSelectedCategory(null);
-                  setSelectedPriceRange(null);
-                }}
                 variant="outlined"
-                size="small"
-                sx={{ borderRadius: 2 }}
+                startIcon={<FilterList />}
+                onClick={() => setFilterDrawerOpen(true)}
+                fullWidth
+                sx={{ 
+                  background: '#ffffff',
+                  borderColor: '#2563eb',
+                  color: '#2563eb',
+                  '&:hover': {
+                    background: 'rgba(37,99,235,0.1)',
+                  },
+                }}
               >
-                Clear Filters
+                Filters
               </Button>
-            )}
-          </Box>
+            </Grid>
+
+            {/* Clear Filters */}
+            <Grid item xs={12} md={1}>
+              <Button
+                variant="text"
+                startIcon={<Clear />}
+                onClick={handleClearFilters}
+                sx={{ color: '#64748b' }}
+              >
+                Clear
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+
+        {/* Results Summary */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="body1" color="text.secondary">
+            Showing {filteredProducts.length} of {products.length} products
+          </Typography>
+          {filteredProducts.length === 0 && (
+            <Alert severity="info" sx={{ flex: 1, ml: 2 }}>
+              No products match your current filters. Try adjusting your search criteria.
+            </Alert>
+          )}
         </Box>
 
         {/* Products Grid */}
-        <Grid container spacing={{ xs: 2, md: 3 }} justifyContent="center">
+        <AnimatePresence mode="wait">
           {loading ? (
-            // Loading skeletons
-            Array.from({ length: itemsPerPage }).map((_, i) => <ProductSkeleton key={i} />)
-          ) : filteredProducts.length === 0 ? (
-            // No results
-            <Grid item xs={12}>
-              <Box
-                sx={{
-                  textAlign: 'center',
-                  py: 8,
-                  px: 2,
-                }}
-              >
-                <Typography variant="h5" sx={{ mb: 2, color: 'text.secondary' }}>
-                  No products found
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
-                  Try adjusting your search or filter criteria
-                </Typography>
-                <Button
-                  onClick={() => {
-                    setSearch('');
-                    setSelectedCategory(null);
-                    setSelectedPriceRange(null);
-                  }}
-                  variant="outlined"
-                  sx={{ borderRadius: 2 }}
-                >
-                  Clear Filters
-                </Button>
-              </Box>
+            <Grid container spacing={3}>
+              {Array.from({ length: 8 }).map((_, index) => (
+                <ProductSkeleton key={index} />
+              ))}
             </Grid>
           ) : (
-            // Products
-            paginatedProducts.map((product: EnhancedProduct, index: number) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-                <Fade in={true} timeout={500 + index * 100}>
-                  <Box sx={{ height: '100%' }}>
-                    <ProductCard product={product} />
-                  </Box>
-                </Fade>
+            <motion.div
+              key={`${viewMode}-${currentPage}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Grid 
+                container 
+                spacing={3}
+                sx={{
+                  gridTemplateColumns: viewMode === "list" ? "1fr" : "repeat(auto-fill, minmax(280px, 1fr))",
+                }}
+              >
+                {paginatedProducts.map((product, index) => (
+                  <Grid 
+                    item 
+                    xs={12} 
+                    sm={viewMode === "list" ? 12 : 6} 
+                    md={viewMode === "list" ? 12 : 4} 
+                    lg={viewMode === "list" ? 12 : 3} 
+                    key={product.id}
+                  >
+                    <ProductCard 
+                      product={product} 
+                      showQuickAdd={viewMode === "grid"}
+                    />
+                  </Grid>
+                ))}
               </Grid>
-            ))
+            </motion.div>
           )}
-        </Grid>
+        </AnimatePresence>
 
         {/* Pagination */}
-        {!loading && totalPages > 1 && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+        {totalPages > 1 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
             <Pagination
               count={totalPages}
               page={currentPage}
-              onChange={handlePageChange}
+              onChange={(_, page) => setCurrentPage(page)}
               color="primary"
-              size={isMobile ? "small" : "large"}
+              size="large"
               sx={{
                 '& .MuiPaginationItem-root': {
                   borderRadius: 2,
@@ -465,6 +402,116 @@ export default function ProductsPage() {
             />
           </Box>
         )}
+
+        {/* Filter Drawer */}
+        <Drawer
+          anchor="right"
+          open={filterDrawerOpen}
+          onClose={() => setFilterDrawerOpen(false)}
+          PaperProps={{
+            sx: { width: { xs: '100%', sm: 350 } },
+          }}
+        >
+          <Box sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                Filters
+              </Typography>
+              <IconButton onClick={() => setFilterDrawerOpen(false)}>
+                <Clear />
+              </IconButton>
+            </Box>
+
+            {/* Price Range */}
+            <Accordion defaultExpanded>
+              <AccordionSummary expandIcon={<ExpandMore />}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  Price Range
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box sx={{ px: 2 }}>
+                  <Slider
+                    value={filterState.priceRange}
+                    onChange={(_, value) => handleFilterChange("priceRange", value)}
+                    valueLabelDisplay="auto"
+                    min={priceRange[0]}
+                    max={priceRange[1]}
+                    valueLabelFormat={formatPrice}
+                  />
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {formatPrice(filterState.priceRange[0])}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {formatPrice(filterState.priceRange[1])}
+                    </Typography>
+                  </Box>
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Rating Filter */}
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMore />}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  Rating
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {[4, 3, 2, 1].map((rating) => (
+                    <Button
+                      key={rating}
+                      variant={filterState.rating === rating ? "contained" : "outlined"}
+                      onClick={() => handleFilterChange("rating", filterState.rating === rating ? 0 : rating)}
+                      startIcon={<span>★</span>}
+                      sx={{ justifyContent: 'flex-start' }}
+                    >
+                      {rating}+ Stars
+                    </Button>
+                  ))}
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Stock Filter */}
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMore />}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  Availability
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Button
+                  variant={filterState.inStock ? "contained" : "outlined"}
+                  onClick={() => handleFilterChange("inStock", !filterState.inStock)}
+                  fullWidth
+                  sx={{ justifyContent: 'flex-start' }}
+                >
+                  In Stock Only
+                </Button>
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Apply Filters */}
+            <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => setFilterDrawerOpen(false)}
+              >
+                Apply Filters
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={handleClearFilters}
+              >
+                Clear
+              </Button>
+            </Box>
+          </Box>
+        </Drawer>
       </Container>
     </Box>
   );
