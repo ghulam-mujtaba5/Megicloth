@@ -12,7 +12,6 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import Paper from "@mui/material/Paper";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -29,16 +28,12 @@ import Checkbox from "@mui/material/Checkbox";
 import Alert from "@mui/material/Alert";
 import Fade from "@mui/material/Fade";
 import Slide from "@mui/material/Slide";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import PaymentIcon from "@mui/icons-material/Payment";
 import SecurityIcon from "@mui/icons-material/Security";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import LocalAtmIcon from "@mui/icons-material/LocalAtm";
 import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
+
 
 interface FormData {
   // Personal Information
@@ -69,7 +64,7 @@ interface FormData {
 const steps = ['Personal Information', 'Shipping Address', 'Payment', 'Review'];
 
 export default function CheckoutPage() {
-  const { cart, getCartTotal, clearCart } = useCart();
+  const { cart, clearCart } = useCart();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -93,9 +88,6 @@ export default function CheckoutPage() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -169,7 +161,7 @@ export default function CheckoutPage() {
         break;
 
       case 3: // Review
-        if (!formData.termsAccepted) newErrors.termsAccepted = 'You must accept the terms';
+        if (!formData.termsAccepted) newErrors.termsAccepted = true;
         break;
     }
 

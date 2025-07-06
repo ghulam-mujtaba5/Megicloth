@@ -17,10 +17,7 @@ import Rating from "@mui/material/Rating";
 import Divider from "@mui/material/Divider";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
 import Fade from "@mui/material/Fade";
 import Slide from "@mui/material/Slide";
 import Alert from "@mui/material/Alert";
@@ -37,6 +34,7 @@ import SecurityIcon from "@mui/icons-material/Security";
 import StarIcon from "@mui/icons-material/Star";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import IconButton from "@mui/material/IconButton";
 
 interface TabPanelProps {
   children?: React.ReactNode;

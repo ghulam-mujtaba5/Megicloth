@@ -20,7 +20,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CloseIcon from "@mui/icons-material/Close";
-import Divider from "@mui/material/Divider";
+
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Fade from "@mui/material/Fade";

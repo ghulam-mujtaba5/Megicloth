@@ -1,5 +1,9 @@
 /* Design System Variables */
 :root {
+  /* Font Variables */
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-poppins: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  
   /* Color Palette */
   --primary-50: #eff6ff;
   --primary-100: #dbeafe;
@@ -164,7 +168,7 @@ html {
 }
 
 body {
-  font-family: var(--font-family-primary);
+  font-family: var(--font-inter);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
   color: var(--neutral-800);
@@ -176,7 +180,7 @@ body {
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-family-display);
+  font-family: var(--font-poppins);
   font-weight: 700;
   line-height: var(--leading-tight);
   color: var(--neutral-900);

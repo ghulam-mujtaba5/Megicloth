@@ -18,10 +18,10 @@ import Skeleton from "@mui/material/Skeleton";
 import Fade from "@mui/material/Fade";
 import Slide from "@mui/material/Slide";
 import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import type { Product } from "./data/products";
 
 // Enhanced product data with more realistic information
-const enhancedProducts = products.map((product, index) => ({
+const enhancedProducts = products.map((product) => ({
   ...product,
   tags: product.category === 'Men' ? ['Premium', 'Comfortable'] : ['Elegant', 'Stylish'],
   fabricType: product.category === 'Men' ? 'Lawn' : 'Embroidered Lawn',
@@ -30,12 +30,19 @@ const enhancedProducts = products.map((product, index) => ({
   returnPolicy: '7 days',
 }));
 
+// Type for enhanced products
+type EnhancedProduct = Product & {
+  tags: string[];
+  fabricType: string;
+  measurements: string;
+  deliveryTime: string;
+  returnPolicy: string;
+};
+
 export default function Home() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // Memoized filtered products for better performance
   const filteredProducts = useMemo(() => {
@@ -60,15 +67,6 @@ export default function Home() {
     }, 800);
     return () => clearTimeout(timer);
   }, []);
-
-  // Debounced search
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -332,7 +330,7 @@ export default function Home() {
               color={selectedCategory === null ? 'primary' : 'default'}
               sx={{ fontWeight: 600 }}
             />
-            {categories.map((category) => (
+            {categories.map((category: string) => (
               <Chip
                 key={category}
                 label={category}
@@ -379,7 +377,7 @@ export default function Home() {
             </Grid>
           ) : (
             // Products
-            filteredProducts.map((product, index) => (
+            filteredProducts.map((product: EnhancedProduct, index: number) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
                 <Fade in={true} timeout={500 + index * 100}>
                   <Box sx={{ height: '100%' }}>

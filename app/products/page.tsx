@@ -1,10 +1,12 @@
 "use client";
 import { products } from "../data/products";
 import ProductCard from "../components/ProductCard";
+import Link from "next/link";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -12,99 +14,80 @@ import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
 import IconButton from "@mui/material/IconButton";
 import Chip from "@mui/material/Chip";
+import Skeleton from "@mui/material/Skeleton";
+import Fade from "@mui/material/Fade";
+import Slide from "@mui/material/Slide";
+import Pagination from "@mui/material/Pagination";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import Button from "@mui/material/Button";
-import Skeleton from "@mui/material/Skeleton";
-import Fade from "@mui/material/Fade";
-import Pagination from "@mui/material/Pagination";
-import Slider from "@mui/material/Slider";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import SortIcon from "@mui/icons-material/Sort";
-import ViewListIcon from "@mui/icons-material/ViewList";
-import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import type { Product } from "../data/products";
 
-// Enhanced product data
-const enhancedProducts = products.map((product, index) => ({
+// Enhanced product data with more realistic information
+const enhancedProducts = products.map((product) => ({
   ...product,
-  tags: product.category === 'Men' ? ['Premium', 'Comfortable', 'Lawn'] : ['Elegant', 'Stylish', 'Embroidered'],
+  tags: product.category === 'Men' ? ['Premium', 'Comfortable'] : ['Elegant', 'Stylish'],
   fabricType: product.category === 'Men' ? 'Lawn' : 'Embroidered Lawn',
   measurements: product.category === 'Men' ? '3.5 meters' : '3-piece set',
   deliveryTime: '2-3 days',
   returnPolicy: '7 days',
-  brand: 'Megicloth',
-  material: product.category === 'Men' ? '100% Cotton Lawn' : 'Premium Embroidered Lawn',
-  care: 'Machine wash cold, tumble dry low',
-  origin: 'Pakistan',
 }));
 
-type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'rating-desc' | 'newest';
-type ViewMode = 'grid' | 'list';
+// Type for enhanced products
+type EnhancedProduct = Product & {
+  tags: string[];
+  fabricType: string;
+  measurements: string;
+  deliveryTime: string;
+  returnPolicy: string;
+};
+
+type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'newest';
 
 export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [currentPage, setCurrentPage] = useState(1);
-  const [showFilters, setShowFilters] = useState(false);
+  const [itemsPerPage] = useState(12);
   
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const itemsPerPage = 12;
-
-  // Get unique categories and tags
-  const categories = useMemo(() => {
-    return [...new Set(enhancedProducts.map(p => p.category))];
-  }, []);
-
-  const allTags = useMemo(() => {
-    const tags = enhancedProducts.flatMap(p => p.tags || []);
-    return [...new Set(tags)];
-  }, []);
-
-  // Get price range
-  const priceRangeData = useMemo(() => {
-    const prices = enhancedProducts.map(p => p.salePrice ?? p.price);
-    return [Math.min(...prices), Math.max(...prices)];
-  }, []);
-
-  // Filtered and sorted products
+  // Memoized filtered and sorted products for better performance
   const filteredProducts = useMemo(() => {
     let filtered = enhancedProducts.filter(product => {
-      // Search filter
       const matchesSearch = search === "" || 
         product.name.toLowerCase().includes(search.toLowerCase()) ||
         product.description.toLowerCase().includes(search.toLowerCase()) ||
-        product.fabricType?.toLowerCase().includes(search.toLowerCase()) ||
-        product.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase()));
-
-      // Category filter
+        product.fabricType.toLowerCase().includes(search.toLowerCase());
+      
       const matchesCategory = !selectedCategory || product.category === selectedCategory;
-
-      // Tags filter
-      const matchesTags = selectedTags.length === 0 || 
-        selectedTags.some(tag => product.tags?.includes(tag));
-
-      // Price range filter
-      const productPrice = product.salePrice ?? product.price;
-      const matchesPrice = productPrice >= priceRange[0] && productPrice <= priceRange[1];
-
-      return matchesSearch && matchesCategory && matchesTags && matchesPrice;
+      
+      const matchesPriceRange = !selectedPriceRange || (() => {
+        const price = product.salePrice ?? product.price;
+        switch (selectedPriceRange) {
+          case 'under-1000':
+            return price < 1000;
+          case '1000-2000':
+            return price >= 1000 && price < 2000;
+          case '2000-5000':
+            return price >= 2000 && price < 5000;
+          case 'over-5000':
+            return price >= 5000;
+          default:
+            return true;
+        }
+      })();
+      
+      return matchesSearch && matchesCategory && matchesPriceRange;
     });
-
+    
     // Sort products
     filtered.sort((a, b) => {
       switch (sortBy) {
@@ -116,25 +99,23 @@ export default function ProductsPage() {
           return (a.salePrice ?? a.price) - (b.salePrice ?? b.price);
         case 'price-desc':
           return (b.salePrice ?? b.price) - (a.salePrice ?? a.price);
-        case 'rating-desc':
-          return (b.rating ?? 0) - (a.rating ?? 0);
         case 'newest':
         default:
-          return 0; // Keep original order
+          return b.id.localeCompare(a.id);
       }
     });
-
+    
     return filtered;
-  }, [search, selectedCategory, selectedTags, priceRange, sortBy]);
+  }, [search, selectedCategory, selectedPriceRange, sortBy]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const paginatedProducts = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredProducts, currentPage]);
+  }, [filteredProducts, currentPage, itemsPerPage]);
 
-  // Simulate loading
+  // Simulate loading with better UX
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -142,10 +123,10 @@ export default function ProductsPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Reset page when filters change
+  // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, selectedCategory, selectedTags, priceRange, sortBy]);
+  }, [search, selectedCategory, selectedPriceRange, sortBy]);
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -159,43 +140,40 @@ export default function ProductsPage() {
     setSelectedCategory(category);
   }, []);
 
-  const handleTagToggle = useCallback((tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
+  const handlePriceRangeSelect = useCallback((range: string | null) => {
+    setSelectedPriceRange(range);
   }, []);
 
-  const handlePriceRangeChange = useCallback((event: Event, newValue: number | number[]) => {
-    setPriceRange(newValue as [number, number]);
+  const handleSortChange = useCallback((sort: SortOption) => {
+    setSortBy(sort);
   }, []);
 
-  const handleSortChange = useCallback((event: any) => {
-    setSortBy(event.target.value as SortOption);
+  const handlePageChange = useCallback((event: React.ChangeEvent<unknown>, page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const handleViewModeChange = useCallback((mode: ViewMode) => {
-    setViewMode(mode);
+  const categories = useMemo(() => {
+    const uniqueCategories = [...new Set(enhancedProducts.map(p => p.category))];
+    return uniqueCategories;
   }, []);
 
-  const handleClearFilters = useCallback(() => {
-    setSearch("");
-    setSelectedCategory(null);
-    setSelectedTags([]);
-    setPriceRange([priceRangeData[0], priceRangeData[1]]);
-    setSortBy('newest');
-  }, [priceRangeData]);
+  const priceRanges = [
+    { value: 'under-1000', label: 'Under Rs. 1,000' },
+    { value: '1000-2000', label: 'Rs. 1,000 - 2,000' },
+    { value: '2000-5000', label: 'Rs. 2,000 - 5,000' },
+    { value: 'over-5000', label: 'Over Rs. 5,000' },
+  ];
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-PK', {
-      style: 'currency',
-      currency: 'PKR',
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  const sortOptions = [
+    { value: 'newest', label: 'Newest First' },
+    { value: 'name-asc', label: 'Name A-Z' },
+    { value: 'name-desc', label: 'Name Z-A' },
+    { value: 'price-asc', label: 'Price Low to High' },
+    { value: 'price-desc', label: 'Price High to Low' },
+  ];
 
-  // Loading skeleton
+  // Loading skeleton component
   const ProductSkeleton = () => (
     <Grid item xs={12} sm={6} md={4} lg={3}>
       <Box sx={{ p: 1 }}>
@@ -214,40 +192,86 @@ export default function ProductsPage() {
 
   return (
     <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
-      <Container maxWidth="xl" sx={{ py: { xs: 3, md: 4 } }}>
-        {/* Page Header */}
-        <Box sx={{ mb: { xs: 3, md: 4 } }}>
-          <Typography
-            variant="h1"
+      {/* Hero Section */}
+      <Box
+        sx={{
+          background: 'linear-gradient(135deg, #1e293b 0%, #2563eb 50%, #3b82f6 100%)',
+          color: '#fff',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+            opacity: 0.3,
+          },
+        }}
+      >
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+          <Box
             sx={{
-              fontSize: { xs: '2rem', md: '3rem' },
-              fontWeight: 800,
+              py: { xs: 6, md: 8 },
+              px: { xs: 2, md: 4 },
               textAlign: 'center',
-              mb: 2,
-              background: 'linear-gradient(45deg, #1e293b 30%, #2563eb 90%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
             }}
           >
-            Our Products
-          </Typography>
-          <Typography
-            variant="h6"
-            sx={{
-              textAlign: 'center',
-              color: '#64748b',
-              maxWidth: 600,
-              mx: 'auto',
-              lineHeight: 1.6,
-            }}
-          >
-            Discover our premium collection of unstitched fabrics for men and women
-          </Typography>
-        </Box>
+            <Slide direction="up" in={true} timeout={800}>
+              <Box>
+                <Typography
+                  variant="h1"
+                  sx={{
+                    fontSize: { xs: '2rem', sm: '2.5rem', md: '3.5rem' },
+                    fontWeight: 800,
+                    mb: 2,
+                    background: 'linear-gradient(45deg, #ffffff 30%, #e0e7ff 90%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  }}
+                >
+                  All Products
+                </Typography>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' },
+                    fontWeight: 500,
+                    mb: 3,
+                    color: '#e0e7ff',
+                    maxWidth: '600px',
+                    mx: 'auto',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  Discover our complete collection of premium unstitched fabrics
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    color: '#c7d2fe',
+                    mb: 4,
+                    maxWidth: '500px',
+                    mx: 'auto',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Browse through our extensive collection of lawn, cotton, and embroidered fabrics for men and women.
+                </Typography>
+              </Box>
+            </Slide>
+          </Box>
+        </Container>
+      </Box>
 
-        {/* Search and Controls */}
-        <Box sx={{ mb: 4 }}>
+      <Container maxWidth="xl" sx={{ py: { xs: 4, md: 6 } }}>
+        {/* Search and Filter Section */}
+        <Box sx={{ mb: { xs: 4, md: 6 } }}>
           {/* Search Bar */}
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
             <TextField
@@ -255,7 +279,6 @@ export default function ProductsPage() {
               value={search}
               onChange={handleSearchChange}
               size="medium"
-              sx={{ maxWidth: 600, width: '100%' }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -271,6 +294,8 @@ export default function ProductsPage() {
                 ),
               }}
               sx={{
+                maxWidth: 600,
+                width: '100%',
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
                   background: '#ffffff',
@@ -286,36 +311,18 @@ export default function ProductsPage() {
             />
           </Box>
 
-          {/* Controls Row */}
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: { xs: 'column', md: 'row' },
-            alignItems: { xs: 'stretch', md: 'center' },
-            justifyContent: 'space-between',
-            gap: 2,
-            mb: 3,
-          }}>
-            {/* Left Controls */}
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              {/* Filter Toggle */}
-              <Button
-                variant="outlined"
-                startIcon={<FilterListIcon />}
-                onClick={() => setShowFilters(!showFilters)}
-                sx={{ borderRadius: 2 }}
-              >
-                Filters
-              </Button>
-
-              {/* Category Chips */}
+          {/* Filters and Sort */}
+          <Grid container spacing={2} sx={{ mb: 4 }}>
+            {/* Category Filters */}
+            <Grid item xs={12} md={4}>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                 <Chip
-                  label="All"
+                  label="All Categories"
                   onClick={() => handleCategorySelect(null)}
                   color={selectedCategory === null ? 'primary' : 'default'}
                   sx={{ fontWeight: 600 }}
                 />
-                {categories.map((category) => (
+                {categories.map((category: string) => (
                   <Chip
                     key={category}
                     label={category}
@@ -325,165 +332,75 @@ export default function ProductsPage() {
                   />
                 ))}
               </Box>
-            </Box>
+            </Grid>
 
-            {/* Right Controls */}
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-              {/* Sort */}
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>Sort by</InputLabel>
+            {/* Price Range Filters */}
+            <Grid item xs={12} md={4}>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <Chip
+                  label="All Prices"
+                  onClick={() => handlePriceRangeSelect(null)}
+                  color={selectedPriceRange === null ? 'primary' : 'default'}
+                  sx={{ fontWeight: 600 }}
+                />
+                {priceRanges.map((range) => (
+                  <Chip
+                    key={range.value}
+                    label={range.label}
+                    onClick={() => handlePriceRangeSelect(range.value)}
+                    color={selectedPriceRange === range.value ? 'primary' : 'default'}
+                    sx={{ fontWeight: 600 }}
+                  />
+                ))}
+              </Box>
+            </Grid>
+
+            {/* Sort Options */}
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Sort By</InputLabel>
                 <Select
                   value={sortBy}
-                  label="Sort by"
-                  onChange={handleSortChange}
+                  label="Sort By"
+                  onChange={(e) => handleSortChange(e.target.value as SortOption)}
                   sx={{ borderRadius: 2 }}
                 >
-                  <MenuItem value="newest">Newest</MenuItem>
-                  <MenuItem value="name-asc">Name A-Z</MenuItem>
-                  <MenuItem value="name-desc">Name Z-A</MenuItem>
-                  <MenuItem value="price-asc">Price Low-High</MenuItem>
-                  <MenuItem value="price-desc">Price High-Low</MenuItem>
-                  <MenuItem value="rating-desc">Highest Rated</MenuItem>
+                  {sortOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
-
-              {/* View Mode */}
-              <Box sx={{ display: 'flex', border: 1, borderColor: 'divider', borderRadius: 2 }}>
-                <IconButton
-                  onClick={() => handleViewModeChange('grid')}
-                  sx={{
-                    borderRadius: 0,
-                    borderTopLeftRadius: 8,
-                    borderBottomLeftRadius: 8,
-                    background: viewMode === 'grid' ? 'primary.main' : 'transparent',
-                    color: viewMode === 'grid' ? 'white' : 'inherit',
-                    '&:hover': {
-                      background: viewMode === 'grid' ? 'primary.dark' : 'action.hover',
-                    },
-                  }}
-                >
-                  <ViewModuleIcon />
-                </IconButton>
-                <IconButton
-                  onClick={() => handleViewModeChange('list')}
-                  sx={{
-                    borderRadius: 0,
-                    borderTopRightRadius: 8,
-                    borderBottomRightRadius: 8,
-                    background: viewMode === 'list' ? 'primary.main' : 'transparent',
-                    color: viewMode === 'list' ? 'white' : 'inherit',
-                    '&:hover': {
-                      background: viewMode === 'list' ? 'primary.dark' : 'action.hover',
-                    },
-                  }}
-                >
-                  <ViewListIcon />
-                </IconButton>
-              </Box>
-            </Box>
-          </Box>
+            </Grid>
+          </Grid>
 
           {/* Results Count */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="body2" color="text.secondary">
-              {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="body1" color="text.secondary">
+              Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, filteredProducts.length)} of {filteredProducts.length} products
             </Typography>
-            {(selectedCategory || selectedTags.length > 0 || search) && (
+            
+            {/* Clear Filters Button */}
+            {(selectedCategory || selectedPriceRange || search) && (
               <Button
-                onClick={handleClearFilters}
-                variant="text"
+                onClick={() => {
+                  setSearch('');
+                  setSelectedCategory(null);
+                  setSelectedPriceRange(null);
+                }}
+                variant="outlined"
                 size="small"
-                sx={{ color: 'primary.main' }}
+                sx={{ borderRadius: 2 }}
               >
-                Clear all filters
+                Clear Filters
               </Button>
             )}
           </Box>
         </Box>
 
-        {/* Filters Panel */}
-        <Fade in={showFilters} timeout={300}>
-          <Box sx={{ mb: 4 }}>
-            <Accordion 
-              expanded={showFilters} 
-              onChange={() => setShowFilters(!showFilters)}
-              sx={{ 
-                borderRadius: 3,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                '&:before': { display: 'none' },
-              }}
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Advanced Filters
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={3}>
-                  {/* Tags Filter */}
-                  <Grid item xs={12} md={6}>
-                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-                      Tags
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                      {allTags.map((tag) => (
-                        <Chip
-                          key={tag}
-                          label={tag}
-                          onClick={() => handleTagToggle(tag)}
-                          color={selectedTags.includes(tag) ? 'primary' : 'default'}
-                          variant={selectedTags.includes(tag) ? 'filled' : 'outlined'}
-                          sx={{ fontWeight: 500 }}
-                        />
-                      ))}
-                    </Box>
-                  </Grid>
-
-                  {/* Price Range Filter */}
-                  <Grid item xs={12} md={6}>
-                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-                      Price Range
-                    </Typography>
-                    <Box sx={{ px: 2 }}>
-                      <Slider
-                        value={priceRange}
-                        onChange={handlePriceRangeChange}
-                        valueLabelDisplay="auto"
-                        min={priceRangeData[0]}
-                        max={priceRangeData[1]}
-                        valueLabelFormat={formatPrice}
-                        sx={{
-                          '& .MuiSlider-thumb': {
-                            background: 'linear-gradient(45deg, #2563eb, #1e40af)',
-                          },
-                          '& .MuiSlider-track': {
-                            background: 'linear-gradient(45deg, #2563eb, #1e40af)',
-                          },
-                        }}
-                      />
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          {formatPrice(priceRange[0])}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {formatPrice(priceRange[1])}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-          </Box>
-        </Fade>
-
         {/* Products Grid */}
-        <Grid 
-          container 
-          spacing={{ xs: 2, md: 3 }} 
-          justifyContent="center"
-          sx={{ mb: 4 }}
-        >
+        <Grid container spacing={{ xs: 2, md: 3 }} justifyContent="center">
           {loading ? (
             // Loading skeletons
             Array.from({ length: itemsPerPage }).map((_, i) => <ProductSkeleton key={i} />)
@@ -504,7 +421,11 @@ export default function ProductsPage() {
                   Try adjusting your search or filter criteria
                 </Typography>
                 <Button
-                  onClick={handleClearFilters}
+                  onClick={() => {
+                    setSearch('');
+                    setSelectedCategory(null);
+                    setSelectedPriceRange(null);
+                  }}
                   variant="outlined"
                   sx={{ borderRadius: 2 }}
                 >
@@ -514,15 +435,8 @@ export default function ProductsPage() {
             </Grid>
           ) : (
             // Products
-            paginatedProducts.map((product, index) => (
-              <Grid 
-                item 
-                xs={12} 
-                sm={viewMode === 'list' ? 12 : 6} 
-                md={viewMode === 'list' ? 12 : 4} 
-                lg={viewMode === 'list' ? 12 : 3} 
-                key={product.id}
-              >
+            paginatedProducts.map((product: EnhancedProduct, index: number) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
                 <Fade in={true} timeout={500 + index * 100}>
                   <Box sx={{ height: '100%' }}>
                     <ProductCard product={product} />
@@ -534,16 +448,14 @@ export default function ProductsPage() {
         </Grid>
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        {!loading && totalPages > 1 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
             <Pagination
               count={totalPages}
               page={currentPage}
-              onChange={(_, page) => setCurrentPage(page)}
+              onChange={handlePageChange}
               color="primary"
-              size="large"
-              showFirstButton
-              showLastButton
+              size={isMobile ? "small" : "large"}
               sx={{
                 '& .MuiPaginationItem-root': {
                   borderRadius: 2,

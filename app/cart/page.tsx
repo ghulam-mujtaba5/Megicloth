@@ -7,20 +7,8 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Snackbar from "@mui/material/Snackbar";
-import Avatar from "@mui/material/Avatar";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -43,7 +31,7 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 export default function Cart() {
-  const { cart, updateQuantity, removeFromCart, clearCart, getCartTotal } = useCart();
+  const { cart, updateQuantity, removeFromCart, clearCart } = useCart();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [removingItem, setRemovingItem] = useState<string | null>(null);
@@ -105,10 +93,6 @@ export default function Cart() {
   const handleCheckout = () => {
     // Navigate to checkout page
     window.location.href = '/checkout';
-  };
-
-  const handleContinueShopping = () => {
-    window.location.href = '/products';
   };
 
   if (cart.length === 0) {
@@ -286,9 +270,9 @@ export default function Cart() {
                             </Typography>
 
                             {/* Tags */}
-                            {item.tags && item.tags.length > 0 && (
+                            {Array.isArray((item as any).tags) && (item as any).tags.length > 0 && (
                               <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                {item.tags.slice(0, 2).map((tag, tagIndex) => (
+                                {(item as any).tags.slice(0, 2).map((tag: string, tagIndex: number) => (
                                   <Chip
                                     key={tagIndex}
                                     label={tag}

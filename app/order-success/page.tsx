@@ -27,9 +27,6 @@ export default function OrderSuccessPage() {
   const [orderNumber, setOrderNumber] = useState("");
   const [estimatedDelivery, setEstimatedDelivery] = useState("");
   
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
   // Generate order number and delivery date on mount
   useEffect(() => {
     const generateOrderNumber = () => {
@@ -53,13 +50,7 @@ export default function OrderSuccessPage() {
     setEstimatedDelivery(calculateDeliveryDate());
   }, []);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-PK', {
-      style: 'currency',
-      currency: 'PKR',
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+
 
   return (
     <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>

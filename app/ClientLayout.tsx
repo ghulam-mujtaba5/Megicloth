@@ -3,10 +3,17 @@ import { CartProvider } from "./context/CartContext";
 import Header from "./components/Header";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
+
+// Create emotion cache
+const createEmotionCache = () => {
+  return createCache({ key: 'css', prepend: true });
+};
 
 // Create a custom theme that matches our design system
-const theme = createTheme({
+const createAppTheme = () => createTheme({
   palette: {
     primary: {
       main: '#2563eb',
@@ -229,17 +236,22 @@ interface ClientLayoutProps {
 }
 
 export default function ClientLayout({ children }: ClientLayoutProps) {
+  const theme = useMemo(() => createAppTheme(), []);
+  const emotionCache = useMemo(() => createEmotionCache(), []);
+  
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <CartProvider>
-        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-          <Header />
-          <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            {children}
-          </main>
-        </div>
-      </CartProvider>
-    </ThemeProvider>
+    <CacheProvider value={emotionCache}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <CartProvider>
+          <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <Header />
+            <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              {children}
+            </main>
+          </div>
+        </CartProvider>
+      </ThemeProvider>
+    </CacheProvider>
   );
 }
