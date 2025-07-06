@@ -1,245 +1,422 @@
-
 "use client";
 import { products } from "./data/products";
 import ProductCard from "./components/ProductCard";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import { Grid } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import InputAdornment from "@mui/material/InputAdornment";
+import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
+import IconButton from "@mui/material/IconButton";
+import Chip from "@mui/material/Chip";
+import Skeleton from "@mui/material/Skeleton";
+import Fade from "@mui/material/Fade";
+import Slide from "@mui/material/Slide";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+
+// Enhanced product data with more realistic information
+const enhancedProducts = products.map((product, index) => ({
+  ...product,
+  tags: product.category === 'Men' ? ['Premium', 'Comfortable'] : ['Elegant', 'Stylish'],
+  fabricType: product.category === 'Men' ? 'Lawn' : 'Embroidered Lawn',
+  measurements: product.category === 'Men' ? '3.5 meters' : '3-piece set',
+  deliveryTime: '2-3 days',
+  returnPolicy: '7 days',
+}));
 
 export default function Home() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  // Memoized filtered products for better performance
+  const filteredProducts = useMemo(() => {
+    const filtered = enhancedProducts.filter(product => {
+      const matchesSearch = search === "" || 
+        product.name.toLowerCase().includes(search.toLowerCase()) ||
+        product.description.toLowerCase().includes(search.toLowerCase()) ||
+        product.fabricType.toLowerCase().includes(search.toLowerCase());
+      
+      const matchesCategory = !selectedCategory || product.category === selectedCategory;
+      
+      return matchesSearch && matchesCategory;
+    });
+    
+    return filtered;
+  }, [search, selectedCategory]);
+
+  // Simulate loading with better UX
   useEffect(() => {
-    setLoading(true);
-    const timeout = setTimeout(() => {
-      setFilteredProducts(
-        products.filter(p =>
-          p.name.toLowerCase().includes(search.toLowerCase()) ||
-          p.description.toLowerCase().includes(search.toLowerCase())
-        )
-      );
+    const timer = setTimeout(() => {
       setLoading(false);
-    }, 400); // Simulate loading and debounce search
-    return () => clearTimeout(timeout);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Debounced search
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
   }, [search]);
 
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  }, []);
+
+  const handleClearSearch = useCallback(() => {
+    setSearch("");
+  }, []);
+
+  const handleCategorySelect = useCallback((category: string | null) => {
+    setSelectedCategory(category);
+  }, []);
+
+  const categories = useMemo(() => {
+    const uniqueCategories = [...new Set(enhancedProducts.map(p => p.category))];
+    return uniqueCategories;
+  }, []);
+
+  // Loading skeleton component
+  const ProductSkeleton = () => (
+    <Grid item xs={12} sm={6} md={4} lg={3}>
+      <Box sx={{ p: 1 }}>
+        <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 2, mb: 1 }} />
+        <Skeleton variant="text" width="80%" height={24} sx={{ mb: 0.5 }} />
+        <Skeleton variant="text" width="60%" height={20} sx={{ mb: 1 }} />
+        <Skeleton variant="text" width="40%" height={16} sx={{ mb: 1 }} />
+        <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+          <Skeleton variant="rectangular" width={60} height={24} sx={{ borderRadius: 1 }} />
+          <Skeleton variant="rectangular" width={80} height={24} sx={{ borderRadius: 1 }} />
+        </Box>
+        <Skeleton variant="rectangular" width="100%" height={40} sx={{ borderRadius: 2 }} />
+      </Box>
+    </Grid>
+  );
+
   return (
-    <Container
-      maxWidth="sm"
-      disableGutters
-      sx={{
-        background: "#f8fafc",
-        minHeight: "100vh",
-        px: { xs: 1.5, sm: 2, md: 4 },
-        py: { xs: 1.5, sm: 2, md: 4 },
-        mx: "auto"
-      }}
-    >
+    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
       {/* Hero Section */}
       <Box
         sx={{
-          background: "linear-gradient(100deg, #1e293b 0%, #2563eb 100%)",
-          color: "#fff",
-          borderRadius: { xs: 2, sm: 3 },
-          p: { xs: 2.5, sm: 5 },
-          mt: { xs: 1, sm: 4 },
-          mb: { xs: 2, sm: 5 },
-          textAlign: "center",
-          boxShadow: { xs: "0 2px 8px rgba(37,99,235,0.10)", sm: "0 8px 32px rgba(37,99,235,0.10)" },
-          position: "relative",
-          overflow: "hidden",
-          transition: "box-shadow 0.3s",
-          mx: { xs: 0, sm: 0 },
-          '&:hover': { boxShadow: { xs: "0 4px 16px rgba(37,99,235,0.18)", sm: "0 12px 40px rgba(37,99,235,0.18)" } }
-        }}
-      >
-        <Box
-          sx={{
-            position: "absolute",
+          background: 'linear-gradient(135deg, #1e293b 0%, #2563eb 50%, #3b82f6 100%)',
+          color: '#fff',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
             top: 0,
             left: 0,
-            width: "100%",
-            height: "100%",
-            background: "url('https://www.transparenttextures.com/patterns/diamond-upholstery.png') repeat",
-            opacity: 0.08,
-            zIndex: 0
-          }}
-        />
-        <Box sx={{ position: "relative", zIndex: 1 }}>
-          <Typography
-            variant="h3"
-            sx={{
-              fontSize: { xs: 22, sm: 30, md: 38 },
-              fontWeight: 900,
-              m: 0,
-              letterSpacing: 1,
-              lineHeight: 1.1,
-              maxWidth: 340,
-              mx: "auto"
-            }}
-          >
-            Unstitched Luxury Fabrics
-          </Typography>
-          <Typography sx={{ fontSize: { xs: 15, sm: 17 }, mt: 1.5, fontWeight: 500, color: "#e0e7ff" }}>
-            Premium Men’s & Women’s Unstitched Clothes
-          </Typography>
-          <Typography sx={{ fontSize: { xs: 12, sm: 14 }, mt: 1.2, color: "#c7d2fe" }}>
-            Shop the latest collections. Fast delivery, easy returns, and the best prices in Pakistan.
-          </Typography>
-          <Button
-            component={Link}
-            href="/products"
-            variant="contained"
-            sx={{
-              mt: { xs: 2, sm: 3 },
-              px: { xs: 2, sm: 4 },
-              py: { xs: 1, sm: 1.5 },
-              background: "#fff",
-              color: "#2563eb",
-              borderRadius: 2,
-              fontWeight: 700,
-              fontSize: { xs: 14, sm: 16 },
-              boxShadow: { xs: "0 1px 6px rgba(37,99,235,0.10)", sm: "0 2px 12px rgba(37,99,235,0.10)" },
-              textTransform: "none",
-              letterSpacing: 1,
-              transition: "background 0.2s, color 0.2s",
-              '&:hover': { background: "#e0e7ff", color: "#1e293b" }
-            }}
-            aria-label="Shop all products"
-          >
-            Shop Now
-          </Button>
-        </Box>
-      </Box>
-
-      {/* Divider */}
-      <Box sx={{ width: "100%", textAlign: "center", mb: { xs: 2, sm: 4 }, mt: { xs: 1, sm: 2 } }}>
-        <Box component="hr" sx={{ border: 0, borderTop: "2px solid #e0e7ef", width: { xs: "100%", sm: "90%" }, mx: "auto", opacity: 0.5 }} />
-      </Box>
-
-      {/* Section Title and View All */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          flexDirection: { xs: "column", sm: "row" },
-          justifyContent: "space-between",
-          mb: { xs: 2, sm: 3 },
-          gap: { xs: 1, sm: 2 },
-          px: { xs: 0.5, sm: 1 },
+            right: 0,
+            bottom: 0,
+            background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+            opacity: 0.3,
+          },
         }}
       >
-        <Typography
-          variant="h4"
-          sx={{
-            fontSize: { xs: 17, sm: 26, md: 32 },
-            fontWeight: 800,
-            color: "#222",
-            textAlign: "left",
-            letterSpacing: 1,
-            mb: { xs: 1, sm: 0 },
-            flex: 1
-          }}
-        >
-          Featured Products
-        </Typography>
-        <Button
-          component={Link}
-          href="/products"
-          variant="outlined"
-          sx={{
-            borderRadius: 2,
-            fontWeight: 600,
-            fontSize: { xs: 13, sm: 15 },
-            px: { xs: 2, sm: 3 },
-            py: { xs: 0.8, sm: 1 },
-            color: "#2563eb",
-            borderColor: "#2563eb",
-            textTransform: "none",
-            letterSpacing: 0.5,
-            minWidth: { xs: 100, sm: 0 },
-            alignSelf: { xs: "stretch", sm: "auto" },
-            '&:hover': { background: "#e0e7ff", borderColor: "#2563eb" }
-          }}
-          aria-label="View all products"
-        >
-          View All
-        </Button>
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+          <Box
+            sx={{
+              py: { xs: 6, md: 10 },
+              px: { xs: 2, md: 4 },
+              textAlign: 'center',
+            }}
+          >
+            <Slide direction="up" in={true} timeout={800}>
+              <Box>
+                <Typography
+                  variant="h1"
+                  sx={{
+                    fontSize: { xs: '2rem', sm: '2.5rem', md: '3.5rem' },
+                    fontWeight: 800,
+                    mb: 2,
+                    background: 'linear-gradient(45deg, #ffffff 30%, #e0e7ff 90%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  }}
+                >
+                  Premium Unstitched Fabrics
+                </Typography>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' },
+                    fontWeight: 500,
+                    mb: 3,
+                    color: '#e0e7ff',
+                    maxWidth: '600px',
+                    mx: 'auto',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  Discover Pakistan's finest collection of unstitched fabrics for men and women
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    color: '#c7d2fe',
+                    mb: 4,
+                    maxWidth: '500px',
+                    mx: 'auto',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Premium quality lawn, cotton, and embroidered fabrics. Fast delivery, easy returns, and the best prices in Pakistan.
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <Button
+                    component={Link}
+                    href="/products"
+                    variant="contained"
+                    size="large"
+                    sx={{
+                      background: '#ffffff',
+                      color: '#2563eb',
+                      px: { xs: 3, md: 4 },
+                      py: { xs: 1.5, md: 2 },
+                      fontSize: { xs: '1rem', md: '1.125rem' },
+                      fontWeight: 700,
+                      borderRadius: 3,
+                      boxShadow: '0 4px 20px rgba(255,255,255,0.3)',
+                      '&:hover': {
+                        background: '#f8fafc',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 8px 30px rgba(255,255,255,0.4)',
+                      },
+                    }}
+                  >
+                    Shop Now
+                  </Button>
+                  <Button
+                    component={Link}
+                    href="/products"
+                    variant="outlined"
+                    size="large"
+                    sx={{
+                      borderColor: '#ffffff',
+                      color: '#ffffff',
+                      px: { xs: 3, md: 4 },
+                      py: { xs: 1.5, md: 2 },
+                      fontSize: { xs: '1rem', md: '1.125rem' },
+                      fontWeight: 600,
+                      borderRadius: 3,
+                      '&:hover': {
+                        borderColor: '#ffffff',
+                        background: 'rgba(255,255,255,0.1)',
+                        transform: 'translateY(-2px)',
+                      },
+                    }}
+                  >
+                    View Collections
+                  </Button>
+                </Box>
+              </Box>
+            </Slide>
+          </Box>
+        </Container>
       </Box>
 
-      {/* Search Bar */}
-      <Box sx={{ display: "flex", justifyContent: "center", mb: { xs: 2, sm: 3 }, px: 0 }}>
-        <TextField
-          type="text"
-          placeholder="Search products..."
-          value={search}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-          size="small"
-          inputProps={{ 'aria-label': 'Search products' }}
-          sx={{
-            borderRadius: 2,
-            fontSize: { xs: 13, sm: 15 },
-            width: "100%",
-            maxWidth: { xs: 260, sm: 340 },
-            background: "#fff",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-            transition: "box-shadow 0.2s",
-            '&:focus-within': { boxShadow: "0 2px 8px rgba(37,99,235,0.10)" }
-          }}
-        />
-      </Box>
+      {/* Features Section */}
+      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+        <Grid container spacing={3} sx={{ mb: { xs: 4, md: 6 } }}>
+          {[
+            { icon: '🚚', title: 'Fast Delivery', desc: '2-3 days across Pakistan' },
+            { icon: '🔄', title: 'Easy Returns', desc: '7-day return policy' },
+            { icon: '💎', title: 'Premium Quality', desc: 'Finest fabric selection' },
+            { icon: '💰', title: 'Best Prices', desc: 'Competitive pricing' },
+          ].map((feature, index) => (
+            <Grid item xs={6} md={3} key={index}>
+              <Fade in={true} timeout={1000 + index * 200}>
+                <Box
+                  sx={{
+                    textAlign: 'center',
+                    p: 3,
+                    borderRadius: 3,
+                    background: '#ffffff',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 8px 25px rgba(0,0,0,0.12)',
+                    },
+                  }}
+                >
+                  <Typography variant="h3" sx={{ mb: 1, fontSize: '2rem' }}>
+                    {feature.icon}
+                  </Typography>
+                  <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                    {feature.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {feature.desc}
+                  </Typography>
+                </Box>
+              </Fade>
+            </Grid>
+          ))}
+        </Grid>
 
-      {/* Products Grid */}
-      <Grid
-        container
-        spacing={{ xs: 1.2, sm: 2.5 }}
-        justifyContent="center"
-        sx={{ px: { xs: 0, sm: 1 } }}
-      >
-        {loading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
+        {/* Search and Filter Section */}
+        <Box sx={{ mb: { xs: 4, md: 6 } }}>
+          <Typography
+            variant="h2"
+            sx={{
+              fontSize: { xs: '1.75rem', md: '2.5rem' },
+              fontWeight: 700,
+              textAlign: 'center',
+              mb: 3,
+              color: '#1e293b',
+            }}
+          >
+            Featured Products
+          </Typography>
+
+          {/* Search Bar */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+            <TextField
+              placeholder="Search products, fabrics, or categories..."
+              value={search}
+              onChange={handleSearchChange}
+              size="medium"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: 'text.secondary' }} />
+                  </InputAdornment>
+                ),
+                endAdornment: search && (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleClearSearch} size="small">
+                      <ClearIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                maxWidth: 500,
+                width: '100%',
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 3,
+                  background: '#ffffff',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  '&:hover': {
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  },
+                  '&.Mui-focused': {
+                    boxShadow: '0 4px 12px rgba(37,99,235,0.15)',
+                  },
+                },
+              }}
+            />
+          </Box>
+
+          {/* Category Filters */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 4, flexWrap: 'wrap' }}>
+            <Chip
+              label="All"
+              onClick={() => handleCategorySelect(null)}
+              color={selectedCategory === null ? 'primary' : 'default'}
+              sx={{ fontWeight: 600 }}
+            />
+            {categories.map((category) => (
+              <Chip
+                key={category}
+                label={category}
+                onClick={() => handleCategorySelect(category)}
+                color={selectedCategory === category ? 'primary' : 'default'}
+                sx={{ fontWeight: 600 }}
+              />
+            ))}
+          </Box>
+        </Box>
+
+        {/* Products Grid */}
+        <Grid container spacing={{ xs: 2, md: 3 }} justifyContent="center">
+          {loading ? (
+            // Loading skeletons
+            Array.from({ length: 8 }).map((_, i) => <ProductSkeleton key={i} />)
+          ) : filteredProducts.length === 0 ? (
+            // No results
+            <Grid item xs={12}>
               <Box
                 sx={{
-                  height: { xs: 220, sm: 320 },
-                  borderRadius: 3,
-                  background: '#e0e7ef',
-                  width: '100%',
-                  maxWidth: 320,
-                  mx: 'auto',
-                  animation: 'pulse 1.5s infinite',
-                  '@keyframes pulse': {
-                    '0%': { opacity: 1 },
-                    '50%': { opacity: 0.5 },
-                    '100%': { opacity: 1 }
-                  }
+                  textAlign: 'center',
+                  py: 8,
+                  px: 2,
                 }}
-              />
-            </Grid>
-          ))
-        ) : filteredProducts.length === 0 ? (
-          <Grid item xs={12} sx={{ textAlign: "center" }}>
-            <Typography sx={{ color: "#888", fontSize: 16, py: 4 }}>
-              No products found.
-            </Typography>
-          </Grid>
-        ) : (
-          filteredProducts.map((product) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-              <Box sx={{ transition: 'transform 0.18s', '&:hover': { transform: 'translateY(-6px) scale(1.03)' } }}>
-                <ProductCard product={product} />
+              >
+                <Typography variant="h5" sx={{ mb: 2, color: 'text.secondary' }}>
+                  No products found
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
+                  Try adjusting your search or filter criteria
+                </Typography>
+                <Button
+                  onClick={() => {
+                    setSearch('');
+                    setSelectedCategory(null);
+                  }}
+                  variant="outlined"
+                  sx={{ borderRadius: 2 }}
+                >
+                  Clear Filters
+                </Button>
               </Box>
             </Grid>
-          ))
+          ) : (
+            // Products
+            filteredProducts.map((product, index) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
+                <Fade in={true} timeout={500 + index * 100}>
+                  <Box sx={{ height: '100%' }}>
+                    <ProductCard product={product} />
+                  </Box>
+                </Fade>
+              </Grid>
+            ))
+          )}
+        </Grid>
+
+        {/* View All Button */}
+        {!loading && filteredProducts.length > 0 && (
+          <Box sx={{ textAlign: 'center', mt: 6 }}>
+            <Button
+              component={Link}
+              href="/products"
+              variant="outlined"
+              size="large"
+              sx={{
+                px: 4,
+                py: 1.5,
+                fontSize: '1.125rem',
+                fontWeight: 600,
+                borderRadius: 3,
+                borderWidth: 2,
+                '&:hover': {
+                  borderWidth: 2,
+                  transform: 'translateY(-2px)',
+                },
+              }}
+            >
+              View All Products
+            </Button>
+          </Box>
         )}
-      </Grid>
-    </Container>
+      </Container>
+    </Box>
   );
 }
