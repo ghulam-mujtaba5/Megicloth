@@ -203,46 +203,87 @@ export default function HomePage() {
       {/* Page layout */}
       <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
         {/* Hero Section */}
-        <section aria-label="Hero" style={{ outline: 'none' }}>
-          <Box sx={{ py: { xs: 6, md: 10 }, background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)', color: '#fff', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <section aria-label="Hero" style={{ outline: 'none', position: 'relative', minHeight: '380px' }}>
+          {/* Hero background image */}
+          <Box sx={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 0,
+            background: 'url(https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80) center/cover no-repeat',
+            opacity: 0.22,
+            filter: 'blur(1.5px) saturate(1.2)',
+          }} aria-hidden="true" />
+          {/* Glassmorphism overlay for text readability */}
+          <Box sx={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 1,
+            background: 'linear-gradient(135deg, rgba(37,99,235,0.85) 0%, rgba(16,185,129,0.85) 100%)',
+            backdropFilter: 'blur(6px)',
+          }} aria-hidden="true" />
+          <Box sx={{ py: { xs: 6, md: 10 }, color: '#fff', textAlign: 'center', position: 'relative', zIndex: 2 }}>
             <Container maxWidth="md">
               <Fade in={true} timeout={800}>
                 <Box>
-                  <h1 style={{ fontWeight: 900, fontSize: '2.5rem', marginBottom: 16, letterSpacing: '-2px', background: 'linear-gradient(45deg, #fff 60%, #bbf7d0 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  <h1
+                    style={{
+                      fontWeight: 900,
+                      fontSize: '2.5rem',
+                      marginBottom: 16,
+                      letterSpacing: '-2px',
+                      background: 'linear-gradient(45deg, #fff 60%, #bbf7d0 100%)',
+                      backgroundClip: 'text',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      textShadow: '0 4px 24px #10b98133',
+                      animation: 'floatHero 3.5s ease-in-out infinite',
+                    }}
+                  >
                     Discover Premium Unstitched Fabrics
                   </h1>
+                  {/* Special Offer Tagline/Callout */}
+                  <Box sx={{
+                    display: 'inline-block',
+                    px: 3,
+                    py: 1.2,
+                    mb: 2.5,
+                    borderRadius: 3,
+                    background: 'rgba(255,255,255,0.18)',
+                    boxShadow: '0 2px 12px #10b98122',
+                    fontWeight: 800,
+                    fontSize: { xs: '1.1rem', md: '1.25rem' },
+                    color: '#fff',
+                    letterSpacing: '0.5px',
+                    border: '1.5px solid #bbf7d0',
+                    backdropFilter: 'blur(2px)',
+                    textShadow: '0 2px 8px #2563eb33',
+                    transition: 'background 0.2s',
+                    outline: 'none',
+                    mx: 'auto',
+                    maxWidth: 420,
+                  }}>
+                    Summer Sale: <span style={{ color: '#bbf7d0', fontWeight: 900 }}>Up to 30% Off</span> – Limited Time Only!
+                  </Box>
                   <Typography component="h2" variant="h5" sx={{ mb: 4, fontWeight: 500, color: 'rgba(255,255,255,0.92)' }}>
                     Elevate your wardrobe with the finest lawn, cotton, and embroidered fabrics. Fast delivery, easy returns, and unbeatable prices.
                   </Typography>
-                  <Button
-                    component={Link}
-                    href="/products"
-                    variant="contained"
-                    size="large"
-                    sx={{
-                      background: 'linear-gradient(45deg, #10b981, #2563eb)',
-                      color: '#fff',
-                      px: 5,
-                      py: 2,
-                      fontSize: '1.25rem',
-                      fontWeight: 700,
-                      borderRadius: 3,
-                      boxShadow: '0 4px 24px #2563eb44',
-                      transition: 'all 0.2s',
-                      outline: 'none',
-                      '&:hover, &:focus': {
-                        background: 'linear-gradient(45deg, #2563eb, #10b981)',
-                        transform: 'translateY(-2px) scale(1.03)',
-                        boxShadow: '0 8px 32px #10b98133',
-                      },
-                    }}
-                  >
-                    Shop Now
-                  </Button>
+                  {/* Shop Now button removed as per request */}
                 </Box>
               </Fade>
             </Container>
           </Box>
+          {/* Floating animation keyframes */}
+          <style>{`
+            @keyframes floatHero {
+              0% { transform: translateY(0); }
+              50% { transform: translateY(-10px); }
+              100% { transform: translateY(0); }
+            }
+          `}</style>
         </section>
         {/* Featured Products */}
         <section aria-label="Featured Products">
@@ -343,8 +384,30 @@ export default function HomePage() {
                             height: '100%',
                             display: 'flex',
                             flexDirection: 'column',
+                            position: 'relative',
+                            background: 'rgba(255,255,255,0.25)',
+                            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
+                            backdropFilter: 'blur(8px)',
+                            borderRadius: 4,
+                            border: '1.5px solid rgba(255,255,255,0.18)',
+                            transition: 'transform 0.18s, box-shadow 0.18s',
+                            '&:hover': {
+                              transform: 'translateY(-6px) scale(1.03)',
+                              boxShadow: '0 16px 40px 0 rgba(16,185,129,0.18)',
+                            },
                           }}
                         >
+                          {/* Badge for Best Seller/New Arrival */}
+                          {idx === 0 && (
+                            <Box sx={{ position: 'absolute', top: 16, left: 16, zIndex: 2 }}>
+                              <Chip label="Best Seller" color="success" sx={{ fontWeight: 700, fontSize: '0.95rem', px: 1.5, boxShadow: 2, background: 'linear-gradient(90deg,#10b981,#2563eb)', color: '#fff' }} />
+                            </Box>
+                          )}
+                          {idx === 1 && (
+                            <Box sx={{ position: 'absolute', top: 16, left: 16, zIndex: 2 }}>
+                              <Chip label="New Arrival" color="primary" sx={{ fontWeight: 700, fontSize: '0.95rem', px: 1.5, boxShadow: 2, background: 'linear-gradient(90deg,#2563eb,#10b981)', color: '#fff' }} />
+                            </Box>
+                          )}
                           <CardContent>
                             <ProductCard product={product} />
                           </CardContent>
