@@ -200,10 +200,6 @@ export default function HomePage() {
           }}
         />
       </Head>
-      {/* Skip to main content link for accessibility */}
-      <a href="#main-content" style={{ position: 'absolute', left: 0, top: 0, background: '#2563eb', color: '#fff', padding: 8, zIndex: 2000, transform: 'translateY(-120%)', transition: 'transform 0.2s', ':focus': { transform: 'translateY(0)' } }} className="skip-link">
-        Skip to main content
-      </a>
       {/* Page layout */}
       <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
         {/* Hero Section */}
@@ -248,191 +244,14 @@ export default function HomePage() {
             </Container>
           </Box>
         </section>
-        {/* Main Content */}
-        <main id="main-content" tabIndex={-1} aria-label="Main content">
-          {/* Featured Collection */}
-          <section aria-label="Featured Collection">
-            <Container maxWidth="xl" sx={{ py: { xs: 6, md: 10 } }}>
-              <Slide direction="up" in={true} timeout={900}>
-                <Box>
-                  <Typography component="h2" variant="h2" sx={{ fontWeight: 800, textAlign: 'center', mb: 4, letterSpacing: '-1px', background: 'linear-gradient(45deg, #1e293b 30%, #2563eb 90%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                    Featured Collection
-                  </Typography>
-                  <Grid container spacing={4} justifyContent="center">
-                    {featured.map((product, idx) => (
-                      <Grid item xs={12} sm={6} md={3} key={product.id}>
-                        <Card sx={{ borderRadius: 4, background: '#f7fafc', boxShadow: '8px 8px 24px #e2e8f0, -8px -8px 24px #ffffff', transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)', '&:hover, &:focus': { boxShadow: '0 12px 32px rgba(31,38,135,0.10), 0 1.5px 8px #e0e7ef', transform: 'scale(1.03)' }, outline: 'none' }} tabIndex={0} aria-label={`Featured product: ${product.name}`}>
-                          <CardMedia
-                            component="img"
-                            image={product.image}
-                            alt={product.name}
-                            sx={{ height: 220, objectFit: 'cover', borderTopLeftRadius: 4, borderTopRightRadius: 4 }}
-                          />
-                          <CardContent>
-                            <Typography variant="h3" sx={{ fontWeight: 700, mb: 1, color: '#1e293b', fontSize: '1.1rem' }}>{product.name}</Typography>
-                            <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>{product.description}</Typography>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                              <StarIcon sx={{ color: '#f59e0b', fontSize: 18 }} />
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>{product.rating || 5}</Typography>
-                            </Box>
-                            <Button
-                              component={Link}
-                              href={`/products/${product.id}`}
-                              variant="outlined"
-                              size="small"
-                              sx={{ borderRadius: 2, fontWeight: 700, mt: 1, outline: 'none', transition: 'all 0.2s', '&:hover, &:focus': { borderColor: '#10b981', color: '#10b981', transform: 'scale(1.04)' } }}
-                            >
-                              View Details
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-              </Slide>
-            </Container>
-          </section>
-          {/* Trust & Testimonials */}
-          <section aria-label="Trust and Testimonials">
-            <Box sx={{ background: 'rgba(255,255,255,0.65)', py: { xs: 6, md: 10 }, borderTop: '1.5px solid #e2e8f0', borderBottom: '1.5px solid #e2e8f0' }}>
-              <Container maxWidth="lg">
-                <Grid container spacing={4} justifyContent="center">
-                  <Grid item xs={12} md={4}>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <VerifiedUserIcon sx={{ fontSize: 40, color: '#10b981', mb: 1 }} />
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>100% Authentic Fabrics</Typography>
-                      <Typography variant="body2" sx={{ color: '#64748b' }}>All products are guaranteed original and premium quality.</Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <LocalShippingIcon sx={{ fontSize: 40, color: '#2563eb', mb: 1 }} />
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Fast Nationwide Delivery</Typography>
-                      <Typography variant="body2" sx={{ color: '#64748b' }}>Get your order delivered anywhere in Pakistan within 2-3 days.</Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <StarIcon sx={{ fontSize: 40, color: '#f59e0b', mb: 1 }} />
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Loved by Customers</Typography>
-                      <Typography variant="body2" sx={{ color: '#64748b' }}>Thousands of 5-star reviews from happy customers nationwide.</Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Container>
-            </Box>
-          </section>
-          {/* Newsletter Signup */}
-          <section aria-label="Newsletter Signup">
-            <Container maxWidth="sm" sx={{ py: { xs: 6, md: 10 } }}>
-              <Fade in={true} timeout={900}>
-                <Box sx={{ textAlign: 'center', background: 'rgba(255,255,255,0.65)', borderRadius: 4, boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.08)', p: { xs: 3, md: 5 } }}>
-                  <Typography component="h2" variant="h4" sx={{ fontWeight: 800, mb: 2, color: '#1e293b' }}>
-                    Join Our Newsletter
-                  </Typography>
-                  <Typography variant="body1" sx={{ color: '#64748b', mb: 3 }}>
-                    Get exclusive offers, new arrivals, and style tips delivered to your inbox.
-                  </Typography>
-                  <Box aria-label="Newsletter signup" role="form" component="form" onSubmit={handleNewsletterSubmit} sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                    <TextField
-                      type="email"
-                      placeholder="Enter your email"
-                      size="medium"
-                      sx={{ minWidth: 260, background: '#f7fafc', borderRadius: 2 }}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <EmailIcon color="action" />
-                          </InputAdornment>
-                        ),
-                      }}
-                      value={newsletterEmail}
-                      onChange={e => setNewsletterEmail(e.target.value)}
-                      required
-                      inputProps={{ 'aria-label': 'Email address' }}
-                    />
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      sx={{
-                        background: 'linear-gradient(45deg, #2563eb, #10b981)',
-                        color: '#fff',
-                        fontWeight: 700,
-                        px: 4,
-                        borderRadius: 2,
-                        '&:hover': {
-                          background: 'linear-gradient(45deg, #10b981, #2563eb)',
-                        },
-                      }}
-                    >
-                      Subscribe
-                    </Button>
-                  </Box>
-                  {newsletterStatus === 'success' && (
-                    <Fade in={newsletterStatus === 'success'}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', color: '#10b981', mt: 2 }}>
-                        <CheckCircleIcon sx={{ mr: 1 }} />
-                        <Typography>Thank you for subscribing!</Typography>
-                        {showConfetti && <CelebrationIcon sx={{ ml: 1, color: '#f59e0b', fontSize: 32, animation: 'spin 1.2s linear' }} />}
-                      </Box>
-                    </Fade>
-                  )}
-                  {newsletterStatus === 'error' && (
-                    <Fade in={newsletterStatus === 'error'}>
-                      <Typography sx={{ color: '#ef4444', mt: 2 }}>Please enter a valid email address.</Typography>
-                    </Fade>
-                  )}
-                </Box>
-              </Fade>
-            </Container>
-          </section>
-          {/* Features Section */}
-          <section aria-label="Shop Features">
-            <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
-              <Grid container spacing={3} sx={{ mb: { xs: 4, md: 6 } }}>
-                {[
-                  { icon: '🚚', title: 'Fast Delivery', desc: '2-3 days across Pakistan' },
-                  { icon: '🔄', title: 'Easy Returns', desc: '7-day return policy' },
-                  { icon: '💎', title: 'Premium Quality', desc: 'Finest fabric selection' },
-                  { icon: '💰', title: 'Best Prices', desc: 'Competitive pricing' },
-                ].map((feature, index) => (
-                  <Grid item xs={6} md={3} key={index}>
-                    <Fade in={true} timeout={1000 + index * 200}>
-                      <Box
-                        sx={{
-                          textAlign: 'center',
-                          p: 3,
-                          borderRadius: 3,
-                          background: '#ffffff',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            transform: 'translateY(-4px)',
-                            boxShadow: '0 8px 25px rgba(0,0,0,0.12)',
-                          },
-                        }}
-                      >
-                        <Typography variant="h3" sx={{ mb: 1, fontSize: '2rem' }}>
-                          {feature.icon}
-                        </Typography>
-                        <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                          {feature.title}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {feature.desc}
-                        </Typography>
-                      </Box>
-                    </Fade>
-                  </Grid>
-                ))}
-              </Grid>
-              {/* Search and Filter Section */}
-              <Box sx={{ mb: { xs: 4, md: 6 } }}>
-                <Typography component="h2" variant="h2" sx={{ fontSize: { xs: '1.75rem', md: '2.5rem' }, fontWeight: 700, textAlign: 'center', mb: 3, color: '#1e293b' }}>
+        {/* Featured Products */}
+        <section aria-label="Featured Products">
+          <Box sx={{ width: '100%', maxWidth: '1600px', mx: 'auto', py: { xs: 6, md: 10 }, px: { xs: 1, sm: 2, md: 4 } }}>
+            <Slide direction="up" in={true} timeout={900}>
+              <Box>
+                <Typography component="h2" variant="h2" sx={{ fontWeight: 800, textAlign: 'center', mb: 4, letterSpacing: '-1px', background: 'linear-gradient(45deg, #1e293b 30%, #2563eb 90%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                   Featured Products
                 </Typography>
-                {/* Search Bar */}
                 <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
                   <TextField
                     placeholder="Search products, fabrics, or categories..."
@@ -473,7 +292,6 @@ export default function HomePage() {
                     }}
                   />
                 </Box>
-                {/* Category Filters */}
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 4, flexWrap: 'wrap' }}>
                   <Chip
                     label="All"
@@ -495,77 +313,217 @@ export default function HomePage() {
                     />
                   ))}
                 </Box>
-              </Box>
-              {/* Products Grid */}
-              <Grid container spacing={{ xs: 2, md: 3 }} justifyContent="center">
-                {filteredProducts.length === 0 && !loading ? (
-                  <Grid item xs={12}>
-                    <Box sx={{ textAlign: 'center', py: 8 }}>
-                      <Image
-                        src="/empty-state.svg"
-                        alt="No products found"
-                        width={180}
-                        height={180}
-                        style={{ opacity: 0.7 }}
-                        loading="lazy"
-                      />
-                      <Typography variant="h5" sx={{ mt: 2, color: '#64748b', fontWeight: 600 }}>
-                        No products found. Try a different search or category!
-                      </Typography>
-                    </Box>
-                  </Grid>
-                ) : loading ? (
-                  Array.from({ length: 4 }).map((_, i) => <ProductSkeleton key={i} />)
-                ) : (
-                  filteredProducts
-                    .filter(product => !featured.some(f => f.id === product.id))
-                    .map((product, idx) => (
-                      <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-                        <ProductCard product={product} imgProps={{ loading: 'lazy' }} />
+                <Grid container spacing={{ xs: 2, sm: 4, md: 5 }} justifyContent="center" wrap="wrap">
+                  {filteredProducts.length === 0 && !loading ? (
+                    <Grid item xs={12}>
+                      <Box sx={{ textAlign: 'center', py: 8 }}>
+                        <Image
+                          src="/empty-state.svg"
+                          alt="No products found"
+                          width={180}
+                          height={180}
+                          style={{ opacity: 0.7 }}
+                          loading="lazy"
+                        />
+                        <Typography variant="h5" sx={{ mt: 2, color: '#64748b', fontWeight: 600 }}>
+                          No products found. Try a different search or category!
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  ) : loading ? (
+                    Array.from({ length: 4 }).map((_, i) => <ProductSkeleton key={i} />)
+                  ) : (
+                    filteredProducts.map((product, idx) => (
+                      <Grid item xs={12} sm={6} md={4} lg={3} key={product.id} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+                        <Card
+                          sx={{
+                            width: '100%',
+                            minWidth: 300,
+                            maxWidth: 360,
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                          }}
+                        >
+                          <CardContent>
+                            <ProductCard product={product} />
+                          </CardContent>
+                        </Card>
                       </Grid>
                     ))
-                )}
-              </Grid>
-              {/* View All Button */}
-              {!loading && filteredProducts.length > 0 && (
-                <Box sx={{ textAlign: 'center', mt: 6 }}>
-                  <Button
-                    component={Link}
-                    href="/products"
-                    variant="outlined"
-                    size="large"
-                    sx={{
-                      px: 4,
-                      py: 1.5,
-                      fontSize: '1.125rem',
-                      fontWeight: 600,
-                      borderRadius: 3,
-                      borderWidth: 2,
-                      outline: 'none',
-                      transition: 'all 0.2s',
-                      '&:hover, &:focus': {
+                  )}
+                </Grid>
+                {!loading && filteredProducts.length > 0 && (
+                  <Box sx={{ textAlign: 'center', mt: 6 }}>
+                    <Button
+                      component={Link}
+                      href="/products"
+                      variant="outlined"
+                      size="large"
+                      sx={{
+                        px: 4,
+                        py: 1.5,
+                        fontSize: '1.125rem',
+                        fontWeight: 600,
+                        borderRadius: 3,
                         borderWidth: 2,
-                        transform: 'translateY(-2px) scale(1.04)',
-                        borderColor: '#10b981',
-                        color: '#10b981',
+                        outline: 'none',
+                        transition: 'all 0.2s',
+                        '&:hover, &:focus': {
+                          borderWidth: 2,
+                          transform: 'translateY(-2px) scale(1.04)',
+                          borderColor: '#10b981',
+                          color: '#10b981',
+                        },
+                      }}
+                    >
+                      View All Products
+                    </Button>
+                  </Box>
+                )}
+              </Box>
+            </Slide>
+          </Box>
+        </section>
+        {/* Trust & Testimonials */}
+        <section aria-label="Trust and Testimonials">
+          <Box sx={{ background: 'rgba(255,255,255,0.65)', py: { xs: 6, md: 10 }, borderTop: '1.5px solid #e2e8f0', borderBottom: '1.5px solid #e2e8f0' }}>
+            <Container maxWidth="lg">
+              <Grid container spacing={4} justifyContent="center">
+                <Grid item xs={12} md={4}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <VerifiedUserIcon sx={{ fontSize: 40, color: '#10b981', mb: 1 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>100% Authentic Fabrics</Typography>
+                    <Typography variant="body2" sx={{ color: '#64748b' }}>All products are guaranteed original and premium quality.</Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <LocalShippingIcon sx={{ fontSize: 40, color: '#2563eb', mb: 1 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Fast Nationwide Delivery</Typography>
+                    <Typography variant="body2" sx={{ color: '#64748b' }}>Get your order delivered anywhere in Pakistan within 2-3 days.</Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <StarIcon sx={{ fontSize: 40, color: '#f59e0b', mb: 1 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Loved by Customers</Typography>
+                    <Typography variant="body2" sx={{ color: '#64748b' }}>Thousands of 5-star reviews from happy customers nationwide.</Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Container>
+          </Box>
+        </section>
+        {/* Newsletter Signup */}
+        <section aria-label="Newsletter Signup">
+          <Container maxWidth="sm" sx={{ py: { xs: 6, md: 10 } }}>
+            <Fade in={true} timeout={900}>
+              <Box sx={{ textAlign: 'center', background: 'rgba(255,255,255,0.65)', borderRadius: 4, boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.08)', p: { xs: 3, md: 5 } }}>
+                <Typography component="h2" variant="h4" sx={{ fontWeight: 800, mb: 2, color: '#1e293b' }}>
+                  Join Our Newsletter
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#64748b', mb: 3 }}>
+                  Get exclusive offers, new arrivals, and style tips delivered to your inbox.
+                </Typography>
+                <Box aria-label="Newsletter signup" role="form" component="form" onSubmit={handleNewsletterSubmit} sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <TextField
+                    type="email"
+                    placeholder="Enter your email"
+                    size="medium"
+                    sx={{ minWidth: 260, background: '#f7fafc', borderRadius: 2 }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <EmailIcon color="action" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    value={newsletterEmail}
+                    onChange={e => setNewsletterEmail(e.target.value)}
+                    required
+                    inputProps={{ 'aria-label': 'Email address' }}
+                  />
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      background: 'linear-gradient(45deg, #2563eb, #10b981)',
+                      color: '#fff',
+                      fontWeight: 700,
+                      px: 4,
+                      borderRadius: 2,
+                      '&:hover': {
+                        background: 'linear-gradient(45deg, #10b981, #2563eb)',
                       },
                     }}
                   >
-                    View All Products
+                    Subscribe
                   </Button>
                 </Box>
-              )}
-            </Container>
-          </section>
-        </main>
-        {/* Scroll to top button */}
-        <ScrollTopButton />
+                {newsletterStatus === 'success' && (
+                  <Fade in={newsletterStatus === 'success'}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: '#10b981', mt: 2 }}>
+                      <CheckCircleIcon sx={{ mr: 1 }} />
+                      <Typography>Thank you for subscribing!</Typography>
+                      {showConfetti && <CelebrationIcon sx={{ ml: 1, color: '#f59e0b', fontSize: 32, animation: 'spin 1.2s linear' }} />}
+                    </Box>
+                  </Fade>
+                )}
+                {newsletterStatus === 'error' && (
+                  <Fade in={newsletterStatus === 'error'}>
+                    <Typography sx={{ color: '#ef4444', mt: 2 }}>Please enter a valid email address.</Typography>
+                  </Fade>
+                )}
+              </Box>
+            </Fade>
+          </Container>
+        </section>
+        {/* Features Section */}
+        <section aria-label="Shop Features">
+          <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+            <Grid container spacing={3} sx={{ mb: { xs: 4, md: 6 } }}>
+              {[
+                { icon: '🚚', title: 'Fast Delivery', desc: '2-3 days across Pakistan' },
+                { icon: '🔄', title: 'Easy Returns', desc: '7-day return policy' },
+                { icon: '💎', title: 'Premium Quality', desc: 'Finest fabric selection' },
+                { icon: '💰', title: 'Best Prices', desc: 'Competitive pricing' },
+              ].map((feature, index) => (
+                <Grid item xs={6} md={3} key={index}>
+                  <Fade in={true} timeout={1000 + index * 200}>
+                    <Box
+                      sx={{
+                        textAlign: 'center',
+                        p: 3,
+                        borderRadius: 3,
+                        background: '#ffffff',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          transform: 'translateY(-4px)',
+                          boxShadow: '0 8px 25px rgba(0,0,0,0.12)',
+                        },
+                      }}
+                    >
+                      <Typography variant="h3" sx={{ mb: 1, fontSize: '2rem' }}>
+                        {feature.icon}
+                      </Typography>
+                      <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                        {feature.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {feature.desc}
+                      </Typography>
+                    </Box>
+                  </Fade>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
+        </section>
       </Box>
-      <style jsx global>{`
-        .skip-link:focus {
-          transform: translateY(0) !important;
-        }
-      `}</style>
+      {/* Scroll to top button */}
+      <ScrollTopButton />
     </>
   );
 }

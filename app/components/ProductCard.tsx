@@ -123,21 +123,28 @@ export default function ProductCard({ product, showQuickAdd = true }: ProductCar
         component={Link}
         href={`/products/${product.id}`}
         sx={{
+          width: '100%',
+          maxWidth: 340,
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          borderRadius: 3,
+          borderRadius: 4,
           overflow: 'hidden',
-          background: '#ffffff',
-          boxShadow: hovered 
-            ? '0 12px 40px rgba(0,0,0,0.15)' 
-            : '0 4px 12px rgba(0,0,0,0.08)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          transform: hovered ? 'translateY(-8px) scale(1.02)' : 'translateY(0) scale(1)',
+          background: 'rgba(255,255,255,0.85)',
+          boxShadow: hovered
+            ? '0 12px 40px rgba(31,38,135,0.13), 0 2px 8px #e0e7ef'
+            : '8px 8px 24px #e2e8f0, -8px -8px 24px #ffffff',
+          border: '1.5px solid #e2e8f0',
+          transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
+          transform: hovered ? 'scale(1.025)' : 'scale(1)',
           cursor: 'pointer',
           textDecoration: 'none',
-          '&:hover': {
+          '&:hover, &:focus': {
+            boxShadow: '0 16px 48px rgba(31,38,135,0.18), 0 2px 8px #e0e7ef',
+            borderColor: '#2563eb',
+            outline: '2px solid #2563eb',
+            outlineOffset: '2px',
             textDecoration: 'none',
           },
         }}
@@ -145,22 +152,24 @@ export default function ProductCard({ product, showQuickAdd = true }: ProductCar
         onMouseLeave={() => setHovered(false)}
         aria-label={`View details for ${product.name}`}
       >
-        {/* Image Section */}
-        <Box sx={{ position: 'relative', overflow: 'hidden' }}>
+        {/* Image Section with improved aspect ratio */}
+        <Box sx={{ position: 'relative', width: '100%', aspectRatio: '4/3', overflow: 'hidden', background: '#f8fafc' }}>
           <CardMedia
             component="img"
-            height={isMobile ? 200 : 240}
-            image={imageUrl}
-            alt={product.name}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
             sx={{
+              width: '100%',
+              height: '100%',
               objectFit: 'cover',
               transition: 'transform 0.3s ease',
               transform: hovered ? 'scale(1.05)' : 'scale(1)',
               filter: imageLoaded ? 'none' : 'blur(10px)',
               background: '#f8fafc',
             }}
+            height={undefined}
+            image={imageUrl}
+            alt={product.name}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
           />
           
           {/* Loading overlay */}
