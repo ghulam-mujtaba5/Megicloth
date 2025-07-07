@@ -31,7 +31,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SecurityIcon from "@mui/icons-material/Security";
-import StarIcon from "@mui/icons-material/Star";
+
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import IconButton from "@mui/material/IconButton";
@@ -717,7 +717,7 @@ export default function ProductDetailPage() {
                   <Grid item xs={12} sm={6} md={3} key={rp.id} role="listitem">
                     <Fade in={true} timeout={400 + idx * 80}>
                       <Box sx={{ height: '100%' }}>
-                        <ProductCard product={rp} loading={false} imgProps={{ loading: 'lazy' }} />
+                        <ProductCard product={rp} />
                       </Box>
                     </Fade>
                   </Grid>

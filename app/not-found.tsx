@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Link from "next/link";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { Slide, Fade } from "@mui/material";
+import { Fade } from "@mui/material";
 
 export default function NotFound() {
   return (

@@ -17,12 +17,12 @@ import Rating from "@mui/material/Rating";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Fade from "@mui/material/Fade";
-import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
+// import { useTheme } from "@mui/material/styles";
+// import useMediaQuery from "@mui/material/useMediaQuery";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+// import VisibilityIcon from "@mui/icons-material/Visibility";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { motion } from "framer-motion";
@@ -41,19 +41,15 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, showQuickAdd = true }: ProductCardProps) {
-  const { addToCart, isInCart, getCartItem } = useCart();
+  const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [hovered, setHovered] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  // const theme = useTheme();
   const [isLoading, setIsLoading] = useState(false);
 
-  const cartItem = getCartItem(product.id);
   const isWishlisted = isInWishlist(product.id);
-  const isInCartItem = isInCart(product.id);
 
   // Enhanced image handling with fallback
   const imageUrl = imageError 

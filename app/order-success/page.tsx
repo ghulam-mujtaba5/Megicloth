@@ -9,7 +9,7 @@ import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
-import Fade from "@mui/material/Fade";
+
 import Slide from "@mui/material/Slide";
 import Alert from "@mui/material/Alert";
 import Link from "next/link";
@@ -20,9 +20,8 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import HomeIcon from "@mui/icons-material/Home";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import ReceiptIcon from "@mui/icons-material/Receipt";
-import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { alpha } from "@mui/material/styles";
+
+// Removed unused imports
 
 export default function OrderSuccessPage() {
   const [orderNumber, setOrderNumber] = useState("");
@@ -77,19 +76,7 @@ export default function OrderSuccessPage() {
     },
   };
 
-  // Neomorphic style for buttons
-  const neoButtonSx = {
-    background: '#f7fafc',
-    boxShadow: '2px 2px 8px #e2e8f0, -2px -2px 8px #ffffff',
-    borderRadius: 2,
-    fontWeight: 700,
-    color: '#2563eb',
-    '&:hover': {
-      background: '#e2e8f0',
-      color: '#1e40af',
-      boxShadow: '0 4px 16px #2563eb22',
-    },
-  };
+// Removed unused variable neoButtonSx
 
   return (
     <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>

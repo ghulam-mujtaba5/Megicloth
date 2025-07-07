@@ -13,7 +13,6 @@ import {
   Divider,
   IconButton,
   InputAdornment,
-  Paper,
   Checkbox,
   FormControlLabel,
   Stepper,
@@ -150,7 +149,7 @@ export default function RegisterPage() {
   };
 
   const handleSocialRegister = (provider: string) => {
-    toast.info(`${provider} registration coming soon!`);
+    toast(`${provider} registration coming soon!`);
   };
 
   // Glassmorphism style for main card

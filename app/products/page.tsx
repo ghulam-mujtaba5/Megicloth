@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { products } from "../data/products";
 import ProductCard from "../components/ProductCard";
 import {
@@ -9,7 +9,6 @@ import {
   Grid,
   TextField,
   Button,
-  Chip,
   FormControl,
   InputLabel,
   Select,
@@ -29,16 +28,13 @@ import {
 import {
   Search,
   FilterList,
-  Sort,
   Clear,
   ExpandMore,
   ViewList,
-  ViewModule,
   GridView,
 } from "@mui/icons-material";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { alpha } from "@mui/material/styles";
 import Fade from '@mui/material/Fade';
 import Zoom from '@mui/material/Zoom';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
@@ -168,7 +164,7 @@ export default function ProductsPage() {
     });
     setSortBy("newest");
     setCurrentPage(1);
-    toast.success("Filters cleared");
+    toast("Filters cleared");
   };
 
   const formatPrice = (price: number) => {
@@ -202,33 +198,6 @@ export default function ProductsPage() {
     border: '1px solid rgba(255,255,255,0.25)',
     overflow: 'hidden',
     p: 3,
-  };
-
-  // Neomorphic style for product cards
-  const neoCardSx = {
-    borderRadius: 4,
-    background: '#f7fafc',
-    boxShadow: '8px 8px 24px #e2e8f0, -8px -8px 24px #ffffff',
-    transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
-    border: '1.5px solid #e2e8f0',
-    '&:hover': {
-      boxShadow: '0 12px 32px rgba(31,38,135,0.10), 0 1.5px 8px #e0e7ef',
-      transform: 'scale(1.01)',
-      borderColor: '#cbd5e1',
-    },
-  };
-
-  // Neomorphic style for filter chips
-  const neoChipSx = {
-    background: '#f1f5f9',
-    boxShadow: '2px 2px 6px #e2e8f0, -2px -2px 6px #ffffff',
-    borderRadius: 2,
-    fontWeight: 600,
-    color: '#2563eb',
-    '&.Mui-selected, &.MuiChip-clickable:hover': {
-      background: '#e0e7ef',
-      color: '#1e40af',
-    },
   };
 
   // Neomorphic style for buttons
@@ -444,7 +413,7 @@ export default function ProductsPage() {
                 <Grid item xs={12} sm={6} md={4} lg={3} key={product.id} role="listitem">
                   <Fade in={true} timeout={500 + idx * 80}>
                     <Box sx={{ height: '100%' }}>
-                      <ProductCard product={product} loading={false} imgProps={{ loading: 'lazy' }} />
+                      <ProductCard product={product} />
                     </Box>
                   </Fade>
                 </Grid>

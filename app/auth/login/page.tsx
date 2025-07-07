@@ -9,13 +9,9 @@ import {
   Typography,
   TextField,
   Button,
-  Alert,
   Divider,
   IconButton,
   InputAdornment,
-  Paper,
-  Fade,
-  Slide,
 } from "@mui/material";
 import {
   Visibility,
@@ -92,7 +88,7 @@ export default function LoginPage() {
   };
 
   const handleSocialLogin = (provider: string) => {
-    toast.info(`${provider} login coming soon!`);
+    toast(`${provider} login coming soon!`);
   };
 
   // Glassmorphism style for main card

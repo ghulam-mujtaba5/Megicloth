@@ -262,7 +262,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-  const forgotPassword = useCallback(async (email: string) => {
+  const forgotPassword = useCallback(async () => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -272,7 +272,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const resetPassword = useCallback(async (token: string, password: string) => {
+  const resetPassword = useCallback(async () => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -282,7 +282,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const verifyEmail = useCallback(async (token: string) => {
+  const verifyEmail = useCallback(async () => {
     try {
       if (!user) throw new Error('User not authenticated');
       

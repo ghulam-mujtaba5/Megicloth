@@ -48,6 +48,8 @@ export default function Cart() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  console.log('Cart contents on cart page:', cart);
+
   // Calculate totals
   const subtotal = useMemo(() => {
     return cart.reduce((sum, item) => sum + (item.salePrice ?? item.price) * item.quantity, 0);

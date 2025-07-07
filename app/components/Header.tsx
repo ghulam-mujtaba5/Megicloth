@@ -13,26 +13,23 @@ import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
+// ...existing imports...
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Badge from "@mui/material/Badge";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
+// ...existing imports...
+// ...existing imports...
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CloseIcon from "@mui/icons-material/Close";
 
 import Button from "@mui/material/Button";
-import Chip from "@mui/material/Chip";
-import Fade from "@mui/material/Fade";
-import Slide from "@mui/material/Slide";
+
+// ...existing imports...
 import SearchIcon from "@mui/icons-material/Search";
 import PersonIcon from "@mui/icons-material/Person";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
-import EmailIcon from "@mui/icons-material/Email";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
+// ...existing imports...
 import Tooltip from "@mui/material/Tooltip";
 import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
@@ -57,11 +54,10 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { wishlist } = useWishlist();
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = cart.reduce((sum, item) => sum + (item.salePrice ?? item.price) * item.quantity, 0);
+  // ...existing code...
   const wishlistCount = wishlist.length;
   
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  // ...existing code...
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -424,123 +420,7 @@ export default function Header() {
     </IconButton>
   );
 
-  const drawer = (
-    <Box sx={{ width: { xs: '100vw', sm: 320 }, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
-      <Box
-        sx={{
-          background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-          color: '#ffffff',
-          p: 3,
-          textAlign: 'center',
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: 1 }}>
-            Megicloth
-          </Typography>
-          <IconButton onClick={handleDrawerToggle} sx={{ color: '#ffffff' }}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Typography variant="body2" sx={{ opacity: 0.9 }}>
-          Premium Unstitched Fabrics
-        </Typography>
-      </Box>
-
-      {/* Navigation */}
-      <List sx={{ flexGrow: 1, p: 0 }}>
-        {navLinks.map((link) => (
-          <ListItem key={link.label} disablePadding>
-            <ListItemButton
-              component={Link}
-              href={link.href}
-              onClick={handleDrawerToggle}
-              sx={{
-                py: 2,
-                px: 3,
-                '&:hover': {
-                  background: 'linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%)',
-                },
-              }}
-            >
-              {link.icon && <ListItemIcon>{link.icon}</ListItemIcon>}
-              <ListItemText 
-                primary={link.label} 
-                primaryTypographyProps={{ 
-                  fontWeight: 600, 
-                  fontSize: '1.1rem',
-                  color: '#1e293b',
-                }} 
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-
-      {/* Cart Summary */}
-      {cartCount > 0 && (
-        <Box sx={{ p: 3, background: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: '#1e293b' }}>
-            Cart Summary
-          </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-            <Typography variant="body2" color="text.secondary">
-              {cartCount} item{cartCount !== 1 ? 's' : ''}
-            </Typography>
-            <Typography variant="body1" sx={{ fontWeight: 600, color: '#10b981' }}>
-              {formatPrice(cartTotal)}
-            </Typography>
-          </Box>
-          <Button
-            component={Link}
-            href="/cart"
-            variant="contained"
-            fullWidth
-            onClick={handleDrawerToggle}
-            sx={{
-              background: 'linear-gradient(45deg, #2563eb, #1e40af)',
-              color: '#ffffff',
-              fontWeight: 600,
-              py: 1.5,
-              borderRadius: 2,
-              '&:hover': {
-                background: 'linear-gradient(45deg, #1e40af, #1e3a8a)',
-                transform: 'translateY(-1px)',
-              },
-            }}
-          >
-            View Cart
-          </Button>
-        </Box>
-      )}
-
-      {/* Contact Info */}
-      <Box sx={{ p: 3, background: '#1e293b', color: '#ffffff' }}>
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          Contact Us
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <LocalPhoneIcon sx={{ fontSize: 16, mr: 1, opacity: 0.8 }} />
-          <Typography variant="body2" sx={{ opacity: 0.9 }}>
-            +92 300 1234567
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <EmailIcon sx={{ fontSize: 16, mr: 1, opacity: 0.8 }} />
-          <Typography variant="body2" sx={{ opacity: 0.9 }}>
-            info@megicloth.com
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <LocationOnIcon sx={{ fontSize: 16, mr: 1, opacity: 0.8 }} />
-          <Typography variant="body2" sx={{ opacity: 0.9 }}>
-            Karachi, Pakistan
-          </Typography>
-        </Box>
-      </Box>
-    </Box>
-  );
+  // ...existing code...
 
   return (
     <AppBar position="sticky" elevation={0} sx={glassAppBarSx}>
@@ -630,7 +510,7 @@ export default function Header() {
           )}
           {/* Navigation links */}
           <List aria-label="Main navigation" role="menu" sx={{ flex: 1 }}>
-            {navLinks.map((link, idx) => (
+            {navLinks.map((link) => (
               <ListItem key={link.href} disablePadding>
                 <ListItemButton component={Link} href={link.href} role="menuitem" tabIndex={0} sx={{ borderRadius: 2, fontWeight: 700, transition: 'background 0.2s', '&:hover, &:focus': { background: alpha('#2563eb', 0.08) } }}>
                   <ListItemText primary={link.label} />
