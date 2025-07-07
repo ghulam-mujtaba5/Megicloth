@@ -28,6 +28,10 @@ import {
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { alpha } from "@mui/material/styles";
+import Zoom from '@mui/material/Zoom';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import LockIcon from '@mui/icons-material/Lock';
 
 export default function WishlistPage() {
   const { wishlist, removeFromWishlist, moveToCart, moveAllToCart } = useWishlist();
@@ -63,26 +67,71 @@ export default function WishlistPage() {
     }).format(price);
   };
 
+  // Glassmorphism style for empty state and sticky/floating elements
+  const glassCardSx = {
+    borderRadius: 4,
+    background: 'rgba(255,255,255,0.65)',
+    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255,255,255,0.25)',
+    overflow: 'hidden',
+    p: { xs: 2, md: 4 },
+  };
+
+  // Neomorphic style for wishlist cards
+  const neoCardSx = {
+    borderRadius: 4,
+    background: '#f7fafc',
+    boxShadow: '8px 8px 24px #e2e8f0, -8px -8px 24px #ffffff',
+    transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
+    border: '1.5px solid #e2e8f0',
+    '&:hover': {
+      boxShadow: '0 12px 32px rgba(31,38,135,0.10), 0 1.5px 8px #e0e7ef',
+      transform: 'scale(1.01)',
+      borderColor: '#cbd5e1',
+    },
+  };
+
+  // Neomorphic style for buttons
+  const neoButtonSx = {
+    background: '#f7fafc',
+    boxShadow: '2px 2px 8px #e2e8f0, -2px -2px 8px #ffffff',
+    borderRadius: 2,
+    fontWeight: 700,
+    color: '#2563eb',
+    '&:hover': {
+      background: '#e2e8f0',
+      color: '#1e40af',
+      boxShadow: '0 4px 16px #2563eb22',
+    },
+  };
+
   if (wishlist.length === 0) {
     return (
       <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
         <Container maxWidth="md" sx={{ py: { xs: 4, md: 8 } }}>
           <Fade in={true} timeout={800}>
             <Box sx={{ textAlign: 'center' }}>
+              {/* Glassy illustration container */}
               <Box
                 sx={{
-                  width: 120,
-                  height: 120,
+                  width: 140,
+                  height: 140,
                   borderRadius: '50%',
-                  background: 'linear-gradient(45deg, #e2e8f0, #cbd5e1)',
+                  background: 'rgba(255,255,255,0.45)',
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   mx: 'auto',
                   mb: 3,
+                  border: '1.5px solid rgba(255,255,255,0.25)',
                 }}
               >
-                <Favorite sx={{ fontSize: 60, color: '#64748b' }} />
+                <Favorite sx={{ fontSize: 70, color: '#64748b' }} />
               </Box>
               
               <Typography
@@ -149,27 +198,28 @@ export default function WishlistPage() {
               <Typography
                 variant="h1"
                 sx={{
-                  fontSize: { xs: '2rem', md: '3rem' },
-                  fontWeight: 800,
+                  fontSize: { xs: '2.2rem', md: '3.2rem' },
+                  fontWeight: 900,
                   background: 'linear-gradient(45deg, #1e293b 30%, #2563eb 90%)',
                   backgroundClip: 'text',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
+                  letterSpacing: '-1.5px',
                 }}
               >
                 My Wishlist
               </Typography>
-              
               <Button
                 variant="contained"
                 startIcon={<ShoppingCart />}
                 onClick={handleMoveAllToCart}
                 sx={{
+                  ...neoButtonSx,
                   background: 'linear-gradient(45deg, #10b981, #059669)',
                   color: '#ffffff',
                   px: 3,
                   py: 1.5,
-                  fontWeight: 600,
+                  fontWeight: 700,
                   borderRadius: 2,
                   '&:hover': {
                     background: 'linear-gradient(45deg, #059669, #047857)',
@@ -180,12 +230,13 @@ export default function WishlistPage() {
                 Move All to Cart
               </Button>
             </Box>
-            
             <Typography
               variant="h6"
               sx={{
                 color: '#64748b',
                 mb: 3,
+                fontWeight: 500,
+                fontSize: { xs: '1.1rem', md: '1.25rem' },
               }}
             >
               {wishlist.length} item{wishlist.length !== 1 ? 's' : ''} in your wishlist
@@ -211,28 +262,22 @@ export default function WishlistPage() {
           </Alert>
         </Slide>
 
+        {/* Trust badges above wishlist */}
+        <Box aria-label="Trust badges" role="region" sx={{ display: 'flex', gap: 3, justifyContent: 'center', mb: 4 }}>
+          <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderRadius: 2, background: '#f0fdf4', boxShadow: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#bbf7d0' } }} tabIndex={0}><VerifiedUserIcon sx={{ color: '#10b981', fontSize: 22 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>100% Authentic</Typography></Box></Zoom>
+          <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderRadius: 2, background: '#eff6ff', boxShadow: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#bae6fd' } }} tabIndex={0}><LocalShippingIcon sx={{ color: '#2563eb', fontSize: 22 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>Fast Delivery</Typography></Box></Zoom>
+          <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderRadius: 2, background: '#fef9c3', boxShadow: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#fde68a' } }} tabIndex={0}><LockIcon sx={{ color: '#f59e0b', fontSize: 22 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>Secure Payments</Typography></Box></Zoom>
+        </Box>
+
         {/* Products Grid */}
-        <Grid container spacing={3}>
+        <Grid container spacing={3} aria-label="Wishlist items" role="list">
           {wishlist.map((product, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
+            <Grid item xs={12} sm={6} md={4} lg={3} key={product.id} role="listitem">
+              <Fade in={true} timeout={500 + index * 80}>
                 <Card
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    borderRadius: 3,
-                    overflow: 'hidden',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
-                    },
-                  }}
+                  sx={neoCardSx}
+                  aria-label={`Wishlist item: ${product.name}`}
+                  role="region"
                 >
                   {/* Product Image */}
                   <Box sx={{ position: 'relative' }}>
@@ -242,6 +287,7 @@ export default function WishlistPage() {
                       image={product.image}
                       alt={product.name}
                       sx={{ objectFit: 'cover' }}
+                      loading="lazy"
                     />
                     
                     {/* Action Buttons */}
@@ -385,7 +431,7 @@ export default function WishlistPage() {
                     </Box>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </Fade>
             </Grid>
           ))}
         </Grid>

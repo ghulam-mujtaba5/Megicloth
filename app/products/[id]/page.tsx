@@ -35,6 +35,11 @@ import StarIcon from "@mui/icons-material/Star";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import IconButton from "@mui/material/IconButton";
+import { alpha } from "@mui/material/styles";
+import Zoom from '@mui/material/Zoom';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import LockIcon from '@mui/icons-material/Lock';
+import Seo from "../../components/Seo";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -190,31 +195,83 @@ export default function ProductDetailPage() {
     }
   };
 
-  return (
-    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
-      <Container maxWidth="xl" sx={{ py: { xs: 3, md: 4 } }}>
-        {/* Back Button */}
-        <Slide direction="right" in={true} timeout={600}>
-          <Button
-            component={Link}
-            href="/products"
-            startIcon={<ArrowBackIcon />}
-            variant="outlined"
-            sx={{
-              mb: 3,
-              borderRadius: 2,
-              fontWeight: 600,
-            }}
-          >
-            Back to Products
-          </Button>
-        </Slide>
+  // Glassmorphism style for main product info card
+  const glassCardSx = {
+    borderRadius: 4,
+    background: 'rgba(255,255,255,0.65)',
+    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255,255,255,0.25)',
+    overflow: 'hidden',
+    p: { xs: 2, md: 4 },
+  };
 
-        <Grid container spacing={4}>
-          {/* Product Images */}
-          <Grid item xs={12} md={6}>
-            <Fade in={true} timeout={800}>
-              <Box>
+  // Neomorphic style for image gallery and info chips
+  const neoBoxSx = {
+    borderRadius: 4,
+    background: '#f7fafc',
+    boxShadow: '8px 8px 24px #e2e8f0, -8px -8px 24px #ffffff',
+    border: '1.5px solid #e2e8f0',
+    transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
+    '&:hover': {
+      boxShadow: '0 12px 32px rgba(31,38,135,0.10), 0 1.5px 8px #e0e7ef',
+      borderColor: '#cbd5e1',
+    },
+  };
+
+  // Neomorphic style for quantity stepper
+  const neoStepperSx = {
+    background: '#f1f5f9',
+    boxShadow: '2px 2px 6px #e2e8f0, -2px -2px 6px #ffffff',
+    borderRadius: 2,
+    px: 1,
+    py: 0.5,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 1,
+  };
+
+  // Neomorphic style for buttons
+  const neoButtonSx = {
+    background: '#f7fafc',
+    boxShadow: '2px 2px 8px #e2e8f0, -2px -2px 8px #ffffff',
+    borderRadius: 2,
+    fontWeight: 700,
+    color: '#2563eb',
+    '&:hover': {
+      background: '#e2e8f0',
+      color: '#1e40af',
+      boxShadow: '0 4px 16px #2563eb22',
+    },
+  };
+
+  return (
+    <>
+      <Seo
+        title={product ? `${product.name} | Megicloth` : "Product Not Found | Megicloth"}
+        description={product ? product.description : "This product could not be found."}
+        ogImage={product ? product.image : "/file.svg"}
+        canonical={`https://megicloth.com/products/${params.id}`}
+      />
+      <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
+        <Container maxWidth="xl" sx={{ py: { xs: 3, md: 4 } }}>
+          {/* Back Button */}
+          <Slide direction="right" in={true} timeout={600}>
+            <Button
+              component={Link}
+              href="/products"
+              variant="outlined"
+              startIcon={<ArrowBackIcon />}
+              sx={{ ...neoButtonSx, mb: 3 }}
+            >
+              Back to Products
+            </Button>
+          </Slide>
+          <Grid container spacing={4}>
+            {/* Product Images (Neomorphic) */}
+            <Grid item xs={12} md={6}>
+              <Box sx={neoBoxSx}>
                 {/* Main Image */}
                 <Card
                   sx={{
@@ -263,13 +320,10 @@ export default function ProductDetailPage() {
                   ))}
                 </Box>
               </Box>
-            </Fade>
-          </Grid>
-
-          {/* Product Information */}
-          <Grid item xs={12} md={6}>
-            <Fade in={true} timeout={1000}>
-              <Box>
+            </Grid>
+            {/* Product Info (Glassmorphism) */}
+            <Grid item xs={12} md={6}>
+              <Box sx={glassCardSx}>
                 {/* Product Tags */}
                 <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
                   {enhancedProduct.tags.map((tag, index) => (
@@ -516,210 +570,179 @@ export default function ProductDetailPage() {
                   </Box>
                 </Alert>
               </Box>
-            </Fade>
+            </Grid>
           </Grid>
-        </Grid>
 
-        {/* Product Details Tabs */}
-        <Box sx={{ mt: 6 }}>
-          <Fade in={true} timeout={1200}>
-            <Card sx={{ borderRadius: 3, background: '#ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-              <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-                <Tabs
-                  value={tabValue}
-                  onChange={(_, newValue) => setTabValue(newValue)}
-                  sx={{
-                    borderBottom: 1,
-                    borderColor: 'divider',
-                    mb: 3,
-                    '& .MuiTab-root': {
-                      fontWeight: 600,
-                      textTransform: 'none',
-                      fontSize: '1rem',
-                    },
-                  }}
-                >
-                  <Tab label="Description" />
-                  <Tab label="Specifications" />
-                  <Tab label="Reviews" />
-                  <Tab label="Shipping & Returns" />
-                </Tabs>
+          {/* Trust badges above product info */}
+          <Box aria-label="Trust badges" role="region" sx={{ display: 'flex', gap: 3, justifyContent: 'center', mb: 4 }}>
+            <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderRadius: 2, background: '#f0fdf4', boxShadow: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#bbf7d0' } }} tabIndex={0}><VerifiedUserIcon sx={{ color: '#10b981', fontSize: 22 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>100% Authentic</Typography></Box></Zoom>
+            <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderRadius: 2, background: '#eff6ff', boxShadow: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#bae6fd' } }} tabIndex={0}><LocalShippingIcon sx={{ color: '#2563eb', fontSize: 22 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>Fast Delivery</Typography></Box></Zoom>
+            <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderRadius: 2, background: '#fef9c3', boxShadow: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#fde68a' } }} tabIndex={0}><LockIcon sx={{ color: '#f59e0b', fontSize: 22 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>Secure Payments</Typography></Box></Zoom>
+          </Box>
 
-                <TabPanel value={tabValue} index={0}>
-                  <Typography variant="body1" sx={{ lineHeight: 1.8, color: '#475569' }}>
-                    {product.description}
-                    <br /><br />
-                    This premium fabric is carefully selected to provide the best quality and comfort. 
-                    Perfect for creating beautiful traditional and modern garments. The fabric is 
-                    breathable, durable, and easy to maintain, making it ideal for everyday wear.
-                  </Typography>
-                </TabPanel>
+          {/* Product Details Tabs */}
+          <Box sx={{ mt: 6 }}>
+            <Fade in={true} timeout={1200}>
+              <Card sx={{ borderRadius: 3, background: '#ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+                <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+                  <Tabs
+                    value={tabValue}
+                    onChange={(_, newValue) => setTabValue(newValue)}
+                    sx={{
+                      borderBottom: 1,
+                      borderColor: 'divider',
+                      mb: 3,
+                      '& .MuiTab-root': {
+                        fontWeight: 600,
+                        textTransform: 'none',
+                        fontSize: '1rem',
+                      },
+                    }}
+                  >
+                    <Tab label="Description" />
+                    <Tab label="Specifications" />
+                    <Tab label="Reviews" />
+                    <Tab label="Shipping & Returns" />
+                  </Tabs>
 
-                <TabPanel value={tabValue} index={1}>
-                  <Grid container spacing={2}>
-                    {Object.entries(enhancedProduct.specifications).map(([key, value]) => (
-                      <Grid item xs={12} sm={6} key={key}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            {key}
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            {value}
-                          </Typography>
-                        </Box>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </TabPanel>
-
-                <TabPanel value={tabValue} index={2}>
-                  <Box sx={{ mb: 3 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                      <Rating value={averageRating} precision={0.1} readOnly />
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {averageRating.toFixed(1)} out of 5
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Based on {enhancedProduct.reviews.length} reviews
+                  <TabPanel value={tabValue} index={0}>
+                    <Typography variant="body1" sx={{ lineHeight: 1.8, color: '#475569' }}>
+                      {product.description}
+                      <br /><br />
+                      This premium fabric is carefully selected to provide the best quality and comfort. 
+                      Perfect for creating beautiful traditional and modern garments. The fabric is 
+                      breathable, durable, and easy to maintain, making it ideal for everyday wear.
                     </Typography>
-                  </Box>
+                  </TabPanel>
 
-                  <Divider sx={{ my: 3 }} />
-
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                    {enhancedProduct.reviews.map((review) => (
-                      <Box key={review.id}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                            {review.name}
-                          </Typography>
-                          <Rating value={review.rating} readOnly size="small" />
-                        </Box>
-                        <Typography variant="body2" sx={{ color: '#475569', mb: 1 }}>
-                          {review.comment}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {new Date(review.date).toLocaleDateString()}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                </TabPanel>
-
-                <TabPanel value={tabValue} index={3}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                        Shipping Information
-                      </Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                        <LocalShippingIcon sx={{ color: '#10b981' }} />
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          Standard Delivery: {enhancedProduct.deliveryTime}
-                        </Typography>
-                      </Box>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        Free shipping on orders over Rs. 2,000. Orders below Rs. 2,000 have a 
-                        shipping fee of Rs. 200.
-                      </Typography>
+                  <TabPanel value={tabValue} index={1}>
+                    <Grid container spacing={2}>
+                      {Object.entries(enhancedProduct.specifications).map(([key, value]) => (
+                        <Grid item xs={12} sm={6} key={key}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              {key}
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {value}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      ))}
                     </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                        Return Policy
-                      </Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                        <RefreshIcon sx={{ color: '#3b82f6' }} />
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {enhancedProduct.returnPolicy} Return Policy
+                  </TabPanel>
+
+                  <TabPanel value={tabValue} index={2}>
+                    <Box sx={{ mb: 3 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                        <Rating value={averageRating} precision={0.1} readOnly />
+                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                          {averageRating.toFixed(1)} out of 5
                         </Typography>
                       </Box>
                       <Typography variant="body2" color="text.secondary">
-                        Easy returns within {enhancedProduct.returnPolicy}. Return shipping is free 
-                        for defective items. Contact our customer support for assistance.
+                        Based on {enhancedProduct.reviews.length} reviews
                       </Typography>
+                    </Box>
+
+                    <Divider sx={{ my: 3 }} />
+
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      {enhancedProduct.reviews.map((review) => (
+                        <Box key={review.id}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                              {review.name}
+                            </Typography>
+                            <Rating value={review.rating} readOnly size="small" />
+                          </Box>
+                          <Typography variant="body2" sx={{ color: '#475569', mb: 1 }}>
+                            {review.comment}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {new Date(review.date).toLocaleDateString()}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  </TabPanel>
+
+                  <TabPanel value={tabValue} index={3}>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                          Shipping Information
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                          <LocalShippingIcon sx={{ color: '#10b981' }} />
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            Standard Delivery: {enhancedProduct.deliveryTime}
+                          </Typography>
+                        </Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                          Free shipping on orders over Rs. 2,000. Orders below Rs. 2,000 have a 
+                          shipping fee of Rs. 200.
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                          Return Policy
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                          <RefreshIcon sx={{ color: '#3b82f6' }} />
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {enhancedProduct.returnPolicy} Return Policy
+                          </Typography>
+                        </Box>
+                        <Typography variant="body2" color="text.secondary">
+                          Easy returns within {enhancedProduct.returnPolicy}. Return shipping is free 
+                          for defective items. Contact our customer support for assistance.
+                        </Typography>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </TabPanel>
-              </CardContent>
-            </Card>
-          </Fade>
-        </Box>
-
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <Box sx={{ mt: 6 }}>
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: 700,
-                mb: 3,
-                textAlign: 'center',
-                color: '#1e293b',
-              }}
-            >
-              Related Products
-            </Typography>
-            <Grid container spacing={3}>
-              {relatedProducts.map((relatedProduct) => (
-                <Grid item xs={12} sm={6} md={3} key={relatedProduct.id}>
-                  <Fade in={true} timeout={800}>
-                    <Card
-                      component={Link}
-                      href={`/products/${relatedProduct.id}`}
-                      sx={{
-                        borderRadius: 3,
-                        overflow: 'hidden',
-                        textDecoration: 'none',
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                          transform: 'translateY(-8px)',
-                          boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
-                        },
-                      }}
-                    >
-                      <CardMedia
-                        component="img"
-                        height={200}
-                        image={relatedProduct.image}
-                        alt={relatedProduct.name}
-                        sx={{ objectFit: 'cover' }}
-                      />
-                      <CardContent>
-                        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                          {relatedProduct.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          {relatedProduct.description}
-                        </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 700, color: '#10b981' }}>
-                          {formatPrice(relatedProduct.salePrice ?? relatedProduct.price)}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Fade>
-                </Grid>
-              ))}
-            </Grid>
+                  </TabPanel>
+                </CardContent>
+              </Card>
+            </Fade>
           </Box>
-        )}
-      </Container>
 
-      {/* Snackbar */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
+          {/* Related Products */}
+          {relatedProducts.length > 0 && (
+            <Box sx={{ mt: 8 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 3, color: '#1e293b' }}>
+                Related Products
+              </Typography>
+              <Grid container spacing={3} aria-label="Related products" role="list">
+                {relatedProducts.map((rp, idx) => (
+                  <Grid item xs={12} sm={6} md={3} key={rp.id} role="listitem">
+                    <Fade in={true} timeout={400 + idx * 80}>
+                      <Box sx={{ height: '100%' }}>
+                        <ProductCard product={rp} loading={false} imgProps={{ loading: 'lazy' }} />
+                      </Box>
+                    </Fade>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          )}
+        </Container>
+
+        {/* Snackbar */}
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
           onClose={() => setSnackbarOpen(false)}
-          severity="success"
-          sx={{ width: '100%' }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <Alert
+            onClose={() => setSnackbarOpen(false)}
+            severity="success"
+            sx={{ width: '100%' }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </>
   );
 } 

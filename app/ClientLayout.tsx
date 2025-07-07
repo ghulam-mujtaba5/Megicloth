@@ -3,6 +3,7 @@ import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ReactNode, useMemo } from "react";
@@ -243,44 +244,20 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   const emotionCache = useMemo(() => createEmotionCache(), []);
   
   return (
-    <CacheProvider value={emotionCache}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+    <ThemeProvider theme={theme}>
+      <CacheProvider value={emotionCache}>
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>
-              <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-                <Header />
-                <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  {children}
-                </main>
-              </div>
-              <Toaster
-                position="top-right"
-                toastOptions={{
-                  duration: 4000,
-                  style: {
-                    background: '#363636',
-                    color: '#fff',
-                    borderRadius: '12px',
-                    fontSize: '14px',
-                  },
-                  success: {
-                    style: {
-                      background: '#10b981',
-                    },
-                  },
-                  error: {
-                    style: {
-                      background: '#ef4444',
-                    },
-                  },
-                }}
-              />
+              <CssBaseline />
+              <Header />
+              <main style={{ minHeight: '70vh' }}>{children}</main>
+              <Footer />
+              <Toaster position="top-center" toastOptions={{ duration: 3500 }} />
             </WishlistProvider>
           </CartProvider>
         </AuthProvider>
-      </ThemeProvider>
-    </CacheProvider>
+      </CacheProvider>
+    </ThemeProvider>
   );
 }

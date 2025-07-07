@@ -28,6 +28,7 @@ import {
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { alpha } from "@mui/material/styles";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -94,6 +95,43 @@ export default function LoginPage() {
     toast.info(`${provider} login coming soon!`);
   };
 
+  // Glassmorphism style for main card
+  const glassCardSx = {
+    borderRadius: 4,
+    background: 'rgba(255,255,255,0.65)',
+    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255,255,255,0.25)',
+    overflow: 'hidden',
+    p: { xs: 3, md: 4 },
+  };
+
+  // Neomorphic style for input fields
+  const neoInputSx = {
+    background: '#f7fafc',
+    boxShadow: '2px 2px 8px #e2e8f0, -2px -2px 8px #ffffff',
+    borderRadius: 2,
+    '& .MuiOutlinedInput-root': {
+      background: '#f7fafc',
+      borderRadius: 2,
+    },
+  };
+
+  // Neomorphic style for buttons
+  const neoButtonSx = {
+    background: '#f7fafc',
+    boxShadow: '2px 2px 8px #e2e8f0, -2px -2px 8px #ffffff',
+    borderRadius: 2,
+    fontWeight: 700,
+    color: '#2563eb',
+    '&:hover': {
+      background: '#e2e8f0',
+      color: '#1e40af',
+      boxShadow: '0 4px 16px #2563eb22',
+    },
+  };
+
   return (
     <Box
       sx={{
@@ -105,16 +143,12 @@ export default function LoginPage() {
       }}
     >
       <Container maxWidth="sm">
-        <Slide direction="up" in={true} timeout={800}>
-          <Paper
-            elevation={24}
-            sx={{
-              p: { xs: 3, md: 4 },
-              borderRadius: 3,
-              background: "rgba(255, 255, 255, 0.95)",
-              backdropFilter: "blur(10px)",
-            }}
-          >
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+        >
+          <Box sx={glassCardSx}>
             {/* Header */}
             <Box sx={{ textAlign: "center", mb: 4 }}>
               <motion.div
@@ -125,18 +159,19 @@ export default function LoginPage() {
                 <Typography
                   variant="h3"
                   sx={{
-                    fontWeight: 800,
+                    fontWeight: 900,
                     background: "linear-gradient(45deg, #667eea, #764ba2)",
                     backgroundClip: "text",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     mb: 1,
+                    letterSpacing: '-1px',
                   }}
                 >
                   Welcome Back
                 </Typography>
               </motion.div>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3, fontWeight: 500 }}>
                 Sign in to your Megicloth account
               </Typography>
             </Box>
@@ -158,7 +193,9 @@ export default function LoginPage() {
                     </InputAdornment>
                   ),
                 }}
-                sx={{ mb: 3 }}
+                sx={{ mb: 3, ...neoInputSx }}
+                autoComplete="email"
+                autoFocus
               />
 
               <TextField
@@ -180,13 +217,16 @@ export default function LoginPage() {
                       <IconButton
                         onClick={() => setShowPassword(!showPassword)}
                         edge="end"
+                        aria-label="Toggle password visibility"
+                        sx={{ color: '#64748b' }}
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
-                sx={{ mb: 2 }}
+                sx={{ mb: 2, ...neoInputSx }}
+                autoComplete="current-password"
               />
 
               <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
@@ -195,10 +235,11 @@ export default function LoginPage() {
                     variant="body2"
                     sx={{
                       color: "primary.main",
-                      "&:hover": { textDecoration: "underline" },
+                      fontWeight: 600,
+                      '&:hover': { textDecoration: "underline" },
                     }}
                   >
-                    Forgot Password?
+                    Forgot password?
                   </Typography>
                 </Link>
               </Box>
@@ -207,80 +248,70 @@ export default function LoginPage() {
                 type="submit"
                 fullWidth
                 variant="contained"
-                size="large"
                 disabled={isLoading}
                 sx={{
+                  ...neoButtonSx,
+                  mb: 2,
                   py: 1.5,
-                  borderRadius: 2,
-                  background: "linear-gradient(45deg, #667eea, #764ba2)",
-                  "&:hover": {
-                    background: "linear-gradient(45deg, #5a6fd8, #6a4190)",
+                  fontSize: '1.1rem',
+                  background: 'linear-gradient(45deg, #2563eb, #1e40af)',
+                  color: '#fff',
+                  boxShadow: '0 4px 16px #2563eb22',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #1e40af, #2563eb)',
+                    color: '#fff',
                   },
                 }}
               >
-                {isLoading ? "Signing In..." : "Sign In"}
+                {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </Box>
 
-            {/* Demo Credentials */}
-            <Alert severity="info" sx={{ mb: 3 }}>
-              <Typography variant="body2">
-                <strong>Demo Credentials:</strong><br />
-                Email: user@example.com<br />
-                Password: password
-              </Typography>
-            </Alert>
-
             {/* Divider */}
-            <Divider sx={{ my: 3 }}>
-              <Typography variant="body2" color="text.secondary">
-                OR
-              </Typography>
-            </Divider>
+            <Divider sx={{ my: 3, fontWeight: 700, color: '#64748b' }}>or</Divider>
 
-            {/* Social Login */}
-            <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+            {/* Social Login Buttons */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
               <Button
                 fullWidth
                 variant="outlined"
                 startIcon={<Google />}
-                onClick={() => handleSocialLogin("Google")}
-                sx={{ borderRadius: 2 }}
+                onClick={() => handleSocialLogin('Google')}
+                sx={{ ...neoButtonSx, color: '#ea4335', borderColor: alpha('#ea4335', 0.2) }}
               >
-                Google
+                Continue with Google
               </Button>
               <Button
                 fullWidth
                 variant="outlined"
                 startIcon={<Facebook />}
-                onClick={() => handleSocialLogin("Facebook")}
-                sx={{ borderRadius: 2 }}
+                onClick={() => handleSocialLogin('Facebook')}
+                sx={{ ...neoButtonSx, color: '#1877f3', borderColor: alpha('#1877f3', 0.2) }}
               >
-                Facebook
+                Continue with Facebook
+              </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<Apple />}
+                onClick={() => handleSocialLogin('Apple')}
+                sx={{ ...neoButtonSx, color: '#111', borderColor: alpha('#111', 0.2) }}
+              >
+                Continue with Apple
               </Button>
             </Box>
 
-            {/* Sign Up Link */}
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="body2" color="text.secondary">
-                Don't have an account?{" "}
-                <Link href="/auth/register" style={{ textDecoration: "none" }}>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    sx={{
-                      color: "primary.main",
-                      fontWeight: 600,
-                      "&:hover": { textDecoration: "underline" },
-                    }}
-                  >
-                    Sign up here
-                  </Typography>
+            {/* Register Link */}
+            <Box sx={{ textAlign: 'center', mt: 2 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 500 }}>
+                Don't have an account?{' '}
+                <Link href="/auth/register" style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'none' }}>
+                  Register
                 </Link>
               </Typography>
             </Box>
-          </Paper>
-        </Slide>
+          </Box>
+        </motion.div>
       </Container>
     </Box>
   );

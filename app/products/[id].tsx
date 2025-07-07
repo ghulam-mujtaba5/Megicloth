@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Rating from "@mui/material/Rating";
+import Image from 'next/image';
 
 type Props = { params: { id: string } };
 
@@ -21,7 +22,14 @@ export default function ProductDetail({ params }: Props) {
     <Container maxWidth="md" sx={{ minHeight: "80vh", py: { xs: 2, sm: 4 } }}>
       <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: { xs: 3, md: 6 }, alignItems: { xs: "center", md: "flex-start" }, background: "#fff", borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", p: { xs: 2, sm: 4 } }}>
         <Box sx={{ minWidth: 260, maxWidth: 340, width: "100%", mb: { xs: 2, md: 0 } }}>
-          <img src={imageUrl} alt={product.name} style={{ width: "100%", height: 240, objectFit: "cover", borderRadius: 12, background: "#f3f4f6" }} />
+          <Image
+            src={imageUrl}
+            alt={product.name}
+            width={600}
+            height={240}
+            style={{ width: '100%', height: 240, objectFit: 'cover', borderRadius: 12, background: '#f3f4f6' }}
+            priority
+          />
         </Box>
         <Box sx={{ flex: 1, width: "100%" }}>
           <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>{product.name}</Typography>

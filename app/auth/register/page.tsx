@@ -32,6 +32,7 @@ import {
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { alpha } from "@mui/material/styles";
 
 const steps = ["Personal Info", "Account Details", "Terms & Conditions"];
 
@@ -152,192 +153,41 @@ export default function RegisterPage() {
     toast.info(`${provider} registration coming soon!`);
   };
 
-  const renderStepContent = (step: number) => {
-    switch (step) {
-      case 0:
-        return (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-              Tell us about yourself
-            </Typography>
-            
-            <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-              <TextField
-                fullWidth
-                label="First Name"
-                value={formData.firstName}
-                onChange={(e) => handleInputChange("firstName", e.target.value)}
-                error={!!errors.firstName}
-                helperText={errors.firstName}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Person color="action" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <TextField
-                fullWidth
-                label="Last Name"
-                value={formData.lastName}
-                onChange={(e) => handleInputChange("lastName", e.target.value)}
-                error={!!errors.lastName}
-                helperText={errors.lastName}
-              />
-            </Box>
+  // Glassmorphism style for main card
+  const glassCardSx = {
+    borderRadius: 4,
+    background: 'rgba(255,255,255,0.65)',
+    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255,255,255,0.25)',
+    overflow: 'hidden',
+    p: { xs: 3, md: 4 },
+  };
 
-            <TextField
-              fullWidth
-              label="Phone Number (Optional)"
-              value={formData.phone}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-              error={!!errors.phone}
-              helperText={errors.phone}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Phone color="action" />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Box>
-        );
+  // Neomorphic style for input fields
+  const neoInputSx = {
+    background: '#f7fafc',
+    boxShadow: '2px 2px 8px #e2e8f0, -2px -2px 8px #ffffff',
+    borderRadius: 2,
+    '& .MuiOutlinedInput-root': {
+      background: '#f7fafc',
+      borderRadius: 2,
+    },
+  };
 
-      case 1:
-        return (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-              Create your account
-            </Typography>
-            
-            <TextField
-              fullWidth
-              label="Email Address"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              error={!!errors.email}
-              helperText={errors.email}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Email color="action" />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ mb: 3 }}
-            />
-
-            <TextField
-              fullWidth
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              value={formData.password}
-              onChange={(e) => handleInputChange("password", e.target.value)}
-              error={!!errors.password}
-              helperText={errors.password}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock color="action" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ mb: 3 }}
-            />
-
-            <TextField
-              fullWidth
-              label="Confirm Password"
-              type={showConfirmPassword ? "text" : "password"}
-              value={formData.confirmPassword}
-              onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-              error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock color="action" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      edge="end"
-                    >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Box>
-        );
-
-      case 2:
-        return (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-              Terms & Preferences
-            </Typography>
-            
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.termsAccepted}
-                  onChange={(e) => handleInputChange("termsAccepted", e.target.checked)}
-                  color="primary"
-                />
-              }
-              label={
-                <Typography variant="body2">
-                  I agree to the{" "}
-                  <Link href="/terms" style={{ color: "primary.main" }}>
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy" style={{ color: "primary.main" }}>
-                    Privacy Policy
-                  </Link>
-                </Typography>
-              }
-              sx={{ mb: 2 }}
-            />
-            {errors.termsAccepted && (
-              <Typography color="error" variant="caption" sx={{ ml: 4, display: "block" }}>
-                {errors.termsAccepted}
-              </Typography>
-            )}
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.newsletter}
-                  onChange={(e) => handleInputChange("newsletter", e.target.checked)}
-                  color="primary"
-                />
-              }
-              label="Subscribe to our newsletter for updates and offers"
-            />
-          </Box>
-        );
-
-      default:
-        return null;
-    }
+  // Neomorphic style for buttons
+  const neoButtonSx = {
+    background: '#f7fafc',
+    boxShadow: '2px 2px 8px #e2e8f0, -2px -2px 8px #ffffff',
+    borderRadius: 2,
+    fontWeight: 700,
+    color: '#2563eb',
+    '&:hover': {
+      background: '#e2e8f0',
+      color: '#1e40af',
+      boxShadow: '0 4px 16px #2563eb22',
+    },
   };
 
   return (
@@ -350,43 +200,42 @@ export default function RegisterPage() {
         py: 4,
       }}
     >
-      <Container maxWidth="md">
+      <Container maxWidth="sm">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.7 }}
         >
-          <Paper
-            elevation={24}
-            sx={{
-              p: { xs: 3, md: 4 },
-              borderRadius: 3,
-              background: "rgba(255, 255, 255, 0.95)",
-              backdropFilter: "blur(10px)",
-            }}
-          >
+          <Box sx={glassCardSx}>
             {/* Header */}
             <Box sx={{ textAlign: "center", mb: 4 }}>
-              <Typography
-                variant="h3"
-                sx={{
-                  fontWeight: 800,
-                  background: "linear-gradient(45deg, #667eea, #764ba2)",
-                  backgroundClip: "text",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  mb: 1,
-                }}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5 }}
               >
-                Join Megicloth
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Create your account to start shopping
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 900,
+                    background: "linear-gradient(45deg, #667eea, #764ba2)",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    mb: 1,
+                    letterSpacing: '-1px',
+                  }}
+                >
+                  Create Account
+                </Typography>
+              </motion.div>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3, fontWeight: 500 }}>
+                Join Megicloth and start your premium experience
               </Typography>
             </Box>
 
             {/* Stepper */}
-            <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+            <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
               {steps.map((label) => (
                 <Step key={label}>
                   <StepLabel>{label}</StepLabel>
@@ -394,101 +243,264 @@ export default function RegisterPage() {
               ))}
             </Stepper>
 
-            {/* Form */}
+            {/* Step Content */}
             <Box component="form" onSubmit={handleSubmit}>
-              {renderStepContent(activeStep)}
+              {activeStep === 0 && (
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+                    Tell us about yourself
+                  </Typography>
+                  <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+                    <TextField
+                      fullWidth
+                      label="First Name"
+                      value={formData.firstName}
+                      onChange={(e) => handleInputChange("firstName", e.target.value)}
+                      error={!!errors.firstName}
+                      helperText={errors.firstName}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Person color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={neoInputSx}
+                      autoComplete="given-name"
+                      autoFocus
+                    />
+                    <TextField
+                      fullWidth
+                      label="Last Name"
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange("lastName", e.target.value)}
+                      error={!!errors.lastName}
+                      helperText={errors.lastName}
+                      sx={neoInputSx}
+                      autoComplete="family-name"
+                    />
+                  </Box>
+                  <TextField
+                    fullWidth
+                    label="Phone Number (Optional)"
+                    value={formData.phone}
+                    onChange={(e) => handleInputChange("phone", e.target.value)}
+                    error={!!errors.phone}
+                    helperText={errors.phone}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Phone color="action" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={neoInputSx}
+                    autoComplete="tel"
+                  />
+                </Box>
+              )}
+              {activeStep === 1 && (
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+                    Account Details
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    label="Email Address"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Email color="action" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{ ...neoInputSx, mb: 3 }}
+                    autoComplete="email"
+                  />
+                  <TextField
+                    fullWidth
+                    label="Password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(e) => handleInputChange("password", e.target.value)}
+                    error={!!errors.password}
+                    helperText={errors.password}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Lock color="action" />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                            aria-label="Toggle password visibility"
+                            sx={{ color: '#64748b' }}
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{ ...neoInputSx, mb: 2 }}
+                    autoComplete="new-password"
+                  />
+                  <TextField
+                    fullWidth
+                    label="Confirm Password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={formData.confirmPassword}
+                    onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                    error={!!errors.confirmPassword}
+                    helperText={errors.confirmPassword}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Lock color="action" />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            edge="end"
+                            aria-label="Toggle confirm password visibility"
+                            sx={{ color: '#64748b' }}
+                          >
+                            {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={neoInputSx}
+                    autoComplete="new-password"
+                  />
+                </Box>
+              )}
+              {activeStep === 2 && (
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+                    Terms & Conditions
+                  </Typography>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.termsAccepted}
+                        onChange={(e) => handleInputChange("termsAccepted", e.target.checked)}
+                        color="primary"
+                      />
+                    }
+                    label={<span>I accept the <b>terms and conditions</b></span>}
+                  />
+                  {errors.termsAccepted && (
+                    <Alert severity="error" sx={{ mt: 2 }}>
+                      {errors.termsAccepted}
+                    </Alert>
+                  )}
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.newsletter}
+                        onChange={(e) => handleInputChange("newsletter", e.target.checked)}
+                        color="primary"
+                      />
+                    }
+                    label={<span>Subscribe to our newsletter</span>}
+                  />
+                </Box>
+              )}
 
-              {/* Navigation Buttons */}
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              {/* Stepper Navigation */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
                 <Button
                   disabled={activeStep === 0}
                   onClick={handleBack}
-                  sx={{ mr: 1 }}
+                  variant="outlined"
+                  sx={{ ...neoButtonSx, color: '#64748b', borderColor: alpha('#64748b', 0.2) }}
                 >
                   Back
                 </Button>
-                <Box>
-                  {activeStep === steps.length - 1 ? (
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      disabled={isLoading}
-                      sx={{
-                        background: "linear-gradient(45deg, #667eea, #764ba2)",
-                        "&:hover": {
-                          background: "linear-gradient(45deg, #5a6fd8, #6a4190)",
-                        },
-                      }}
-                    >
-                      {isLoading ? "Creating Account..." : "Create Account"}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      onClick={handleNext}
-                      sx={{
-                        background: "linear-gradient(45deg, #667eea, #764ba2)",
-                        "&:hover": {
-                          background: "linear-gradient(45deg, #5a6fd8, #6a4190)",
-                        },
-                      }}
-                    >
-                      Next
-                    </Button>
-                  )}
-                </Box>
+                {activeStep < steps.length - 1 ? (
+                  <Button
+                    onClick={handleNext}
+                    variant="contained"
+                    sx={{
+                      ...neoButtonSx,
+                      background: 'linear-gradient(45deg, #2563eb, #1e40af)',
+                      color: '#fff',
+                      boxShadow: '0 4px 16px #2563eb22',
+                      '&:hover': {
+                        background: 'linear-gradient(45deg, #1e40af, #2563eb)',
+                        color: '#fff',
+                      },
+                    }}
+                  >
+                    Next
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={isLoading}
+                    sx={{
+                      ...neoButtonSx,
+                      background: 'linear-gradient(45deg, #10b981, #059669)',
+                      color: '#fff',
+                      boxShadow: '0 4px 16px #10b98122',
+                      '&:hover': {
+                        background: 'linear-gradient(45deg, #059669, #047857)',
+                        color: '#fff',
+                      },
+                    }}
+                  >
+                    {isLoading ? 'Creating account...' : 'Create Account'}
+                  </Button>
+                )}
               </Box>
             </Box>
 
             {/* Divider */}
-            <Divider sx={{ my: 3 }}>
-              <Typography variant="body2" color="text.secondary">
-                OR
-              </Typography>
-            </Divider>
+            <Divider sx={{ my: 3, fontWeight: 700, color: '#64748b' }}>or</Divider>
 
-            {/* Social Register */}
-            <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+            {/* Social Register Buttons */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
               <Button
                 fullWidth
                 variant="outlined"
                 startIcon={<Google />}
-                onClick={() => handleSocialRegister("Google")}
-                sx={{ borderRadius: 2 }}
+                onClick={() => handleSocialRegister('Google')}
+                sx={{ ...neoButtonSx, color: '#ea4335', borderColor: alpha('#ea4335', 0.2) }}
               >
-                Google
+                Continue with Google
               </Button>
               <Button
                 fullWidth
                 variant="outlined"
                 startIcon={<Facebook />}
-                onClick={() => handleSocialRegister("Facebook")}
-                sx={{ borderRadius: 2 }}
+                onClick={() => handleSocialRegister('Facebook')}
+                sx={{ ...neoButtonSx, color: '#1877f3', borderColor: alpha('#1877f3', 0.2) }}
               >
-                Facebook
+                Continue with Facebook
               </Button>
             </Box>
 
-            {/* Sign In Link */}
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="body2" color="text.secondary">
-                Already have an account?{" "}
-                <Link href="/auth/login" style={{ textDecoration: "none" }}>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    sx={{
-                      color: "primary.main",
-                      fontWeight: 600,
-                      "&:hover": { textDecoration: "underline" },
-                    }}
-                  >
-                    Sign in here
-                  </Typography>
+            {/* Login Link */}
+            <Box sx={{ textAlign: 'center', mt: 2 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 500 }}>
+                Already have an account?{' '}
+                <Link href="/auth/login" style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'none' }}>
+                  Login
                 </Link>
               </Typography>
             </Box>
-          </Paper>
+          </Box>
         </motion.div>
       </Container>
     </Box>
