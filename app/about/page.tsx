@@ -12,6 +12,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import Seo from "../components/Seo";
 
+
 export default function AboutPage() {
   return (
     <>
