@@ -29,7 +29,7 @@ export const products: Product[] = [
     name: 'Unstitched Women’s Lawn Suit',
     description: 'Beautiful unstitched lawn fabric for women. 3-piece set.',
     price: 3200,
-    image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
     category: 'Women',
     stock: 18,
     sku: 'MGS-102',
