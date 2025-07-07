@@ -23,10 +23,6 @@ import type { Product } from "./data/products";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import StarIcon from "@mui/icons-material/Star";
-import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import EmailIcon from "@mui/icons-material/Email";
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Zoom from '@mui/material/Zoom';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -455,21 +451,21 @@ export default function HomePage() {
               <Grid container spacing={4} justifyContent="center">
                 <Grid item xs={12} md={4}>
                   <Box sx={{ textAlign: 'center' }}>
-                    <VerifiedUserIcon sx={{ fontSize: 40, color: '#10b981', mb: 1 }} />
+                    <img src="/icons/Trust.svg" width={40} height={40} alt="Trust" style={{ marginBottom: 8 }} />
                     <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>100% Authentic Fabrics</Typography>
                     <Typography variant="body2" sx={{ color: '#64748b' }}>All products are guaranteed original and premium quality.</Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <Box sx={{ textAlign: 'center' }}>
-                    <LocalShippingIcon sx={{ fontSize: 40, color: '#2563eb', mb: 1 }} />
+                    <img src="/icons/Delivery.svg" width={40} height={40} alt="Delivery" style={{ marginBottom: 8 }} />
                     <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Fast Nationwide Delivery</Typography>
                     <Typography variant="body2" sx={{ color: '#64748b' }}>Get your order delivered anywhere in Pakistan within 2-3 days.</Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <Box sx={{ textAlign: 'center' }}>
-                    <StarIcon sx={{ fontSize: 40, color: '#f59e0b', mb: 1 }} />
+                    <img src="/icons/Star.svg" width={40} height={40} alt="Star" style={{ marginBottom: 8 }} />
                     <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Loved by Customers</Typography>
                     <Typography variant="body2" sx={{ color: '#64748b' }}>Thousands of 5-star reviews from happy customers nationwide.</Typography>
                   </Box>
@@ -498,7 +494,7 @@ export default function HomePage() {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <EmailIcon color="action" />
+                          <img src="/icons/Email.svg" width={24} height={24} alt="Email" />
                         </InputAdornment>
                       ),
                     }}
@@ -547,10 +543,10 @@ export default function HomePage() {
           <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
             <Grid container spacing={3} sx={{ mb: { xs: 4, md: 6 } }}>
               {[
-                { icon: '🚚', title: 'Fast Delivery', desc: '2-3 days across Pakistan' },
-                { icon: '🔄', title: 'Easy Returns', desc: '7-day return policy' },
-                { icon: '💎', title: 'Premium Quality', desc: 'Finest fabric selection' },
-                { icon: '💰', title: 'Best Prices', desc: 'Competitive pricing' },
+                { icon: <img src="/icons/Delivery.svg" width={32} height={32} alt="Delivery" />, title: 'Fast Delivery', desc: '2-3 days across Pakistan' },
+                { icon: <img src="/icons/Return.svg" width={32} height={32} alt="7-day Return Policy" />, title: 'Easy Returns', desc: '7-day return policy' },
+                { icon: <img src="/icons/Fabric.svg" width={32} height={32} alt="Fabric" />, title: 'Premium Quality', desc: 'Finest fabric selection' },
+                { icon: <img src="/icons/Star.svg" width={32} height={32} alt="Star" />, title: 'Best Prices', desc: 'Competitive pricing' },
               ].map((feature, index) => (
                 <Grid item xs={6} md={3} key={index}>
                   <Fade in={true} timeout={1000 + index * 200}>
@@ -568,9 +564,7 @@ export default function HomePage() {
                         },
                       }}
                     >
-                      <Typography variant="h3" sx={{ mb: 1, fontSize: '2rem' }}>
-                        {feature.icon}
-                      </Typography>
+                      <Box sx={{ mb: 1 }}>{feature.icon}</Box>
                       <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
                         {feature.title}
                       </Typography>
