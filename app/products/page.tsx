@@ -8,13 +8,14 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { Grid } from "@mui/material";
 
+
 export default function Products() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [filteredProducts, setFilteredProducts] = useState(products);
 
   useEffect(() => {
-    setLoading(true);
+    setLoading(true)
     const timeout = setTimeout(() => {
       setFilteredProducts(
         products.filter(p =>

@@ -26,15 +26,13 @@ import {
   Security,
   Refresh,
 } from "@mui/icons-material";
-import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { alpha } from "@mui/material/styles";
 import Zoom from '@mui/material/Zoom';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import LockIcon from '@mui/icons-material/Lock';
 
 export default function WishlistPage() {
-  const { wishlist, removeFromWishlist, moveToCart, moveAllToCart } = useWishlist();
+  const { wishlist, removeFromWishlist, moveAllToCart } = useWishlist();
   const { addToCart } = useCart();
 
   const handleMoveToCart = (productId: string) => {
@@ -65,18 +63,6 @@ export default function WishlistPage() {
       currency: 'PKR',
       minimumFractionDigits: 0,
     }).format(price);
-  };
-
-  // Glassmorphism style for empty state and sticky/floating elements
-  const glassCardSx = {
-    borderRadius: 4,
-    background: 'rgba(255,255,255,0.65)',
-    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-    border: '1px solid rgba(255,255,255,0.25)',
-    overflow: 'hidden',
-    p: { xs: 2, md: 4 },
   };
 
   // Neomorphic style for wishlist cards
@@ -265,7 +251,7 @@ export default function WishlistPage() {
         {/* Trust badges above wishlist */}
         <Box aria-label="Trust badges" role="region" sx={{ display: 'flex', gap: 3, justifyContent: 'center', mb: 4 }}>
           <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderRadius: 2, background: '#f0fdf4', boxShadow: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#bbf7d0' } }} tabIndex={0}><VerifiedUserIcon sx={{ color: '#10b981', fontSize: 22 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>100% Authentic</Typography></Box></Zoom>
-          <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderRadius: 2, background: '#eff6ff', boxShadow: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#bae6fd' } }} tabIndex={0}><LocalShippingIcon sx={{ color: '#2563eb', fontSize: 22 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>Fast Delivery</Typography></Box></Zoom>
+          <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderRadius: 2, background: '#eff6ff', boxShadow: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#bae6fd' } }} tabIndex={0}><LocalShipping sx={{ color: '#2563eb', fontSize: 22 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>Fast Delivery</Typography></Box></Zoom>
           <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderRadius: 2, background: '#fef9c3', boxShadow: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#fde68a' } }} tabIndex={0}><LockIcon sx={{ color: '#f59e0b', fontSize: 22 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>Secure Payments</Typography></Box></Zoom>
         </Box>
 

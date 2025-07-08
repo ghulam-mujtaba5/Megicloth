@@ -14,9 +14,6 @@ import {
   Tabs,
   Tab,
   List,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
   Divider,
   Chip,
   IconButton,
@@ -31,28 +28,18 @@ import {
   MenuItem,
   Switch,
   FormControlLabel,
-  Alert,
 } from "@mui/material";
+import toast from "react-hot-toast";
 import {
   Person,
   ShoppingBag,
   Favorite,
   LocationOn,
   Settings,
-  Edit,
-  Delete,
   Add,
-  LocalShipping,
-  Payment,
-  Security,
-  Notifications,
-  Email,
-  Phone,
-  CalendarToday,
+  Delete,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
-import toast from "react-hot-toast";
-import { alpha } from "@mui/material/styles";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -103,7 +90,6 @@ export default function ProfilePage() {
   const { user, isAuthenticated, isLoading, updateProfile, addAddress, removeAddress } = useAuth();
   const router = useRouter();
   const [tabValue, setTabValue] = useState(0);
-  const [editProfile, setEditProfile] = useState(false);
   const [addAddressDialog, setAddAddressDialog] = useState(false);
   const [newAddress, setNewAddress] = useState({
     type: "home" as const,
@@ -136,27 +122,8 @@ export default function ProfilePage() {
     return null;
   }
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-  };
-
-  const handleProfileUpdate = async () => {
-    try {
-      const result = await updateProfile({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phone: user.phone,
-      });
-      
-      if (result.success) {
-        toast.success("Profile updated successfully!");
-        setEditProfile(false);
-      } else {
-        toast.error(result.error || "Failed to update profile");
-      }
-    } catch (error) {
-      toast.error("An error occurred while updating profile");
-    }
   };
 
   const handleAddAddress = async () => {
@@ -223,34 +190,6 @@ export default function ProfilePage() {
     border: '1px solid rgba(255,255,255,0.25)',
     overflow: 'hidden',
     p: { xs: 2, md: 4 },
-  };
-
-  // Neomorphic style for order and address cards
-  const neoCardSx = {
-    borderRadius: 4,
-    background: '#f7fafc',
-    boxShadow: '8px 8px 24px #e2e8f0, -8px -8px 24px #ffffff',
-    transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
-    border: '1.5px solid #e2e8f0',
-    '&:hover': {
-      boxShadow: '0 12px 32px rgba(31,38,135,0.10), 0 1.5px 8px #e0e7ef',
-      transform: 'scale(1.01)',
-      borderColor: '#cbd5e1',
-    },
-  };
-
-  // Neomorphic style for buttons
-  const neoButtonSx = {
-    background: '#f7fafc',
-    boxShadow: '2px 2px 8px #e2e8f0, -2px -2px 8px #ffffff',
-    borderRadius: 2,
-    fontWeight: 700,
-    color: '#2563eb',
-    '&:hover': {
-      background: '#e2e8f0',
-      color: '#1e40af',
-      boxShadow: '0 4px 16px #2563eb22',
-    },
   };
 
   return (
@@ -322,8 +261,6 @@ export default function ProfilePage() {
                   <Grid item>
                     <Button
                       variant="outlined"
-                      startIcon={<Edit />}
-                      onClick={() => setEditProfile(true)}
                       sx={{ color: "white", borderColor: "white", "&:hover": { borderColor: "white", backgroundColor: "rgba(255,255,255,0.1)" } }}
                     >
                       Edit Profile
@@ -439,7 +376,7 @@ export default function ProfilePage() {
               </Card>
             ) : (
               <List>
-                {mockOrders.map((order, index) => (
+                {mockOrders.map((order) => (
                   <Card key={order.id} sx={{ mb: 2 }}>
                     <CardContent>
                       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
@@ -541,9 +478,9 @@ export default function ProfilePage() {
                         {address.phone}
                       </Typography>
                       <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
-                        <IconButton size="small" color="primary">
+                        {/* <IconButton size="small" color="primary">
                           <Edit />
-                        </IconButton>
+                        </IconButton> */}
                         <IconButton
                           size="small"
                           color="error"

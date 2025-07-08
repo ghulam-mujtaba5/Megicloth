@@ -2,7 +2,7 @@
 import { products } from "../../data/products";
 import { useCart } from "../../context/CartContext";
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -35,11 +35,11 @@ import SecurityIcon from "@mui/icons-material/Security";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import IconButton from "@mui/material/IconButton";
-import { alpha } from "@mui/material/styles";
 import Zoom from '@mui/material/Zoom';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import LockIcon from '@mui/icons-material/Lock';
 import Seo from "../../components/Seo";
+import ProductCard from "../../components/ProductCard";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -65,7 +65,6 @@ function TabPanel(props: TabPanelProps) {
 
 export default function ProductDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const { addToCart, isInCart, getCartItem } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -218,18 +217,6 @@ export default function ProductDetailPage() {
       boxShadow: '0 12px 32px rgba(31,38,135,0.10), 0 1.5px 8px #e0e7ef',
       borderColor: '#cbd5e1',
     },
-  };
-
-  // Neomorphic style for quantity stepper
-  const neoStepperSx = {
-    background: '#f1f5f9',
-    boxShadow: '2px 2px 6px #e2e8f0, -2px -2px 6px #ffffff',
-    borderRadius: 2,
-    px: 1,
-    py: 0.5,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 1,
   };
 
   // Neomorphic style for buttons
