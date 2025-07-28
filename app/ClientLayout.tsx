@@ -4,7 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { OrderProvider } from "./context/OrderContext";
 import { ProductProvider } from "./context/ProductContext";
-import NewNavbar from "./components/NewNavbar";
+import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { ThemeProvider as MuiThemeProvider, createTheme } from "@mui/material/styles";
 import { Box } from '@mui/material';
@@ -256,7 +256,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
             <OrderProvider>
               <WishlistProvider>
               <CssBaseline />
-              <NewNavbar />
+              <Header />
               <Box component="main" sx={{ minHeight: '70vh' }}>{children}</Box>
               <Footer />
               <Toaster position="top-center" toastOptions={{ duration: 3500 }} />

@@ -1,86 +1,78 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export interface HeroSlide {
-  id: string;
+// 1. Define the types for your homepage settings
+interface HeroSlide {
+  imageUrl: string;
   title: string;
   subtitle: string;
-  imageUrl: string;
-  link: string;
+  link?: string;
   buttonText: string;
 }
 
-export interface HomepageSettings {
+// 1. Define the types for your homepage settings
+interface HomepageSettings {
+  heroTitle: string;
+  heroSubtitle: string;
+  featuredCategories: string[];
+  featuredBrands: string[];
   heroSlides: HeroSlide[];
-  featuredCategories: string[]; // Array of category IDs
-  featuredBrands: string[]; // Array of brand IDs
 }
 
+// 2. Define the context type
 interface HomepageContextType {
   settings: HomepageSettings;
-  updateHeroSlides: (slides: HeroSlide[]) => void;
-  updateFeaturedCategories: (categoryIds: string[]) => void;
-  updateFeaturedBrands: (brandIds: string[]) => void;
+  setSettings: React.Dispatch<React.SetStateAction<HomepageSettings>>;
 }
 
+// 3. Create the context with a default value
 const HomepageContext = createContext<HomepageContextType | undefined>(undefined);
 
-export function useHomepage() {
+// 4. Create the Provider component
+export const HomepageProvider = ({ children }: { children: ReactNode }) => {
+  const [settings, setSettings] = useState<HomepageSettings>({
+    heroSlides: [
+      {
+        imageUrl: '/images/hero/hero-1.jpg',
+        title: 'New Summer Collection',
+        subtitle: 'Discover the latest trends in unstitched fabrics.',
+        buttonText: 'Shop Now',
+        link: '/products',
+      },
+      {
+        imageUrl: '/images/hero/hero-2.jpg',
+        title: 'Exquisite Lawn Prints',
+        subtitle: 'Perfect for every occasion, crafted with elegance.',
+        buttonText: 'Explore Designs',
+        link: '/products?category=lawn',
+      },
+      {
+        imageUrl: '/images/hero/hero-3.jpg',
+        title: 'Festive Season Specials',
+        subtitle: 'Get ready for the celebrations with our exclusive festive range.',
+        buttonText: 'View Collection',
+        link: '/products?category=festive',
+      },
+    ],
+    heroTitle: 'Premium Unstitched Fabrics',
+    heroSubtitle: 'Elevate your wardrobe with quality and style.',
+    featuredCategories: ['1', '2', '3'], // Default category IDs
+    featuredBrands: ['1', '2', '3', '4', '6'], // Default brand IDs
+  });
+
+  return (
+    <HomepageContext.Provider value={{ settings, setSettings }}>
+      {children}
+    </HomepageContext.Provider>
+  );
+};
+
+// 5. Create the custom hook for easy consumption
+export const useHomepage = () => {
   const context = useContext(HomepageContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useHomepage must be used within a HomepageProvider');
   }
   return context;
-}
-
-const initialSettings: HomepageSettings = {
-  heroSlides: [
-    {
-      id: '1',
-      title: 'Discover Our New Collection',
-      subtitle: 'High-quality fabrics for every occasion. Explore the latest trends.',
-      imageUrl: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=1920&q=80',
-      link: '/collections/new-arrivals',
-      buttonText: 'Shop Now',
-    },
-    {
-      id: '2',
-      title: 'Summer Sale is Here!',
-      subtitle: 'Get up to 50% off on selected items. Limited time offer.',
-      imageUrl: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1920&q=80',
-      link: '/collections/sale',
-      buttonText: 'Explore Sale',
-    },
-    {
-      id: '3',
-      title: 'Luxury Fabrics, Unbeatable Prices',
-      subtitle: 'Experience the finest materials for your creations.',
-      imageUrl: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1920&q=80',
-      link: '/collections/luxury',
-      buttonText: 'Discover Luxury',
-    },
-  ],
-  featuredCategories: ['1', '2', '3', '4'],
-  featuredBrands: ['1', '2', '3', '4', '5', '6'],
 };
-
-export function HomepageProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<HomepageSettings>(initialSettings);
-
-  const updateHeroSlides = useCallback((slides: HeroSlide[]) => {
-    setSettings(prev => ({ ...prev, heroSlides: slides }));
-  }, []);
-
-  const updateFeaturedCategories = useCallback((categoryIds: string[]) => {
-    setSettings(prev => ({ ...prev, featuredCategories: categoryIds }));
-  }, []);
-
-  const updateFeaturedBrands = useCallback((brandIds: string[]) => {
-    setSettings(prev => ({ ...prev, featuredBrands: brandIds }));
-  }, []);
-
-  const value = { settings, updateHeroSlides, updateFeaturedCategories, updateFeaturedBrands };
-
-  return <HomepageContext.Provider value={value}>{children}</HomepageContext.Provider>;
-}
