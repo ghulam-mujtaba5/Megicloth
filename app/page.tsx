@@ -35,6 +35,7 @@ import InstagramFeed from './components/InstagramFeed';
 import BlogPreview from './components/BlogPreview';
 import HighlightedFeatures from './components/HighlightedFeatures';
 import QuickAccessCategories from './components/QuickAccessCategories';
+import FeaturedBrands from './components/FeaturedBrands';
 import { CategoryProvider } from './context/CategoryContext';
 import { BlogProvider } from './context/BlogContext';
 
@@ -187,6 +188,7 @@ export default function HomePage() {
         <HeroCarousel />
 
         <QuickAccessCategories />
+        <FeaturedBrands />
 
         {/* Featured Products Section */}
         <section aria-labelledby="featured-products-title">

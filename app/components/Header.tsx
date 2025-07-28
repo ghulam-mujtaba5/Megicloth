@@ -6,7 +6,7 @@ import { useWishlist } from "../context/WishlistContext";
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -55,6 +55,7 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { wishlist } = useWishlist();
   const pathname = usePathname();
+  const router = useRouter();
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const wishlistCount = wishlist.length;
@@ -143,7 +144,7 @@ export default function Header() {
           setSearch(selected);
         } else {
           saveRecentSearch(selected.name);
-          window.location.href = `/products/${selected.id}`;
+          router.push(`/products/${selected.id}`);
         }
       } else if (search.trim()) {
         saveRecentSearch(search);
@@ -169,7 +170,7 @@ export default function Header() {
           setMobileSearch(selected);
         } else {
           saveRecentSearch(selected.name);
-          window.location.href = `/products/${selected.id}`;
+          router.push(`/products/${selected.id}`);
         }
       } else if (mobileSearch.trim()) {
         saveRecentSearch(mobileSearch);
@@ -279,7 +280,7 @@ export default function Header() {
               <List dense>
                 {search.trim() && searchResults.length > 0 ? (
                   searchResults.map((result, idx) => (
-                    <ListItem key={result.id} disablePadding selected={highlightedIndex === idx} onMouseDown={() => { saveRecentSearch(result.name); window.location.href = `/products/${result.id}`; }}>
+                    <ListItem key={result.id} disablePadding selected={highlightedIndex === idx} onMouseDown={() => { saveRecentSearch(result.name); router.push(`/products/${result.id}`); }}>
                       <ListItemButton><ListItemAvatar><Avatar src={result.image} alt={result.name} variant="rounded" /></ListItemAvatar><ListItemText primary={result.name} secondary={formatPrice(result.salePrice ?? result.price)} /></ListItemButton>
                     </ListItem>
                   ))
@@ -348,7 +349,7 @@ export default function Header() {
               <List dense>
                 {mobileSearch.trim() && mobileSearchResults.length > 0 ? (
                   mobileSearchResults.map((result, idx) => (
-                    <ListItem key={result.id} disablePadding selected={mobileHighlightedIndex === idx} onMouseDown={() => { saveRecentSearch(result.name); window.location.href = `/products/${result.id}`; }}>
+                    <ListItem key={result.id} disablePadding selected={mobileHighlightedIndex === idx} onMouseDown={() => { saveRecentSearch(result.name); router.push(`/products/${result.id}`); }}>
                       <ListItemButton><ListItemAvatar><Avatar src={result.image} alt={result.name} variant="rounded" /></ListItemAvatar><ListItemText primary={result.name} secondary={formatPrice(result.salePrice ?? result.price)} /></ListItemButton>
                     </ListItem>
                   ))

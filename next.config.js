@@ -1,13 +1,29 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    optimizePackageImports: ['@mui/material', '@mui/icons-material'],
-  },
+
   compiler: {
     emotion: true,
   },
   images: {
-    domains: ['megicloth.com', 'images.unsplash.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'megicloth.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.gulahmedshop.com',
+        pathname: '/media/logo/stores/1/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pk.sapphireonline.pk',
+      },
+    ],
     formats: ['image/webp', 'image/avif'],
   },
   // Handle font loading issues
