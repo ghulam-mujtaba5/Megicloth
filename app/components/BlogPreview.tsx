@@ -40,11 +40,13 @@ const BlogPreview = () => {
                 </CardContent>
               </CardActionArea>
               <Box sx={{ p: 2, pt: 0 }}>
-                <Link href={`/blog/${post.id}`} passHref>
-                  <Button component="a" endIcon={<ArrowForwardIcon />}>
-                    Read More
-                  </Button>
-                </Link>
+                <Button
+                  component={Link}
+                  href={`/blog/${post.id}`}
+                  endIcon={<ArrowForwardIcon />}
+                >
+                  Read More
+                </Button>
               </Box>
             </Card>
           </Grid>

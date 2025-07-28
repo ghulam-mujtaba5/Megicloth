@@ -404,7 +404,7 @@ export default function Header() {
               sx={{ color: '#1e293b', ml: 1 }}
             >
               <Avatar sx={{ width: 32, height: 32, bgcolor: '#2563eb', fontWeight: 700 }}>
-                {user?.name?.[0] || <PersonIcon />}
+                {user?.firstName ? user.firstName[0] : <PersonIcon />}
               </Avatar>
             </IconButton>
           </Tooltip>

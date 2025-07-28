@@ -311,7 +311,7 @@ export default function ProductDetailPage() {
             </TabPanel>
 
             <TabPanel value={tabValue} index={2}>
-              <ReviewForm onSubmit={handleReviewSubmit} />
+              <ReviewForm productId={product.id} onSubmit={handleReviewSubmit} />
               <Divider sx={{ my: 4 }} />
               <Box>
                 {reviews.length > 0 ? (
