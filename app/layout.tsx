@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Poppins } from 'next/font/google';
-import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { AppProviders } from './providers';
+
 
 const inter = Inter({
   subsets: ['latin'],
@@ -88,6 +88,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
       <body>
+
         <AppProviders>
           <ClientLayout>
             {children}

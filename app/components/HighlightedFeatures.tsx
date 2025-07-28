@@ -1,86 +1,67 @@
+'use client';
+
 import React from 'react';
 import { Box, Container, Grid, Typography, Fade } from '@mui/material';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import ReplayIcon from '@mui/icons-material/Replay';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import styles from './HighlightedFeatures.module.css';
 
 const features = [
   {
-    icon: <LocalShippingIcon sx={{ fontSize: 40, color: '#fff' }} />,
+    icon: <LocalShippingIcon fontSize="large" />,
     title: 'Free Delivery',
     description: 'On orders over Rs. 2500',
-    color: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+    className: styles.iconBg1,
   },
   {
-    icon: <MonetizationOnIcon sx={{ fontSize: 40, color: '#fff' }} />,
+    icon: <MonetizationOnIcon fontSize="large" />,
     title: 'Cash on Delivery',
     description: 'Pay when you receive your order',
-    color: 'linear-gradient(45deg, #4CAF50 30%, #81C784 90%)',
+    className: styles.iconBg2,
   },
   {
-    icon: <ReplayIcon sx={{ fontSize: 40, color: '#fff' }} />,
+    icon: <ReplayIcon fontSize="large" />,
     title: 'Easy Returns',
     description: '7-day return policy',
-    color: 'linear-gradient(45deg, #FF9800 30%, #FFB74D 90%)',
+    className: styles.iconBg3,
   },
   {
-    icon: <VerifiedUserIcon sx={{ fontSize: 40, color: '#fff' }} />,
+    icon: <VerifiedUserIcon fontSize="large" />,
     title: 'Quality Assured',
     description: 'Authentic and high-quality products',
-    color: 'linear-gradient(45deg, #9C27B0 30%, #BA68C8 90%)',
+    className: styles.iconBg4,
   },
 ];
 
 const HighlightedFeatures = () => {
   return (
-    <Box sx={{ py: 8, backgroundColor: '#f9fafb' }}>
+    <Box component="section" className={styles.section}>
       <Container maxWidth="lg">
-        <Box sx={{ textAlign: 'center', mb: 6 }}>
-          <Typography variant="h4" component="h2" sx={{ fontWeight: 700, mb: 1 }}>
+        <div className={styles.titleContainer}>
+          <Typography variant="h4" component="h2" className={styles.title}>
             Why Choose Megicloth?
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" className={styles.subtitle}>
             We provide the best service and quality products.
           </Typography>
-        </Box>
+        </div>
         <Grid container spacing={4}>
           {features.map((feature, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
               <Fade in={true} timeout={1000 + index * 300}>
-                <Box sx={{
-                  p: 3,
-                  textAlign: 'center',
-                  borderRadius: '16px',
-                  backgroundColor: '#fff',
-                  transition: 'transform 0.3s, box-shadow 0.3s',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
-                  }
-                }}>
-                  <Box sx={{ 
-                    width: 70, 
-                    height: 70, 
-                    borderRadius: '50%', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    background: feature.color, 
-                    mx: 'auto', 
-                    mb: 2,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                  }}>
+                <div className={styles.featureCard}>
+                  <div className={`${styles.iconWrapper} ${feature.className}`}>
                     {feature.icon}
-                  </Box>
-                  <Typography variant="h6" component="h3" sx={{ fontWeight: 600, mb: 1 }}>
+                  </div>
+                  <Typography variant="h6" component="h3" className={styles.featureTitle}>
                     {feature.title}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" className={styles.featureDescription}>
                     {feature.description}
                   </Typography>
-                </Box>
+                </div>
               </Fade>
             </Grid>
           ))}

@@ -1,42 +1,42 @@
-import React from 'react';
-import { useHomepage } from '../context/HomepageContext';
-import { brands, Brand } from '@/app/data/brands';
-import { Box, Container, Grid, Paper, Typography } from '@mui/material';
+'use client';
+
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
 import Image from 'next/image';
+import styles from './FeaturedBrands.module.css';
 
-const FeaturedBrands: React.FC = () => {
-  const { settings } = useHomepage();
-  const featuredBrands = brands.filter((b: Brand) => settings.featuredBrands.includes(b.id));
+const brands = [
+  { name: 'Brand 1', src: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=80&q=80&grayscale&1' },
+  { name: 'Brand 2', src: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=80&q=80&grayscale&2' },
+  { name: 'Brand 3', src: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=80&q=80&grayscale&3' },
+  { name: 'Brand 4', src: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=80&q=80&grayscale&4' },
+];
 
+const FeaturedBrands = () => {
   return (
-    <Box sx={{ py: { xs: 4, md: 8 }, backgroundColor: 'background.paper' }}>
+    <section className={styles.section}>
       <Container maxWidth="lg">
-        <Typography variant="h4" component="h2" sx={{ mb: 4, fontWeight: 700, textAlign: 'center' }}>
+        <Typography variant="h4" component="h2" className={styles.title}>
           Featured Brands
         </Typography>
-        <Grid container spacing={4} justifyContent="center">
-          {featuredBrands.map((brand: Brand) => (
-            <Grid item key={brand.id} xs={6} sm={4} md={2}>
-              <Paper elevation={0} sx={{ p: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', border: '1px solid #e2e8f0' }}>
+        <Grid container spacing={4} justifyContent="center" alignItems="center">
+          {brands.map((brand, index) => (
+            <Grid item key={index} xs={6} sm={4} md={3} lg={2}>
+              <div className={styles.logoBox}>
                 <Image
-                  src={brand.logo}
+                  src={brand.src}
                   alt={brand.name}
                   width={120}
-                  height={60}
-                  style={{ objectFit: 'contain' }}
-                  onError={(e) => {
-                    const target = e.currentTarget as HTMLImageElement;
-                    if (target.src !== '/fallback-logo.png') {
-                      target.src = '/fallback-logo.png';
-                    }
-                  }}
+                  height={50}
+                  className={styles.brandImage}
                 />
-              </Paper>
+              </div>
             </Grid>
           ))}
         </Grid>
       </Container>
-    </Box>
+    </section>
   );
 };
 

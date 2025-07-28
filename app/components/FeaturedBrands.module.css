@@ -1,0 +1,40 @@
+.section {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.title {
+  text-align: center;
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  color: var(--neutral-800);
+  margin-bottom: 3rem;
+}
+
+.logoBox {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background-color: #fff;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logoBox:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.brandImage {
+  object-fit: contain;
+  filter: grayscale(100%);
+  opacity: 0.8;
+  transition: filter var(--transition-fast), opacity var(--transition-fast);
+}
+
+.logoBox:hover .brandImage {
+  filter: grayscale(0%);
+  opacity: 1;
+}

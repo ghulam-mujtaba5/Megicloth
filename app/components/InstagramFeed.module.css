@@ -1,0 +1,93 @@
+.section {
+  padding: var(--space-8) 0;
+  background-color: var(--neutral-100);
+}
+
+.title {
+  text-align: center;
+  font-family: var(--font-poppins) !important;
+  font-weight: 700 !important;
+  margin-bottom: var(--space-1) !important;
+  color: var(--neutral-800);
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--neutral-600);
+  margin-bottom: var(--space-7) !important;
+}
+
+.gridContainer {
+  padding: 0 var(--space-4);
+}
+
+.gridItem {
+  position: relative;
+  overflow: hidden; /* Ensures the zoom effect is contained */
+}
+
+.image {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s var(--transition-ease);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: var(--neutral-white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s var(--transition-ease);
+  cursor: pointer;
+}
+
+.gridItem:hover .overlay {
+  opacity: 1;
+}
+
+.gridItem:hover .image {
+  transform: scale(1.1);
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+}
+
+.statItem:first-child {
+  margin-right: var(--space-4);
+}
+
+.statIcon {
+  margin-right: var(--space-1);
+  font-size: 18px !important;
+}
+
+.followButtonContainer {
+  text-align: center;
+  margin-top: var(--space-7);
+}
+
+.followButton {
+  border-radius: 9999px !important; /* Pill shape */
+  text-transform: none !important;
+  padding: var(--space-3) var(--space-6) !important;
+  font-weight: 600 !important;
+  border-width: 2px !important;
+}

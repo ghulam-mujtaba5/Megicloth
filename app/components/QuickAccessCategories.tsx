@@ -1,66 +1,66 @@
-"use client";
-import React from 'react';
-import { Box, Container, Grid, Typography, Card, CardActionArea, CardMedia } from '@mui/material';
+'use client';
+
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Image from 'next/image';
 import Link from 'next/link';
-import { useHomepage } from '../context/HomepageContext';
-import { useCategories } from '../context/CategoryContext';
+import styles from './QuickAccessCategories.module.css';
 
-const QuickAccessCategories: React.FC = () => {
-  const { settings } = useHomepage();
-  const { categories } = useCategories();
+const categories = [
+  {
+    name: 'Cotton',
+    href: '/products?category=cotton',
+    imageUrl: 'https://images.unsplash.com/photo-1620799140408-edc6d5f9435a?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    name: 'Linen',
+    href: '/products?category=linen',
+    imageUrl: 'https://images.unsplash.com/photo-1604935583329-639158913a34?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    name: 'Silk',
+    href: '/products?category=silk',
+    imageUrl: 'https://images.unsplash.com/photo-1583209502004-3c888c6a3a9a?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    name: 'Wool',
+    href: '/products?category=wool',
+    imageUrl: 'https://images.unsplash.com/photo-1593121924398-d42a284a4c33?auto=format&fit=crop&w=800&q=80',
+  },
+];
 
-  const featuredCategories = categories.filter(c => settings.featuredCategories.includes(c.id));
+const QuickAccessCategories = () => {
   return (
-    <Box sx={{ py: { xs: 4, md: 8 }, backgroundColor: 'background.default' }}>
+    <section className={styles.section}>
       <Container maxWidth="lg">
-        <Typography variant="h4" component="h2" sx={{ mb: 4, fontWeight: 700, textAlign: 'center' }}>
+        <Typography variant="h4" component="h2" className={styles.title}>
           Shop By Category
         </Typography>
         <Grid container spacing={4}>
-          {featuredCategories.map((category) => (
-            <Grid item xs={12} sm={6} md={3} key={category.id}>
-              <Link href={`/products?category=${category.name}`} passHref style={{ textDecoration: 'none' }}>
-                <CardActionArea sx={{ borderRadius: 2, overflow: 'hidden', display: 'block' }}>
-                  <Card sx={{ position: 'relative', '&:hover .overlay': { opacity: 1 } }}>
-                    <CardMedia
-                      component="img"
-                      image={category.imageUrl}
-                      alt={category.name}
-                      sx={{
-                        height: 300,
-                        transition: 'transform 0.3s ease-in-out',
-                        '&:hover': {
-                          transform: 'scale(1.1)',
-                        },
-                      }}
-                    />
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)',
-                        color: '#fff',
-                        p: 2,
-                        borderBottomLeftRadius: 'inherit',
-                        borderBottomRightRadius: 'inherit',
-                        zIndex: 1,
-                        pointerEvents: 'none',
-                      }}
-                    >
-                      <Typography variant="h5" component="h3" sx={{ fontWeight: 700, color: '#fff' }}>
-                        {category.name}
-                      </Typography>
-                    </Box>
-                  </Card>
-                </CardActionArea>
+          {categories.map((category) => (
+            <Grid item xs={12} sm={6} md={3} key={category.name}>
+              <Link href={category.href} passHref className={styles.cardLink}>
+                <div className={styles.card}>
+                  <Image
+                    src={category.imageUrl}
+                    alt={category.name}
+                    width={400}
+                    height={350}
+                    className={styles.cardImage}
+                  />
+                  <div className={styles.overlay}>
+                    <Typography variant="h5" component="h3" className={styles.categoryName}>
+                      {category.name}
+                    </Typography>
+                  </div>
+                </div>
               </Link>
             </Grid>
           ))}
         </Grid>
       </Container>
-    </Box>
+    </section>
   );
 };
 

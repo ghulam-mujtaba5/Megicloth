@@ -7,14 +7,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useHomepage } from '../context/HomepageContext';
 import { Box, Typography, Button, useTheme, useMediaQuery } from '@mui/material';
+import styles from './HeroCarousel.module.css';
 
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import 'swiper/css/effect-fade';
-
-
 
 const HeroCarousel = () => {
   const { settings } = useHomepage();
@@ -38,7 +37,7 @@ const HeroCarousel = () => {
         }}
         navigation={!isMobile}
         modules={[Autoplay, Pagination, Navigation, EffectFade]}
-        className="hero-swiper"
+        className={styles.heroSwiper}
         style={{ height: '100%', width: '100%' }}
       >
         {heroSlides.map((slide, index) => (
@@ -52,23 +51,7 @@ const HeroCarousel = () => {
                 quality={90}
                 priority={index === 0}
               />
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  color: 'white',
-                  p: 3,
-                }}
-              >
+              <Box className={styles.overlay}>
                 <Box className="swiper-slide-content">
                 <Typography
                   variant={isMobile ? 'h3' : 'h2'}
