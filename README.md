@@ -28,7 +28,7 @@ A modern, mobile-first e-commerce platform for premium unstitched fabrics, built
 - **Smooth Animations**: Fade, slide, and scale animations for better user experience
 - **Loading States**: Skeleton loaders and progress indicators
 - **Toast Notifications**: User feedback for actions and errors
-- **Dark/Light Theme**: Theme support (ready for implementation)
+
 
 ### ⚡ Performance & SEO
 - **Next.js 14**: App Router with server-side rendering
@@ -257,3 +257,13 @@ For support and questions:
 **Built with ❤️ for the Pakistani textile industry**
 
 *Megicloth - Premium Unstitched Fabrics*
+
+
+testing credentials:
+
+Admin Email: admin@megicloth.com
+Admin Password: adminpassword
+There is also a regular user account for testing:
+
+User Email: user@example.com
+User Password: password

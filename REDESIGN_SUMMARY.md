@@ -202,7 +202,7 @@ app/data/
 3. **Reviews System**: Customer reviews and ratings
 4. **Recommendations**: AI-powered product recommendations
 5. **Multi-language**: Internationalization support
-6. **Dark Mode**: Theme switching capability
+
 
 ### Performance Monitoring
 1. **Core Web Vitals**: Monitor performance metrics
