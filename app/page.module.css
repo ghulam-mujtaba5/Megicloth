@@ -191,8 +191,8 @@ a.secondary {
   height: 100%;
   z-index: 1;
   background: linear-gradient(135deg, rgba(37,99,235,0.85) 0%, rgba(16,185,129,0.85) 100%);
-  backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .heroContent {
@@ -238,8 +238,8 @@ a.secondary {
   color: #fff;
   letter-spacing: 0.5px;
   border: 1.5px solid #bbf7d0;
-  backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
   text-shadow: 0 2px 8px #2563eb33;
   transition: background 0.2s;
   outline: none;
@@ -251,4 +251,219 @@ a.secondary {
 .heroSaleSpan {
   color: #bbf7d0;
   font-weight: 900;
+}
+
+.featureBox {
+  text-align: center;
+  padding: 24px;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all 0.3s ease;
+}
+
+.featureBox:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.featureIconContainer {
+  margin-bottom: 8px;
+}
+
+.testimonialBox {
+  background: rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(10px); /* For Safari */
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.testimonialBox:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
+}
+
+.testimonialImage {
+  margin-bottom: 8px;
+}
+
+.testimonialTitle {
+  font-weight: 700 !important;
+  margin-bottom: 4px !important;
+}
+
+.testimonialText {
+  color: #64748b !important;
+}
+
+.testimonialCard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.testimonialCardContent {
+  flex-grow: 1;
+}
+
+.testimonialsSection {
+  background: rgba(255,255,255,0.65);
+  padding-top: 48px;
+  padding-bottom: 48px;
+  border-top: 1.5px solid #e2e8f0;
+  border-bottom: 1.5px solid #e2e8f0;
+}
+
+@media (min-width: 960px) {
+  .testimonialsSection {
+    padding-top: 80px;
+    padding-bottom: 80px;
+  }
+}
+
+.newsletterSection {
+  background-color: #f1f5f9;
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+
+@media (min-width: 960px) {
+  .newsletterSection {
+    padding-top: 80px;
+    padding-bottom: 80px;
+  }
+}
+
+.newsletterBox {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  background-color: #fff;
+  padding: 32px;
+  border-radius: 24px;
+  box-shadow: 0 16px 40px rgba(31, 38, 135, 0.08);
+}
+
+.newsletterImageContainer {
+  flex-shrink: 0;
+}
+
+.newsletterImage {
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.newsletterContent {
+  flex-grow: 1;
+}
+
+.newsletterForm {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.newsletterForm button {
+  min-width: 120px;
+}
+
+.newsletterTitle {
+  font-weight: 800 !important;
+  margin-bottom: 8px !important;
+}
+
+.newsletterSubtitle {
+  margin-bottom: 24px !important;
+}
+
+.newsletterInput .MuiOutlinedInput-root {
+  background-color: #f7fafc;
+  border-radius: 8px;
+}
+
+.newsletterInput .MuiOutlinedInput-notchedOutline {
+  border: none;
+}
+
+.newsletterSuccess {
+  display: flex;
+  align-items: center;
+  color: #10b981;
+  margin-top: 16px;
+}
+
+.brandLogoBox {
+  padding: 16px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  align-items: center;
+}
+
+.brandLogoBox:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.brandImage {
+  height: 60px;
+  width: 100%;
+  object-fit: contain;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.brandLogoBox:hover .brandImage {
+  filter: grayscale(80%);
+  opacity: 0.7;
+}
+
+.newsletterError {
+  color: #ef4444;
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .newsletterBox {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .newsletterForm {
+    flex-direction: column;
+  }
+}
+
+/* New Arrivals Section */
+.newArrivalsSection {
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+
+@media (min-width: 768px) {
+  .newArrivalsSection {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+}
+
+.newArrivalsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.newArrivalsTitle {
+  font-weight: 800 !important;
 }

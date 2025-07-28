@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
+import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
+import { ProductProvider } from './context/ProductContext';
+import { HomepageProvider } from './context/HomepageContext';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -81,9 +85,17 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ClientLayout>
-          {children}
-        </ClientLayout>
+        <AuthProvider>
+          <ProductProvider>
+            <HomepageProvider>
+              <CartProvider>
+                <ClientLayout>
+                  {children}
+                </ClientLayout>
+              </CartProvider>
+            </HomepageProvider>
+          </ProductProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -10,6 +10,10 @@ interface CartContextType {
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
+  subtotal: number;
+  discount: number;
+  shippingCost: number;
+  total: number;
   getCartTotal: () => number;
   getCartCount: () => number;
   isInCart: (id: string) => boolean;
@@ -65,8 +69,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cart, isInitialized]);
 
   // Memoized cart calculations
-  const cartTotal = useMemo(() => {
-    return cart.reduce((sum, item) => sum + (item.salePrice ?? item.price) * item.quantity, 0);
+  const { subtotal, discount, shippingCost, total } = useMemo(() => {
+    const subtotal = cart.reduce((sum, item) => sum + (item.salePrice ?? item.price) * item.quantity, 0);
+    const discount = 0; // Placeholder for discount logic
+    const shippingCost = subtotal > 5000 ? 0 : 200; // Example shipping logic
+    const total = subtotal - discount + shippingCost;
+    return { subtotal, discount, shippingCost, total };
   }, [cart]);
 
   const cartCount = useMemo(() => {
@@ -145,8 +153,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const getCartTotal = useCallback(() => {
-    return cartTotal;
-  }, [cartTotal]);
+    return subtotal;
+  }, [subtotal]);
 
   const getCartCount = useCallback(() => {
     return cartCount;
@@ -183,6 +191,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     removeFromCart,
     updateQuantity,
     clearCart,
+    subtotal,
+    discount,
+    shippingCost,
+    total,
     getCartTotal,
     getCartCount,
     isInCart,

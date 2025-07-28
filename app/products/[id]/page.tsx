@@ -2,7 +2,9 @@
 import { products } from "../../data/products";
 import { useCart } from "../../context/CartContext";
 import { useState, useEffect, useMemo } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import ImageZoom from 'react-medium-image-zoom';
+import 'react-medium-image-zoom/dist/styles.css';
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -17,6 +19,8 @@ import Rating from "@mui/material/Rating";
 import Divider from "@mui/material/Divider";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 import Fade from "@mui/material/Fade";
 import Slide from "@mui/material/Slide";
@@ -39,7 +43,13 @@ import Zoom from '@mui/material/Zoom';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import LockIcon from '@mui/icons-material/Lock';
 import Seo from "../../components/Seo";
+import SizeGuideDialog from "../../components/SizeGuideDialog";
 import ProductCard from "../../components/ProductCard";
+import ReviewForm from "../../components/ReviewForm";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -72,19 +82,18 @@ export default function ProductDetailPage() {
   const [tabValue, setTabValue] = useState(0);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  
+    const [reviews, setReviews] = useState<any[]>([]);
+    const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [addStitching, setAddStitching] = useState(false);
+  const router = useRouter();
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  // Find the product
-  const product = useMemo(() => {
-    return products.find(p => p.id === params.id);
-  }, [params.id]);
+  const product = useMemo(() => products.find(p => p.id === params.id), [params.id]);
 
-  // Enhanced product data
   const enhancedProduct = useMemo(() => {
     if (!product) return null;
-    
     return {
       ...product,
       tags: product.category === 'Men' ? ['Premium', 'Comfortable', 'Lawn'] : ['Elegant', 'Stylish', 'Embroidered'],
@@ -98,27 +107,37 @@ export default function ProductDetailPage() {
       origin: 'Pakistan',
       images: [
         product.image,
-        'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80',
-        'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=400&q=80',
-        'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=400&q=80',
+        product.image.replace('.jpg', '-2.jpg'),
+        product.image.replace('.jpg', '-3.jpg'),
+        product.image.replace('.jpg', '-4.jpg'),
       ],
-      reviews: [
-        { id: 1, name: 'Sarah K.', rating: 5, comment: 'Excellent quality fabric! Perfect for summer wear.', date: '2024-01-15' },
-        { id: 2, name: 'Ahmed M.', rating: 4, comment: 'Good material, fast delivery. Will order again.', date: '2024-01-10' },
-        { id: 3, name: 'Fatima R.', rating: 5, comment: 'Beautiful embroidery work. Highly recommended!', date: '2024-01-08' },
-      ],
+      reviews: product.reviews || [],
       specifications: {
-        'Fabric Type': product.category === 'Men' ? 'Lawn' : 'Embroidered Lawn',
-        'Material': product.category === 'Men' ? '100% Cotton Lawn' : 'Premium Embroidered Lawn',
+        'Fabric': product.category === 'Men' ? 'Premium Lawn' : 'Embroidered Lawn',
+        'Pieces': product.category === 'Men' ? '1' : '3',
+        'Category': product.category,
+        'SKU': `MGC-${product.id.slice(0, 4).toUpperCase()}`,
         'Weight': '120 GSM',
         'Width': '2.5 meters',
         'Length': product.category === 'Men' ? '3.5 meters' : '3-piece set',
         'Care Instructions': 'Machine wash cold, tumble dry low',
         'Origin': 'Pakistan',
         'Brand': 'Megicloth',
-      }
+      },
     };
   }, [product]);
+
+  useEffect(() => {
+    if (enhancedProduct) {
+      setReviews(enhancedProduct.reviews);
+    }
+  }, [enhancedProduct]);
+
+  const finalPrice = useMemo(() => {
+    if (!product) return 0;
+    const basePrice = product.salePrice || product.price;
+    return addStitching ? basePrice + (product.stitchingCost || 0) : basePrice;
+  }, [product, addStitching]);
 
   // Related products
   const relatedProducts = useMemo(() => {
@@ -160,10 +179,22 @@ export default function ProductDetailPage() {
     ? Math.round(((product.price - product.salePrice) / product.price) * 100)
     : 0;
 
-  const averageRating = enhancedProduct.reviews.reduce((sum, review) => sum + review.rating, 0) / enhancedProduct.reviews.length;
+  const averageRating = useMemo(() => {
+    if (reviews.length === 0) return 0;
+    return reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+  }, [reviews]);
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    if (!product) return;
+
+    const productToAdd = {
+      ...product,
+      name: addStitching ? `${product.name} (Stitched)` : product.name,
+      price: finalPrice,
+      salePrice: addStitching ? finalPrice : product.salePrice,
+    };
+
+    addToCart(productToAdd, quantity);
     setSnackbarMessage("Added to cart successfully!");
     setSnackbarOpen(true);
   };
@@ -178,6 +209,26 @@ export default function ProductDetailPage() {
     setIsFavorite(!isFavorite);
     setSnackbarMessage(isFavorite ? "Removed from favorites" : "Added to favorites");
     setSnackbarOpen(true);
+  };
+
+  const handleReviewSubmit = (newReview: any) => {
+    setReviews(prevReviews => [newReview, ...prevReviews]);
+    setSnackbarMessage("Review submitted successfully!");
+    setSnackbarOpen(true);
+  };
+
+  const handleBuyNow = () => {
+    if (!product) return;
+
+    const productToAdd = {
+      ...product,
+      name: addStitching ? `${product.name} (Stitched)` : product.name,
+      price: finalPrice,
+      salePrice: addStitching ? finalPrice : product.salePrice,
+    };
+
+    addToCart(productToAdd, quantity);
+    router.push('/checkout');
   };
 
   const handleShare = () => {
@@ -247,7 +298,7 @@ export default function ProductDetailPage() {
           <Slide direction="right" in={true} timeout={600}>
             <Button
               component={Link}
-              href="/products"
+              href="/shop"
               variant="outlined"
               startIcon={<ArrowBackIcon />}
               sx={{ ...neoButtonSx, mb: 3 }}
@@ -268,13 +319,15 @@ export default function ProductDetailPage() {
                     boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                   }}
                 >
-                  <CardMedia
-                    component="img"
-                    height={isMobile ? 300 : 400}
-                    image={enhancedProduct.images[selectedImage]}
-                    alt={product.name}
-                    sx={{ objectFit: 'cover' }}
-                  />
+                  <ImageZoom>
+                    <CardMedia
+                      component="img"
+                      height={isMobile ? 300 : 400}
+                      image={enhancedProduct.images[selectedImage]}
+                      alt={product.name}
+                      sx={{ objectFit: 'cover' }}
+                    />
+                  </ImageZoom>
                 </Card>
 
                 {/* Thumbnail Images */}
@@ -356,7 +409,7 @@ export default function ProductDetailPage() {
                     }}
                   />
                   <Typography variant="body2" sx={{ ml: 1, color: '#64748b' }}>
-                    ({enhancedProduct.reviews.length} reviews)
+                    ({reviews.length} reviews)
                   </Typography>
                 </Box>
 
@@ -371,7 +424,7 @@ export default function ProductDetailPage() {
                         fontSize: { xs: '1.75rem', md: '2rem' },
                       }}
                     >
-                      {formatPrice(product.salePrice ?? product.price)}
+                      {formatPrice(finalPrice)}
                     </Typography>
                     {product.salePrice && (
                       <Typography
@@ -382,10 +435,16 @@ export default function ProductDetailPage() {
                           fontWeight: 600,
                         }}
                       >
-                        {formatPrice(product.price)}
+                        {formatPrice(product.price + (addStitching ? (product.stitchingCost || 0) : 0))}
                       </Typography>
                     )}
                   </Box>
+                  {product.deliveryTime && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 2, color: 'text.secondary' }}>
+                      <LocalShippingIcon fontSize="small" />
+                      <Typography variant="body2">Estimated Delivery: {product.deliveryTime}</Typography>
+                    </Box>
+                  )}
                   {product.salePrice && (
                     <Chip
                       label={`${discountPercentage}% OFF`}
@@ -451,9 +510,14 @@ export default function ProductDetailPage() {
 
                 {/* Quantity and Actions */}
                 <Box sx={{ mb: 3 }}>
-                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                    Quantity
-                  </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      Quantity
+                    </Typography>
+                    <Button variant="text" onClick={() => setSizeGuideOpen(true)} sx={{ textTransform: 'none' }}>
+                      Size Guide
+                    </Button>
+                  </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
                     <TextField
                       type="number"
@@ -475,8 +539,41 @@ export default function ProductDetailPage() {
                       of {product.stock} available
                     </Typography>
                   </Box>
-
+                  {product.stitchingAvailable && (
+                    <Box sx={{ my: 2 }}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={addStitching}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAddStitching(e.target.checked)}
+                            name="stitching"
+                          />
+                        }
+                        label={`Add Stitching (+${formatPrice(product.stitchingCost || 0)})`}
+                      />
+                    </Box>
+                  )}
                   <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <Button
+                      onClick={handleBuyNow}
+                      variant="contained"
+                      color="secondary"
+                      disabled={product.stock === 0}
+                      sx={{
+                        background: 'linear-gradient(45deg, #f59e0b, #d97706)',
+                        px: 4,
+                        py: 1.5,
+                        borderRadius: 3,
+                        fontWeight: 700,
+                        fontSize: '1rem',
+                        '&:hover': {
+                          background: 'linear-gradient(45deg, #d97706, #b45309)',
+                          transform: 'translateY(-2px)',
+                        },
+                      }}
+                    >
+                      Buy Now
+                    </Button>
                     <Button
                       onClick={handleAddToCart}
                       variant="contained"
@@ -531,6 +628,7 @@ export default function ProductDetailPage() {
                     >
                       <ShareIcon />
                     </IconButton>
+                    <SizeGuideDialog open={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} />
                   </Box>
                 </Box>
 
@@ -602,24 +700,40 @@ export default function ProductDetailPage() {
                     </Typography>
                   </TabPanel>
 
-                  <TabPanel value={tabValue} index={1}>
-                    <Grid container spacing={2}>
-                      {Object.entries(enhancedProduct.specifications).map(([key, value]) => (
-                        <Grid item xs={12} sm={6} key={key}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}>
-                            <Typography variant="body2" color="text.secondary">
-                              {key}
-                            </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                              {value}
-                            </Typography>
-                          </Box>
+                                    <TabPanel value={tabValue} index={1}>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                        Product Specifications
+                      </Typography>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body2" color="text.secondary">Fabric Type</Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>{enhancedProduct.fabricType}</Typography>
                         </Grid>
-                      ))}
-                    </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body2" color="text.secondary">Material</Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>{enhancedProduct.material}</Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body2" color="text.secondary">Measurements</Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>{enhancedProduct.measurements}</Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body2" color="text.secondary">Origin</Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>{enhancedProduct.origin}</Typography>
+                        </Grid>
+                      </Grid>
+                      <Divider sx={{ my: 3 }} />
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                        Care Instructions
+                      </Typography>
+                      <Typography variant="body1" sx={{ color: '#475569' }}>
+                        {enhancedProduct.care}
+                      </Typography>
+                    </Box>
                   </TabPanel>
 
-                  <TabPanel value={tabValue} index={2}>
+                                    <TabPanel value={tabValue} index={2}>
                     <Box sx={{ mb: 3 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                         <Rating value={averageRating} precision={0.1} readOnly />
@@ -628,14 +742,14 @@ export default function ProductDetailPage() {
                         </Typography>
                       </Box>
                       <Typography variant="body2" color="text.secondary">
-                        Based on {enhancedProduct.reviews.length} reviews
+                        Based on {reviews.length} reviews
                       </Typography>
                     </Box>
 
                     <Divider sx={{ my: 3 }} />
 
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                      {enhancedProduct.reviews.map((review) => (
+                      {reviews.map((review) => (
                         <Box key={review.id}>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                             <Typography variant="body1" sx={{ fontWeight: 600 }}>
@@ -652,6 +766,10 @@ export default function ProductDetailPage() {
                         </Box>
                       ))}
                     </Box>
+
+                    <Divider sx={{ my: 4 }} />
+
+                    <ReviewForm productId={product.id} onSubmit={handleReviewSubmit} />
                   </TabPanel>
 
                   <TabPanel value={tabValue} index={3}>
@@ -699,17 +817,23 @@ export default function ProductDetailPage() {
               <Typography variant="h5" sx={{ fontWeight: 700, mb: 3, color: '#1e293b' }}>
                 Related Products
               </Typography>
-              <Grid container spacing={3} aria-label="Related products" role="list">
-                {relatedProducts.map((rp, idx) => (
-                  <Grid item xs={12} sm={6} md={3} key={rp.id} role="listitem">
-                    <Fade in={true} timeout={400 + idx * 80}>
-                      <Box sx={{ height: '100%' }}>
-                        <ProductCard product={rp} />
-                      </Box>
-                    </Fade>
-                  </Grid>
+              <Swiper
+                modules={[Navigation]}
+                spaceBetween={30}
+                slidesPerView={4}
+                navigation
+                breakpoints={{
+                  320: { slidesPerView: 1, spaceBetween: 10 },
+                  640: { slidesPerView: 2, spaceBetween: 20 },
+                  1024: { slidesPerView: 4, spaceBetween: 30 },
+                }}
+              >
+                {relatedProducts.map((rp) => (
+                  <SwiperSlide key={rp.id}>
+                    <ProductCard product={rp} />
+                  </SwiperSlide>
                 ))}
-              </Grid>
+              </Swiper>
             </Box>
           )}
         </Container>

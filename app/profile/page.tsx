@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useOrders } from "../context/OrderContext";
 import { useRouter } from "next/navigation";
 import {
   Container,
@@ -63,31 +64,10 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-// Mock order data
-const mockOrders = [
-  {
-    id: "ORD-001",
-    date: "2024-01-15",
-    status: "delivered",
-    total: 4500,
-    items: [
-      { name: "Unstitched Men's Lawn Suit", quantity: 1, price: 2000 },
-      { name: "Unstitched Women's Embroidered Lawn", quantity: 1, price: 2500 },
-    ],
-  },
-  {
-    id: "ORD-002",
-    date: "2024-01-10",
-    status: "processing",
-    total: 3200,
-    items: [
-      { name: "Unstitched Women's Lawn Suit", quantity: 1, price: 3200 },
-    ],
-  },
-];
-
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading, updateProfile, addAddress, removeAddress } = useAuth();
+  const { getOrdersForCurrentUser } = useOrders();
+  const orders = getOrdersForCurrentUser();
   const router = useRouter();
   const [tabValue, setTabValue] = useState(0);
   const [addAddressDialog, setAddAddressDialog] = useState(false);
@@ -349,7 +329,7 @@ export default function ProfilePage() {
                       <Typography variant="body2" color="text.secondary">
                         Total Orders
                       </Typography>
-                      <Typography variant="body1">{mockOrders.length}</Typography>
+                      <Typography variant="body1">{orders.length}</Typography>
                     </Box>
                   </CardContent>
                 </Card>
@@ -362,7 +342,7 @@ export default function ProfilePage() {
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
               Order History
             </Typography>
-            {mockOrders.length === 0 ? (
+            {orders.length === 0 ? (
               <Card>
                 <CardContent sx={{ textAlign: "center", py: 4 }}>
                   <ShoppingBag sx={{ fontSize: 60, color: "text.secondary", mb: 2 }} />
@@ -376,7 +356,7 @@ export default function ProfilePage() {
               </Card>
             ) : (
               <List>
-                {mockOrders.map((order) => (
+                {orders.map((order) => (
                   <Card key={order.id} sx={{ mb: 2 }}>
                     <CardContent>
                       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>

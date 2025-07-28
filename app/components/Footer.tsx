@@ -127,12 +127,32 @@ export default function Footer() {
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#1e293b' }}>
               Quick Links
             </Typography>
-            <Box aria-label="Footer navigation" role="navigation" sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <Link href="/products" style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none', outline: 'none' }} tabIndex={0}>Shop</Link>
-              <Link href="/wishlist" style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none', outline: 'none' }} tabIndex={0}>Wishlist</Link>
-              <Link href="/cart" style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none', outline: 'none' }} tabIndex={0}>Cart</Link>
-              <Link href="/profile" style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none', outline: 'none' }} tabIndex={0}>My Account</Link>
-              <Link href="/contact" style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none', outline: 'none' }} tabIndex={0}>Contact</Link>
+            <Box aria-label="Footer navigation" role="navigation" sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              {[ 
+                { href: '/products', label: 'Shop' },
+                { href: '/wishlist', label: 'Wishlist' },
+                { href: '/cart', label: 'Cart' },
+                { href: '/profile', label: 'My Account' },
+                { href: '/contact', label: 'Contact' },
+              ].map((item) => (
+                <Link key={item.href} href={item.href} passHref>
+                  <Typography
+                    component="a"
+                    sx={{
+                      color: 'primary.main',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      outline: 'none',
+                      '&:hover': {
+                        textDecoration: 'underline',
+                        color: 'primary.dark',
+                      },
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                </Link>
+              ))}
             </Box>
           </Grid>
 
@@ -142,10 +162,10 @@ export default function Footer() {
               Contact Us
             </Typography>
             <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
-              Email: <a href="mailto:support@megicloth.com" style={{ color: '#2563eb', textDecoration: 'none', outline: 'none' }} tabIndex={0}>support@megicloth.com</a>
+              Email: <Link href="mailto:support@megicloth.com" sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>support@megicloth.com</Link>
             </Typography>
             <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
-              Phone: <a href="tel:+923001234567" style={{ color: '#2563eb', textDecoration: 'none', outline: 'none' }} tabIndex={0}>+92 300 1234567</a>
+              Phone: <Link href="tel:+923001234567" sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>+92 300 1234567</Link>
             </Typography>
             <Typography variant="body2" sx={{ color: '#64748b' }}>
               Address: 123 Textile Street, Karachi, Pakistan

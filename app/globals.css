@@ -179,7 +179,8 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6, .MuiTypography-root {
+  color: #111827 !important;
   font-family: var(--font-poppins);
   font-weight: 700;
   line-height: var(--leading-tight);
@@ -364,4 +365,16 @@ img {
   h2, h3 {
     page-break-after: avoid;
   }
+}
+
+/* Hero Carousel Animation */
+.hero-swiper .swiper-slide-content {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+}
+
+.hero-swiper .swiper-slide-active .swiper-slide-content {
+  opacity: 1;
+  transform: translateY(0);
 }

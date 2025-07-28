@@ -7,7 +7,7 @@ const nextConfig = {
     emotion: true,
   },
   images: {
-    domains: ['megicloth.com'],
+    domains: ['megicloth.com', 'images.unsplash.com'],
     formats: ['image/webp', 'image/avif'],
   },
   // Handle font loading issues
@@ -38,4 +38,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;

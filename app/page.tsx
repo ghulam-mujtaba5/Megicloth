@@ -15,30 +15,28 @@ import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
 import IconButton from "@mui/material/IconButton";
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import Chip from "@mui/material/Chip";
 import Skeleton from "@mui/material/Skeleton";
 import Fade from "@mui/material/Fade";
 import Slide from "@mui/material/Slide";
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Zoom from '@mui/material/Zoom';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CelebrationIcon from '@mui/icons-material/Celebration';
 import Seo from "./components/Seo";
 import Image from 'next/image';
 import Head from "next/head";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import styles from './page.module.css';
-
-// Enhanced product data with more realistic information
-const enhancedProducts = products.map((product) => ({
-  ...product,
-  tags: product.category === 'Men' ? ['Premium', 'Comfortable'] : ['Elegant', 'Stylish'],
-  fabricType: product.category === 'Men' ? 'Lawn' : 'Embroidered Lawn',
-  measurements: product.category === 'Men' ? '3.5 meters' : '3-piece set',
-  deliveryTime: '2-3 days',
-  returnPolicy: '7 days',
-}));
+import HeroCarousel from './components/HeroCarousel';
+import TrendingProducts from './components/TrendingProducts';
+import Testimonials from './components/Testimonials';
+import InstagramFeed from './components/InstagramFeed';
+import BlogPreview from './components/BlogPreview';
+import HighlightedFeatures from './components/HighlightedFeatures';
+import QuickAccessCategories from './components/QuickAccessCategories';
+import { CategoryProvider } from './context/CategoryContext';
+import { BlogProvider } from './context/BlogContext';
 
 function ScrollTopButton() {
   const [visible, setVisible] = useState(false);
@@ -64,12 +62,19 @@ function ScrollTopButton() {
 }
 
 export default function HomePage() {
+  // Enhanced product data with more realistic information
+  const enhancedProducts = useMemo(() => products.map((product) => ({
+    ...product,
+    tags: product.category === 'Men' ? ['Premium', 'Comfortable'] : ['Elegant', 'Stylish'],
+    fabricType: product.category === 'Men' ? 'Lawn' : 'Embroidered Lawn',
+    measurements: product.category === 'Men' ? '3.5 meters' : '3-piece set',
+    deliveryTime: '2-3 days',
+    returnPolicy: '7 days',
+  })), []);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [newsletterEmail, setNewsletterEmail] = useState("");
-  const [newsletterStatus, setNewsletterStatus] = useState<'idle'|'success'|'error'>('idle');
-  const [showConfetti, setShowConfetti] = useState(false);
+
 
   // Memoized filtered products for better performance
   const filteredProducts = useMemo(() => {
@@ -132,20 +137,11 @@ export default function HomePage() {
   // Featured products (top 4 by rating)
   const featured = [...products].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 4);
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newsletterEmail.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
-      setNewsletterStatus('error');
-      return;
-    }
-    setNewsletterStatus('success');
-    setShowConfetti(true);
-    setTimeout(() => setShowConfetti(false), 1800);
-    setTimeout(() => setNewsletterStatus('idle'), 2500);
-    setNewsletterEmail("");
-  };
+
 
   return (
+    <BlogProvider>
+      <CategoryProvider>
     <>
       {/* SEO and structured data */}
       <Seo
@@ -187,333 +183,186 @@ export default function HomePage() {
         />
       </Head>
       {/* Page layout */}
-      <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
-        {/* Hero Section */}
-        <section aria-label="Hero" className={styles.heroSection}>
-          {/* Hero background image */}
-          <div className={styles.heroBg} aria-hidden="true" />
-          {/* Glassmorphism overlay for text readability */}
-          <div className={styles.heroOverlay} aria-hidden="true" />
-          <div className={styles.heroContent}>
-            <Container maxWidth="md">
-              <Fade in={true} timeout={800}>
-                <Box>
-                  <h1 className={styles.heroTitle}>
-                    Discover Premium Unstitched Fabrics
-                  </h1>
-                  {/* Special Offer Tagline/Callout */}
-                  <div className={styles.heroTagline}>
-                    Summer Sale: <span className={styles.heroSaleSpan}>Up to 30% Off</span> – Limited Time Only!
-                  </div>
-                  <Typography component="h2" variant="h5" sx={{ mb: 4, fontWeight: 500, color: 'rgba(255,255,255,0.92)' }}>
-                    Elevate your wardrobe with the finest lawn, cotton, and embroidered fabrics. Fast delivery, easy returns, and unbeatable prices.
-                  </Typography>
-                  {/* Shop Now button removed as per request */}
-                </Box>
-              </Fade>
-            </Container>
-          </div>
-        </section>
-        {/* Featured Products */}
-        <section aria-label="Featured Products">
-          <Box sx={{ width: '100%', maxWidth: '1600px', mx: 'auto', py: { xs: 6, md: 10 }, px: { xs: 1, sm: 2, md: 4 } }}>
-            <Slide direction="up" in={true} timeout={900}>
-              <Box>
-                <Typography component="h2" variant="h2" sx={{ fontWeight: 800, textAlign: 'center', mb: 4, letterSpacing: '-1px', background: 'linear-gradient(45deg, #1e293b 30%, #2563eb 90%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  Featured Products
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-                  <TextField
-                    placeholder="Search products, fabrics, or categories..."
-                    value={search}
-                    onChange={handleSearchChange}
-                    size="medium"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon sx={{ color: 'text.secondary' }} />
-                        </InputAdornment>
-                      ),
-                      endAdornment: search && (
-                        <InputAdornment position="end">
-                          <IconButton onClick={handleClearSearch} size="small" aria-label="Clear search">
-                            <ClearIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                    inputProps={{ 'aria-label': 'Search products' }}
-                    sx={{
-                      maxWidth: 500,
-                      width: '100%',
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 3,
-                        background: '#ffffff',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                        '&:hover': {
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                        },
-                        '&.Mui-focused': {
-                          boxShadow: '0 4px 12px rgba(37,99,235,0.15)',
-                        },
-                        outline: 'none',
-                        transition: 'box-shadow 0.2s',
-                      },
-                    }}
-                  />
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 4, flexWrap: 'wrap' }}>
-                  <Chip
-                    label="All"
-                    onClick={() => handleCategorySelect(null)}
-                    color={selectedCategory === null ? 'primary' : 'default'}
-                    sx={{ fontWeight: 600, outline: 'none', '&:focus, &:hover': { background: '#2563eb', color: '#fff' } }}
-                    tabIndex={0}
-                    aria-label="Show all categories"
-                  />
-                  {categories.map((category: string) => (
-                    <Chip
-                      key={category}
-                      label={category}
-                      onClick={() => handleCategorySelect(category)}
-                      color={selectedCategory === category ? 'primary' : 'default'}
-                      sx={{ fontWeight: 600, outline: 'none', '&:focus, &:hover': { background: '#2563eb', color: '#fff' } }}
-                      tabIndex={0}
-                      aria-label={`Show category: ${category}`}
-                    />
-                  ))}
-                </Box>
-                <Grid container spacing={{ xs: 2, sm: 4, md: 5 }} justifyContent="center" wrap="wrap">
-                  {filteredProducts.length === 0 && !loading ? (
-                    <Grid item xs={12}>
-                      <Box sx={{ textAlign: 'center', py: 8 }}>
-                        <Image
-                          src="/empty-state.svg"
-                          alt="No products found"
-                          width={180}
-                          height={180}
-                          style={{ opacity: 0.7 }}
-                          loading="lazy"
-                        />
-                        <Typography variant="h5" sx={{ mt: 2, color: '#64748b', fontWeight: 600 }}>
-                          No products found. Try a different search or category!
-                        </Typography>
-                      </Box>
+      <Box component="main" sx={{ flexGrow: 1, overflowX: 'hidden', background: 'linear-gradient(to bottom, #ffffff, #f0f2f5)' }}>
+        <HeroCarousel />
+
+        <QuickAccessCategories />
+
+        {/* Featured Products Section */}
+        <section aria-labelledby="featured-products-title">
+          <Container maxWidth="lg" sx={{ py: 6 }}>
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
+              <Typography id="featured-products-title" variant="h4" component="h2" sx={{ fontWeight: 700, color: '#111827' }}>
+                Featured Products
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Handpicked for you from our latest collection.
+              </Typography>
+            </Box>
+            <Grid container spacing={3}>
+              {loading
+                ? Array.from(new Array(8)).map((_, index) => (
+                    <Grid item xs={12} sm={6} md={3} key={index}>
+                      <ProductSkeleton />
                     </Grid>
-                  ) : loading ? (
-                    Array.from({ length: 4 }).map((_, i) => <ProductSkeleton key={i} />)
-                  ) : (
-                    filteredProducts.map((product, idx) => (
-                      <Grid item xs={12} sm={6} md={4} lg={3} key={product.id} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
-                        <Card
-                          sx={{
-                            width: '100%',
-                            minWidth: 300,
-                            maxWidth: 360,
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            position: 'relative',
-                            background: 'rgba(255,255,255,0.25)',
-                            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
-                            backdropFilter: 'blur(8px)',
-                            borderRadius: 4,
-                            border: '1.5px solid rgba(255,255,255,0.18)',
-                            transition: 'transform 0.18s, box-shadow 0.18s',
-                            '&:hover': {
-                              transform: 'translateY(-6px) scale(1.03)',
-                              boxShadow: '0 16px 40px 0 rgba(16,185,129,0.18)',
-                            },
-                          }}
-                        >
-                          {/* Badge for Best Seller/New Arrival */}
-                          {idx === 0 && (
-                            <Box sx={{ position: 'absolute', top: 16, left: 16, zIndex: 2 }}>
-                              <Chip label="Best Seller" color="success" sx={{ fontWeight: 700, fontSize: '0.95rem', px: 1.5, boxShadow: 2, background: 'linear-gradient(90deg,#10b981,#2563eb)', color: '#fff' }} />
-                            </Box>
-                          )}
-                          {idx === 1 && (
-                            <Box sx={{ position: 'absolute', top: 16, left: 16, zIndex: 2 }}>
-                              <Chip label="New Arrival" color="primary" sx={{ fontWeight: 700, fontSize: '0.95rem', px: 1.5, boxShadow: 2, background: 'linear-gradient(90deg,#2563eb,#10b981)', color: '#fff' }} />
-                            </Box>
-                          )}
-                          <CardContent>
-                            <ProductCard product={product} />
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    ))
-                  )}
-                </Grid>
-                {!loading && filteredProducts.length > 0 && (
-                  <Box sx={{ textAlign: 'center', mt: 6 }}>
-                    <Button
-                      component={Link}
-                      href="/products"
-                      variant="outlined"
-                      size="large"
-                      sx={{
-                        px: 4,
-                        py: 1.5,
-                        fontSize: '1.125rem',
-                        fontWeight: 600,
-                        borderRadius: 3,
-                        borderWidth: 2,
-                        outline: 'none',
-                        transition: 'all 0.2s',
-                        '&:hover, &:focus': {
-                          borderWidth: 2,
-                          transform: 'translateY(-2px) scale(1.04)',
-                          borderColor: '#10b981',
-                          color: '#10b981',
-                        },
-                      }}
-                    >
-                      View All Products
-                    </Button>
-                  </Box>
-                )}
-              </Box>
-            </Slide>
-          </Box>
+                  ))
+                : enhancedProducts.slice(0, 8).map((product, index) => (
+                    <Grid item xs={12} sm={6} md={3} key={product.id}>
+                      <Fade in={true} timeout={800 + index * 100}>
+                        <div>
+                          <ProductCard product={product} />
+                        </div>
+                      </Fade>
+                    </Grid>
+                  ))}
+            </Grid>
+            <Box sx={{ textAlign: 'center', mt: 4 }}>
+              <Button component={Link} href="/shop" variant="contained" size="large">
+                View All Products
+              </Button>
+            </Box>
+          </Container>
         </section>
         {/* Trust & Testimonials */}
-        <section aria-label="Trust and Testimonials">
-          <Box sx={{ background: 'rgba(255,255,255,0.65)', py: { xs: 6, md: 10 }, borderTop: '1.5px solid #e2e8f0', borderBottom: '1.5px solid #e2e8f0' }}>
+        <section aria-label="Trust and Testimonials" className={styles.testimonialsSection}>
+          <Box>
             <Container maxWidth="lg">
               <Grid container spacing={4} justifyContent="center">
                 <Grid item xs={12} md={4}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <img src="/icons/Trust.svg" width={40} height={40} alt="Trust" style={{ marginBottom: 8 }} />
-                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>100% Authentic Fabrics</Typography>
-                    <Typography variant="body2" sx={{ color: '#64748b' }}>All products are guaranteed original and premium quality.</Typography>
-                  </Box>
+                  <div className={styles.testimonialBox}>
+                    <img src="/icons/Trust.svg" width={40} height={40} alt="Trust" className={styles.testimonialImage} />
+                    <Typography variant="h6" className={styles.testimonialTitle}>100% Authentic Fabrics</Typography>
+                    <Typography variant="body2" className={styles.testimonialText}>All products are guaranteed original and premium quality.</Typography>
+                  </div>
                 </Grid>
                 <Grid item xs={12} md={4}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <img src="/icons/Delivery.svg" width={40} height={40} alt="Delivery" style={{ marginBottom: 8 }} />
-                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Fast Nationwide Delivery</Typography>
-                    <Typography variant="body2" sx={{ color: '#64748b' }}>Get your order delivered anywhere in Pakistan within 2-3 days.</Typography>
-                  </Box>
+                  <div className={styles.testimonialBox}>
+                    <img src="/icons/Delivery.svg" width={40} height={40} alt="Delivery" className={styles.testimonialImage} />
+                    <Typography variant="h6" className={styles.testimonialTitle}>Fast Nationwide Delivery</Typography>
+                    <Typography variant="body2" className={styles.testimonialText}>Get your order delivered anywhere in Pakistan within 2-3 days.</Typography>
+                  </div>
                 </Grid>
                 <Grid item xs={12} md={4}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <img src="/icons/Star.svg" width={40} height={40} alt="Star" style={{ marginBottom: 8 }} />
-                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Loved by Customers</Typography>
-                    <Typography variant="body2" sx={{ color: '#64748b' }}>Thousands of 5-star reviews from happy customers nationwide.</Typography>
-                  </Box>
+                  <div className={styles.testimonialBox}>
+                    <img src="/icons/Star.svg" width={40} height={40} alt="Star" className={styles.testimonialImage} />
+                    <Typography variant="h6" className={styles.testimonialTitle}>Loved by Customers</Typography>
+                    <Typography variant="body2" className={styles.testimonialText}>Thousands of 5-star reviews from happy customers nationwide.</Typography>
+                  </div>
                 </Grid>
               </Grid>
             </Container>
           </Box>
         </section>
+
+        {/* Trending Products Section */}
+        <Fade in={!loading} timeout={1500}>
+          <section aria-labelledby="trending-products-title">
+            <Container maxWidth="lg" className={styles.newArrivalsSection}>
+              <TrendingProducts />
+            </Container>
+          </section>
+        </Fade>
+
+        {/* Highlighted Features Section */}
+        <HighlightedFeatures />
+
         {/* Newsletter Signup */}
         <section aria-label="Newsletter Signup">
-          <Container maxWidth="sm" sx={{ py: { xs: 6, md: 10 } }}>
-            <Fade in={true} timeout={900}>
-              <Box sx={{ textAlign: 'center', background: 'rgba(255,255,255,0.65)', borderRadius: 4, boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.08)', p: { xs: 3, md: 5 } }}>
-                <Typography component="h2" variant="h4" sx={{ fontWeight: 800, mb: 2, color: '#1e293b' }}>
-                  Join Our Newsletter
-                </Typography>
-                <Typography variant="body1" sx={{ color: '#64748b', mb: 3 }}>
-                  Get exclusive offers, new arrivals, and style tips delivered to your inbox.
-                </Typography>
-                <Box aria-label="Newsletter signup" role="form" component="form" onSubmit={handleNewsletterSubmit} sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <TextField
-                    type="email"
-                    placeholder="Enter your email"
-                    size="medium"
-                    sx={{ minWidth: 260, background: '#f7fafc', borderRadius: 2 }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <img src="/icons/Email.svg" width={24} height={24} alt="Email" />
-                        </InputAdornment>
-                      ),
-                    }}
-                    value={newsletterEmail}
-                    onChange={e => setNewsletterEmail(e.target.value)}
-                    required
-                    inputProps={{ 'aria-label': 'Email address' }}
-                  />
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{
-                      background: 'linear-gradient(45deg, #2563eb, #10b981)',
-                      color: '#fff',
-                      fontWeight: 700,
-                      px: 4,
-                      borderRadius: 2,
-                      '&:hover': {
-                        background: 'linear-gradient(45deg, #10b981, #2563eb)',
-                      },
-                    }}
-                  >
-                    Subscribe
-                  </Button>
+          <Box sx={{ py: 8, backgroundColor: '#f9fafb' }}>
+            <Container maxWidth="lg">
+              <Fade in={true} timeout={1600}>
+                <Box sx={{ backgroundColor: 'white', borderRadius: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
+                  <Grid container alignItems="center">
+                    <Grid item xs={12} md={6} sx={{ display: { xs: 'none', md: 'block' } }}>
+                      <Image
+                        src="https://images.unsplash.com/photo-1562157873-818bc0726f68?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
+                        alt="Fashionable clothes on a rack"
+                        width={627}
+                        height={627}
+                        style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <Box sx={{ p: { xs: 4, md: 6 }, textAlign: { xs: 'center', md: 'left' } }}>
+                        <Typography variant="h4" component="h2" sx={{ fontWeight: 800, mb: 1, letterSpacing: '-0.5px' }}>
+                          Stay in the Loop
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                          Subscribe to our newsletter for the latest updates, new arrivals, and exclusive offers.
+                        </Typography>
+                        <Box component="form" sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+                          <TextField
+                            label="Email Address"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                          />
+                          <Button 
+                            variant="contained" 
+                            type="submit" 
+                            size="large"
+                            startIcon={<MailOutlineIcon />}
+                            sx={{ borderRadius: '12px', py: '15px', px: 4, whiteSpace: 'nowrap' }}
+                          >
+                            Subscribe
+                          </Button>
+                        </Box>
+                      </Box>
+                    </Grid>
+                  </Grid>
                 </Box>
-                {newsletterStatus === 'success' && (
-                  <Fade in={newsletterStatus === 'success'}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', color: '#10b981', mt: 2 }}>
-                      <CheckCircleIcon sx={{ mr: 1 }} />
-                      <Typography>Thank you for subscribing!</Typography>
-                      {showConfetti && <CelebrationIcon sx={{ ml: 1, color: '#f59e0b', fontSize: 32, animation: 'spin 1.2s linear' }} />}
-                    </Box>
-                  </Fade>
-                )}
-                {newsletterStatus === 'error' && (
-                  <Fade in={newsletterStatus === 'error'}>
-                    <Typography sx={{ color: '#ef4444', mt: 2 }}>Please enter a valid email address.</Typography>
-                  </Fade>
-                )}
-              </Box>
-            </Fade>
-          </Container>
+              </Fade>
+            </Container>
+          </Box>
         </section>
-        {/* Features Section */}
-        <section aria-label="Shop Features">
-          <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
-            <Grid container spacing={3} sx={{ mb: { xs: 4, md: 6 } }}>
-              {[
-                { icon: <img src="/icons/Delivery.svg" width={32} height={32} alt="Delivery" />, title: 'Fast Delivery', desc: '2-3 days across Pakistan' },
-                { icon: <img src="/icons/Return.svg" width={32} height={32} alt="7-day Return Policy" />, title: 'Easy Returns', desc: '7-day return policy' },
-                { icon: <img src="/icons/Fabric.svg" width={32} height={32} alt="Fabric" />, title: 'Premium Quality', desc: 'Finest fabric selection' },
-                { icon: <img src="/icons/Star.svg" width={32} height={32} alt="Star" />, title: 'Best Prices', desc: 'Competitive pricing' },
-              ].map((feature, index) => (
-                <Grid item xs={6} md={3} key={index}>
-                  <Fade in={true} timeout={1000 + index * 200}>
-                    <Box
-                      sx={{
-                        textAlign: 'center',
-                        p: 3,
-                        borderRadius: 3,
-                        background: '#ffffff',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                          transform: 'translateY(-4px)',
-                          boxShadow: '0 8px 25px rgba(0,0,0,0.12)',
-                        },
-                      }}
-                    >
-                      <Box sx={{ mb: 1 }}>{feature.icon}</Box>
-                      <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                        {feature.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {feature.desc}
-                      </Typography>
-                    </Box>
-                  </Fade>
-                </Grid>
-              ))}
+
+        {/* Testimonials Section */}
+        <Testimonials />
+
+        {/* Featured Brands Section */}
+        <section aria-label="Featured Brands">
+          <Container maxWidth="lg" sx={{ py: 6 }}>
+            <Typography variant="h4" component="h2" textAlign="center" gutterBottom sx={{ color: '#111827' }}>
+              Featured Brands
+            </Typography>
+            <Grid container spacing={4} justifyContent="center">
+              <Grid item>
+                <div className={styles.brandLogoBox}>
+  <img src="https://www.pngwing.com/pngs/180/120/png-transparent-digital-textile-printing-paper-logo-textile-text-logo.png" alt="Textile Digital Printing Logo" className={styles.brandImage} />
+</div>
+              </Grid>
+              <Grid item>
+                <div className={styles.brandLogoBox}>
+  <img src="https://www.pngwing.com/pngs/1200/630/png-transparent-kerala-green-logo-global-organic-textile-standard.png" alt="Kerala Green Textile Logo" className={styles.brandImage} />
+</div>
+              </Grid>
+              <Grid item>
+                <div className={styles.brandLogoBox}>
+  <img src="https://www.pngwing.com/pngs/4717/2606/png-transparent-textile-industry-stamp-logo.png" alt="Textile Industry Stamp Logo" className={styles.brandImage} />
+</div>
+              </Grid>
+              <Grid item>
+                <div className={styles.brandLogoBox}>
+  <img src="https://www.pngwing.com/pngs/2299/937/png-transparent-super-cheap-fabrics-logo.png" alt="Super Cheap Fabrics Logo" className={styles.brandImage} />
+</div>
+              </Grid>
             </Grid>
           </Container>
         </section>
+
+        {/* Instagram Feed */}
+        <InstagramFeed />
+
+        {/* Blog Preview */}
+        <BlogPreview />
+
+        {/* Features Section */}
+
       </Box>
       {/* Scroll to top button */}
       <ScrollTopButton />
     </>
+      </CategoryProvider>
+    </BlogProvider>
   );
 }

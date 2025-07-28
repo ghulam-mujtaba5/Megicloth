@@ -19,15 +19,30 @@ import TextField from "@mui/material/TextField";
 import Snackbar from "@mui/material/Snackbar";
 import Avatar from "@mui/material/Avatar";
 import Dialog from "@mui/material/Dialog";
+import Grid from "@mui/material/Grid";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 
 export default function Cart() {
   const { cart, updateQuantity, removeFromCart, clearCart } = useCart();
-  const total = cart.reduce((sum, item) => sum + (item.salePrice ?? item.price) * item.quantity, 0);
+  const [promoCode, setPromoCode] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [shippingCost] = useState(150); // Mock shipping cost
   const [snackbar, setSnackbar] = useState({ open: false, message: "" });
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const subtotal = cart.reduce((sum, item) => sum + (item.salePrice ?? item.price) * item.quantity, 0);
+  const total = subtotal - discount + shippingCost;
+
+  const handleApplyPromoCode = () => {
+    if (promoCode.toUpperCase() === 'MEGI10') {
+      setDiscount(subtotal * 0.1);
+      setSnackbar({ open: true, message: 'Promo code applied successfully!' });
+    } else {
+      setSnackbar({ open: true, message: 'Invalid promo code.' });
+    }
+  };
 
   const handleRemove = (id: string) => {
     removeFromCart(id);
@@ -52,7 +67,9 @@ export default function Cart() {
         </Box>
       ) : (
         <>
-          <TableContainer component={Paper} sx={{ borderRadius: { xs: 2, sm: 3 }, boxShadow: { xs: "0 1px 4px rgba(0,0,0,0.04)", sm: "0 2px 8px rgba(0,0,0,0.04)" }, mb: { xs: 2, sm: 4 } }}>
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={8}>
+              <TableContainer component={Paper} sx={{ borderRadius: { xs: 2, sm: 3 }, boxShadow: { xs: "0 1px 4px rgba(0,0,0,0.04)", sm: "0 2px 8px rgba(0,0,0,0.04)" } }}>
             <Table size={window.innerWidth < 600 ? "small" : "medium"}>
               <TableHead>
                 <TableRow sx={{ background: "#f1f5f9" }}>
@@ -97,11 +114,48 @@ export default function Cart() {
               </TableBody>
             </Table>
           </TableContainer>
-          <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between", alignItems: "center", mb: { xs: 2, sm: 4 }, gap: 2 }}>
-            <Button onClick={() => setDialogOpen(true)} color="error" variant="contained" sx={{ borderRadius: 2, fontWeight: 600, px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 }, fontSize: { xs: 14, sm: 16 } }}>Clear Cart</Button>
-            <Typography sx={{ fontSize: { xs: 18, sm: 22 }, fontWeight: 700, mt: { xs: 2, sm: 0 } }}>Total: Rs. {total}</Typography>
-          </Box>
-          <Link href="/checkout" style={{ background: "#10b981", color: "#fff", padding: "12px 0", borderRadius: 8, fontWeight: 700, fontSize: 17, textDecoration: "none", display: "block", textAlign: "center", width: "100%", maxWidth: 320, margin: '0 auto' }}>Proceed to Checkout</Link>
+            <Button onClick={() => setDialogOpen(true)} color="error" variant="outlined" sx={{ mt: 2 }}>Clear Cart</Button>
+          </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Order Summary</Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                  <Typography>Subtotal</Typography>
+                  <Typography>Rs. {subtotal.toLocaleString()}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                  <Typography>Shipping</Typography>
+                  <Typography>Rs. {shippingCost.toLocaleString()}</Typography>
+                </Box>
+                {discount > 0 && (
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, color: 'success.main' }}>
+                    <Typography>Discount</Typography>
+                    <Typography>- Rs. {discount.toLocaleString()}</Typography>
+                  </Box>
+                )}
+                <Box sx={{ display: 'flex', gap: 1, my: 2 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="Promo Code"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                  />
+                  <Button variant="contained" onClick={handleApplyPromoCode}>Apply</Button>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, borderTop: '1px solid #e5e7eb', pt: 2 }}>
+                  <Typography sx={{ fontWeight: 700, fontSize: 18 }}>Total</Typography>
+                  <Typography sx={{ fontWeight: 700, fontSize: 18 }}>Rs. {total.toLocaleString()}</Typography>
+                </Box>
+                <Link href="/checkout" passHref style={{ textDecoration: 'none' }}>
+                  <Button fullWidth variant="contained" size="large" sx={{ mt: 2, background: '#10b981', '&:hover': { background: '#059669' } }}>
+                    Proceed to Checkout
+                  </Button>
+                </Link>
+              </Paper>
+            </Grid>
+          </Grid>
           <Snackbar
             open={snackbar.open}
             autoHideDuration={2500}

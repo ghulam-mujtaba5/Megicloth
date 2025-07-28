@@ -2,9 +2,12 @@
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import { WishlistProvider } from "./context/WishlistContext";
-import Header from "./components/Header";
+import { OrderProvider } from "./context/OrderContext";
+import { ProductProvider } from "./context/ProductContext";
+import NewNavbar from "./components/NewNavbar";
 import Footer from "./components/Footer";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider as MuiThemeProvider, createTheme } from "@mui/material/styles";
+import { Box } from '@mui/material';
 import CssBaseline from "@mui/material/CssBaseline";
 import { ReactNode, useMemo } from "react";
 import createCache from '@emotion/cache';
@@ -19,6 +22,7 @@ const createEmotionCache = () => {
 // Create a custom theme that matches our design system
 const createAppTheme = () => createTheme({
   palette: {
+    mode: 'light',
     primary: {
       main: '#2563eb',
       light: '#3b82f6',
@@ -242,22 +246,26 @@ interface ClientLayoutProps {
 export default function ClientLayout({ children }: ClientLayoutProps) {
   const theme = useMemo(() => createAppTheme(), []);
   const emotionCache = useMemo(() => createEmotionCache(), []);
-  
+
   return (
-    <ThemeProvider theme={theme}>
+    <MuiThemeProvider theme={theme}>
       <CacheProvider value={emotionCache}>
         <AuthProvider>
-          <CartProvider>
-            <WishlistProvider>
+          <ProductProvider>
+            <CartProvider>
+            <OrderProvider>
+              <WishlistProvider>
               <CssBaseline />
-              <Header />
-              <main style={{ minHeight: '70vh' }}>{children}</main>
+              <NewNavbar />
+              <Box component="main" sx={{ minHeight: '70vh' }}>{children}</Box>
               <Footer />
               <Toaster position="top-center" toastOptions={{ duration: 3500 }} />
-            </WishlistProvider>
+              </WishlistProvider>
+            </OrderProvider>
           </CartProvider>
-        </AuthProvider>
+        </ProductProvider>
+      </AuthProvider>
       </CacheProvider>
-    </ThemeProvider>
+    </MuiThemeProvider>
   );
 }
