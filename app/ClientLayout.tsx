@@ -1,9 +1,5 @@
 "use client";
-import { CartProvider } from "./context/CartContext";
-import { AuthProvider } from "./context/AuthContext";
-import { WishlistProvider } from "./context/WishlistContext";
-import { OrderProvider } from "./context/OrderContext";
-import { ProductProvider } from "./context/ProductContext";
+
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { ThemeProvider as MuiThemeProvider, createTheme } from "@mui/material/styles";
@@ -250,21 +246,11 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   return (
     <MuiThemeProvider theme={theme}>
       <CacheProvider value={emotionCache}>
-        <AuthProvider>
-          <ProductProvider>
-            <CartProvider>
-            <OrderProvider>
-              <WishlistProvider>
-              <CssBaseline />
-              <Header />
-              <Box component="main" sx={{ minHeight: '70vh' }}>{children}</Box>
-              <Footer />
-              <Toaster position="top-center" toastOptions={{ duration: 3500 }} />
-              </WishlistProvider>
-            </OrderProvider>
-          </CartProvider>
-        </ProductProvider>
-      </AuthProvider>
+        <CssBaseline />
+        <Header />
+        <Box component="main" sx={{ minHeight: '70vh' }}>{children}</Box>
+        <Footer />
+        <Toaster position="top-center" toastOptions={{ duration: 3500 }} />
       </CacheProvider>
     </MuiThemeProvider>
   );

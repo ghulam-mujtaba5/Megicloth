@@ -10,11 +10,8 @@ import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import Fade from "@mui/material/Fade";
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Zoom from '@mui/material/Zoom';
-import Seo from "./components/Seo";
 import Image from 'next/image';
-import Head from "next/head";
 import styles from './page.module.css';
 import HeroCarousel from './components/HeroCarousel';
 import TrendingProducts from './components/TrendingProducts';
@@ -23,55 +20,16 @@ import InstagramFeed from './components/InstagramFeed';
 import BlogPreview from './components/BlogPreview';
 import HighlightedFeatures from './components/HighlightedFeatures';
 import QuickAccessCategories from './components/QuickAccessCategories';
-import { CategoryProvider } from './context/CategoryContext';
-import { BlogProvider } from './context/BlogContext';
 import { products } from "./data/products";
 import ProductCard from "./components/ProductCard";
 import Skeleton from "@mui/material/Skeleton";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
-
-function ScrollTopButton() {
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 300);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-  return (
-    <Zoom in={visible}>
-      <Box sx={{ position: 'fixed', bottom: 32, right: 32, zIndex: 1200 }}>
-        <IconButton
-          aria-label="Scroll to top"
-          sx={{
-            backgroundColor: 'var(--neutral-50)',
-            color: 'var(--primary-600)',
-            boxShadow: 3,
-            '&:hover': {
-              backgroundColor: 'var(--neutral-200)',
-              transform: 'translateY(-2px)',
-            },
-          }}
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        >
-          <KeyboardArrowUpIcon fontSize="large" />
-        </IconButton>
-      </Box>
-    </Zoom>
-  );
-}
+import ScrollTopButton from "./components/ScrollTopButton";
 
 export default function HomePage() {
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -82,17 +40,11 @@ export default function HomePage() {
       product.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [searchQuery]);
+
+  const loading = false; // This will be replaced with real data fetching logic
+
   return (
-    <BlogProvider>
-      <CategoryProvider>
-        <>
-          <Seo
-            title="Megicloth - Premium Unstitched Fabrics in Pakistan"
-            description="Discover the latest collection of high-quality unstitched fabrics for men and women. Shop lawn, cotton, and festive collections online."
-          />
-          <Head>
-            <title>Megicloth Homepage</title>
-          </Head>
+    <>
 
           <Box component="main" sx={{ backgroundColor: 'var(--neutral-50)' }}>
 
@@ -242,7 +194,5 @@ export default function HomePage() {
           </Box>
           <ScrollTopButton />
         </>
-      </CategoryProvider>
-    </BlogProvider>
   );
 }

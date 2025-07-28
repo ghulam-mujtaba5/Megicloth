@@ -11,7 +11,8 @@ export type Product = {
   name: string;
   description: string;
   price: number;
-  image: string;
+  image: string; // Main thumbnail image
+  images: string[]; // Array of all product images
   group: string; // e.g., "Men’s Unstitched"
   category: string; // e.g., "Summer Collection"
   stock: number;
@@ -23,6 +24,7 @@ export type Product = {
   deliveryTime?: string;
   stitchingAvailable?: boolean;
   stitchingCost?: number;
+  tags?: string[];
 };
 
 export const products: Product[] = [
@@ -31,7 +33,14 @@ export const products: Product[] = [
     name: 'Azure Bloom Lawn Suit',
     description: 'Premium quality unstitched lawn fabric for men. 3.5 meters.',
     price: 2200,
-    image: 'https://images.unsplash.com/photo-1469398715555-76331a6c7c9b?auto=format&fit=crop&w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1469398715555-76331a6c7c9b?auto=format&fit=crop&w=800&q=80',
+    images: [
+        'https://images.unsplash.com/photo-1469398715555-76331a6c7c9b?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1516762689621-3e4822615d2a?auto=format&fit=crop&w=800&q=60',
+        'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=800&q=60',
+        'https://images.unsplash.com/photo-1578939658264-3c3b7a5a8a6d?auto=format&fit=crop&w=800&q=60',
+    ], 
+    tags: ['Premium', 'Comfortable', 'Lawn'],
     group: 'Men’s Unstitched',
     category: 'Summer Collection',
     stock: 25,
@@ -49,7 +58,12 @@ export const products: Product[] = [
     name: 'Crimson Garden Lawn Suit',
     description: 'Beautiful unstitched lawn fabric for women. 3-piece set.',
     price: 3200,
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
+    images: [
+        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1516762689621-3e4822615d2a?auto=format&fit=crop&w=800&q=60',
+    ],
+    tags: ['Elegant', 'Stylish', 'Embroidered'],
     group: 'Women’s Unstitched',
     category: 'Luxury Lawn',
     stock: 18,
@@ -67,7 +81,9 @@ export const products: Product[] = [
     name: 'Obsidian Weave Wash & Wear',
     description: 'Soft, comfortable unstitched wash & wear fabric for men.',
     price: 2600,
-    image: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=800&q=80',
+    images: ['https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=800&q=80'],
+    tags: ['Formal', 'Wash & Wear'],
     group: 'Men’s Unstitched',
     category: 'Formal Fabric',
     stock: 20,
@@ -84,7 +100,9 @@ export const products: Product[] = [
     name: 'Emerald Bloom Embroidered Lawn',
     description: 'Elegant unstitched embroidered lawn for women. 3-piece set.',
     price: 4000,
-    image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80',
+    images: ['https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80'],
+    tags: ['Embroidered', 'Lawn', 'Luxury'],
     group: 'Women’s Unstitched',
     category: 'Embroidered / Plain',
     stock: 10,

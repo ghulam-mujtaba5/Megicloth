@@ -6,49 +6,31 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 interface FiltersSidebarProps {
   filters: {
     categories: string[];
-    fabricTypes: string[];
     priceRange: [number, number];
     availability: string;
   };
-  setFilters: (filters: any) => void;
+  onFilterChange: (newFilters: any) => void;
 }
 
 const categories = ["Men's Collection", "Women's Collection", "New Arrivals", "Sale"];
-const fabricTypes = ["Cotton", "Silk", "Lawn", "Chiffon", "Velvet"];
 
-const FiltersSidebar = ({ filters, setFilters }: FiltersSidebarProps) => {
+const FiltersSidebar = ({ filters, onFilterChange }: FiltersSidebarProps) => {
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = event.target;
-    setFilters((prevFilters: any) => ({
-      ...prevFilters,
-      categories: checked
-        ? [...prevFilters.categories, name]
-        : prevFilters.categories.filter((c: string) => c !== name),
-    }));
+    const newCategories = checked
+      ? [...filters.categories, name]
+      : filters.categories.filter((c) => c !== name);
+    onFilterChange({ ...filters, categories: newCategories });
   };
 
-  const handleFabricChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = event.target;
-    setFilters((prevFilters: any) => ({
-      ...prevFilters,
-      fabricTypes: checked
-        ? [...prevFilters.fabricTypes, name]
-        : prevFilters.fabricTypes.filter((f: string) => f !== name),
-    }));
-  };
+
 
   const handlePriceChange = (_event: Event, newValue: number | number[]) => {
-    setFilters((prevFilters: any) => ({
-      ...prevFilters,
-      priceRange: newValue as [number, number],
-    }));
+    onFilterChange({ ...filters, priceRange: newValue as [number, number] });
   };
 
   const handleAvailabilityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFilters((prevFilters: any) => ({
-      ...prevFilters,
-      availability: event.target.value,
-    }));
+    onFilterChange({ ...filters, availability: event.target.value });
   };
   return (
     <Box component="aside">
@@ -74,23 +56,7 @@ const FiltersSidebar = ({ filters, setFilters }: FiltersSidebarProps) => {
         </AccordionDetails>
       </Accordion>
 
-      {/* Fabric Type Filter */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Fabric Type</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <FormGroup>
-            {fabricTypes.map(fabric => (
-              <FormControlLabel
-                key={fabric}
-                control={<Checkbox checked={filters.fabricTypes.includes(fabric)} onChange={handleFabricChange} name={fabric} />}
-                label={fabric}
-              />
-            ))}
-          </FormGroup>
-        </AccordionDetails>
-      </Accordion>
+
 
       {/* Price Range Filter */}
       <Accordion>
