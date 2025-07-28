@@ -18,7 +18,19 @@ const FeaturedBrands: React.FC = () => {
           {featuredBrands.map((brand: Brand) => (
             <Grid item key={brand.id} xs={6} sm={4} md={2}>
               <Paper elevation={0} sx={{ p: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', border: '1px solid #e2e8f0' }}>
-                <Image src={brand.logo} alt={brand.name} width={120} height={60} style={{ objectFit: 'contain' }} />
+                <Image
+                  src={brand.logo}
+                  alt={brand.name}
+                  width={120}
+                  height={60}
+                  style={{ objectFit: 'contain' }}
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (target.src !== '/fallback-logo.png') {
+                      target.src = '/fallback-logo.png';
+                    }
+                  }}
+                />
               </Paper>
             </Grid>
           ))}

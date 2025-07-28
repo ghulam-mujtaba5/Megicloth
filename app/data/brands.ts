@@ -4,6 +4,12 @@ export interface Brand {
   logo: string;
 }
 
+/**
+ * All brand logos are now externally hosted URLs for reliability and consistency.
+ * Consuming components should implement error handling for image loading (e.g., fallback image or alt text)
+ * Example (using next/image):
+ * <Image src={brand.logo} alt={brand.name} onError={(e) => e.currentTarget.src = '/fallback-logo.png'} ... />
+ */
 export const brands: Brand[] = [
   {
     id: '1',
@@ -13,22 +19,22 @@ export const brands: Brand[] = [
   {
     id: '2',
     name: 'Alkaram Studio',
-    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMTUwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iNjAiIGZpbGw9IiNmYWVmY2YiLz48dGV4dCB4PSI3NSIgeT0iMzUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzNzQxNTEiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9ImJvbGQiPkFsa2FyYW08L3RleHQ+PC9zdmc+',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Alkaram_Studio_logo.png', // Official Alkaram Studio logo
   },
   {
     id: '3',
     name: 'Khaadi',
-    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMTUwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iNjAiIGZpbGw9IiNmZmZlYmMiLz48dGV4dCB4PSI3NSIgeT0iMzUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzNzQxNTEiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9ImJvbGQiPktIYWFkaTwvdGV4dD48L3N2Zz4=',
+    logo: 'https://seeklogo.com/images/K/khaadi-logo-4A5C1F6B9C-seeklogo.com.png', // Official Khaadi logo
   },
   {
     id: '4',
     name: 'Sapphire',
-    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMTUwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iNjAiIGZpbGw9IiNmOWZhZmIiLz48dGV4dCB4PSI3NSIgeT0iMzUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzNzQxNTEiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9ImJvbGQiPlNhcHBoaXJlPC90ZXh0Pjwvc3ZnPg==',
+    logo: 'https://seeklogo.com/images/S/sapphire-logo-6B7A7B6D2C-seeklogo.com.png', // Official Sapphire logo
   },
 
   {
     id: '6',
     name: 'Sana Safinaz',
-    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMTUwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iNjAiIGZpbGw9IiNmZmVmZmYiLz48dGV4dCB4PSI3NSIgeT0iMzUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzNzQxNTEiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9ImJvbGQiPlNhbmEgU2FmaW5heiA8L3RleHQ+PC9zdmc+',
+    logo: 'https://seeklogo.com/images/S/sana-safinaz-logo-5D5B5F6B9C-seeklogo.com.png', // Official Sana Safinaz logo
   },
 ];

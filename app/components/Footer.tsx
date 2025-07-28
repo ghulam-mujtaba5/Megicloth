@@ -3,7 +3,6 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
-import Link from "next/link";
 import IconButton from "@mui/material/IconButton";
 import EmailIcon from "@mui/icons-material/Email";
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -18,6 +17,8 @@ import Fade from '@mui/material/Fade';
 import Zoom from '@mui/material/Zoom';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CelebrationIcon from '@mui/icons-material/Celebration';
+import MuiLink from '@mui/material/Link';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function Footer() {
@@ -25,6 +26,7 @@ export default function Footer() {
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterStatus, setNewsletterStatus] = useState<'idle'|'success'|'error'>('idle');
   const [showConfetti, setShowConfetti] = useState(false);
+
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newsletterEmail.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
@@ -37,12 +39,32 @@ export default function Footer() {
     setTimeout(() => setNewsletterStatus('idle'), 2500);
     setNewsletterEmail("");
   };
+
+  const renderFooterLink = ({ href, label }: { href: string; label: string }) => (
+    <Link key={href} href={href} passHref legacyBehavior>
+      <Typography
+        component="a"
+        sx={{
+          color: 'primary.main',
+          fontWeight: 600,
+          textDecoration: 'none',
+          outline: 'none',
+          '&:hover': {
+            textDecoration: 'underline',
+            color: 'primary.dark',
+          },
+        }}
+      >
+        {label}
+      </Typography>
+    </Link>
+  );
   return (
     <Box sx={{ background: 'rgba(255,255,255,0.85)', borderTop: '1.5px solid #e2e8f0', mt: 8, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
       <Container maxWidth="xl" sx={{ py: { xs: 6, md: 10 } }}>
-        <Grid container spacing={6}>
-          {/* Brand & Newsletter */}
-          <Grid item xs={12} md={4}>
+        <Grid container spacing={{ xs: 6, md: 4 }}>
+          {/* Column 1: Brand Info & Newsletter */}
+          <Grid item xs={12} md={4} lg={4}>
             <Box sx={{ mb: 3 }}>
               <Typography
                 variant="h4"
@@ -122,67 +144,72 @@ export default function Footer() {
             </Box>
           </Grid>
 
-          {/* Navigation Links */}
-          <Grid item xs={12} md={2}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#1e293b' }}>
-              Quick Links
-            </Typography>
-            <Box aria-label="Footer navigation" role="navigation" sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              {[ 
-                { href: '/products', label: 'Shop' },
-                { href: '/wishlist', label: 'Wishlist' },
-                { href: '/cart', label: 'Cart' },
-                { href: '/profile', label: 'My Account' },
-                { href: '/contact', label: 'Contact' },
-              ].map((item) => (
-                <Link key={item.href} href={item.href} passHref>
-                  <Typography
-                    component="a"
-                    sx={{
-                      color: 'primary.main',
-                      fontWeight: 600,
-                      textDecoration: 'none',
-                      outline: 'none',
-                      '&:hover': {
-                        textDecoration: 'underline',
-                        color: 'primary.dark',
-                      },
-                    }}
-                  >
-                    {item.label}
-                  </Typography>
-                </Link>
-              ))}
+          {/* Links Section */}
+          <Grid item xs={12} md={8} lg={5}>
+            <Grid container spacing={4}>
+              {/* Column 1: Shop */}
+              <Grid item xs={6} sm={4}>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#1e293b' }}>Shop</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                  {[
+                    { href: '/products', label: 'All Products' },
+                    { href: '/categories', label: 'Categories' },
+                    { href: '/sale', label: 'On Sale' },
+                    { href: '/new-arrivals', label: 'New Arrivals' },
+                  ].map(renderFooterLink)}
+                </Box>
+              </Grid>
+              {/* Column 2: Customer Service */}
+              <Grid item xs={6} sm={4}>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#1e293b' }}>Support</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                  {[
+                    { href: '/contact', label: 'Contact Us' },
+                    { href: '/faq', label: 'FAQ' },
+                    { href: '/shipping', label: 'Shipping' },
+                    { href: '/returns', label: 'Returns' },
+                  ].map(renderFooterLink)}
+                </Box>
+              </Grid>
+              {/* Column 3: Company */}
+              <Grid item xs={12} sm={4}>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#1e293b' }}>Company</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                  {[
+                    { href: '/about', label: 'About Us' },
+                    { href: '/privacy', label: 'Privacy Policy' },
+                    { href: '/terms', label: 'Terms of Service' },
+                  ].map(renderFooterLink)}
+                </Box>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          {/* Contact & Trust Badges */}
+          <Grid item xs={12} md={4} lg={3}>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#1e293b' }}>
+                Contact Us
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
+                Email: <MuiLink href="mailto:support@megicloth.com" sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>support@megicloth.com</MuiLink>
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#64748b', mb: 3 }}>
+                Phone: <MuiLink href="tel:+923001234567" sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>+92 300 1234567</MuiLink>
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#1e293b' }}>
+                Why Shop With Us?
+              </Typography>
+              <Box aria-label="Trust badges" role="region">
+                <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#f0fdf4' } }} tabIndex={0}><VerifiedUserIcon sx={{ color: '#10b981', fontSize: 28 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>100% Authentic Fabrics</Typography></Box></Zoom>
+                <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#eff6ff' } }} tabIndex={0}><LocalShippingIcon sx={{ color: '#2563eb', fontSize: 28 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>Fast Nationwide Delivery</Typography></Box></Zoom>
+                <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 2, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#fef9c3' } }} tabIndex={0}><LockIcon sx={{ color: '#f59e0b', fontSize: 28 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>Secure Payments</Typography></Box></Zoom>
+              </Box>
             </Box>
           </Grid>
 
-          {/* Contact Info */}
-          <Grid item xs={12} md={3}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#1e293b' }}>
-              Contact Us
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
-              Email: <Link href="mailto:support@megicloth.com" sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>support@megicloth.com</Link>
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
-              Phone: <Link href="tel:+923001234567" sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>+92 300 1234567</Link>
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#64748b' }}>
-              Address: 123 Textile Street, Karachi, Pakistan
-            </Typography>
-          </Grid>
-
-          {/* Trust Badges */}
-          <Grid item xs={12} md={3}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#1e293b' }}>
-              Why Shop With Us?
-            </Typography>
-            <Box aria-label="Trust badges" role="region">
-              <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#f0fdf4' } }} tabIndex={0}><VerifiedUserIcon sx={{ color: '#10b981', fontSize: 28 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>100% Authentic Fabrics</Typography></Box></Zoom>
-              <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#eff6ff' } }} tabIndex={0}><LocalShippingIcon sx={{ color: '#2563eb', fontSize: 28 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>Fast Nationwide Delivery</Typography></Box></Zoom>
-              <Zoom in={true}><Box sx={{ display: 'flex', alignItems: 'center', gap: 2, transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.08)', background: '#fef9c3' } }} tabIndex={0}><LockIcon sx={{ color: '#f59e0b', fontSize: 28 }} /><Typography variant="body2" sx={{ color: '#64748b' }}>Secure Payments</Typography></Box></Zoom>
-            </Box>
-          </Grid>
         </Grid>
         <Box sx={{ borderTop: '1.5px solid #e2e8f0', mt: 6, pt: 3, textAlign: 'center' }}>
           <Typography variant="body2" sx={{ color: '#64748b' }}>

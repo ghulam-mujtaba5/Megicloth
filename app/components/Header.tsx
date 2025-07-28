@@ -292,25 +292,36 @@ export default function Header() {
 
   // Search bar (desktop)
   const searchBarDesktop = (
-    <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', ml: 4, position: 'relative' }}>
+    <Box sx={{ flex: 1, maxWidth: 600, ml: 4, display: { xs: 'none', md: 'flex' } }} ref={setSearchAnchorEl}>
       <TextField
+        fullWidth
         size="small"
-        placeholder="Search products..."
+        placeholder="Search for products, brands, and categories..."
         value={search}
-        onChange={e => setSearch(e.target.value)}
-        onFocus={e => { setSearchFocused(true); setSearchAnchorEl(e.currentTarget); }}
-        onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
+        onChange={(e) => setSearch(e.target.value)}
+        onFocus={() => setSearchFocused(true)}
+        onBlur={() => setTimeout(() => setSearchFocused(false), 150)} // Delay to allow click on results
         onKeyDown={handleSearchKeyDown}
         sx={{
           background: '#f7fafc',
           borderRadius: 2,
-          minWidth: 220,
-          '& .MuiOutlinedInput-root': { borderRadius: 2 },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              border: '1px solid #e2e8f0',
+            },
+            '&:hover fieldset': {
+              borderColor: '#2563eb',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#2563eb',
+              boxShadow: `0 0 0 2px ${alpha('#2563eb', 0.2)}`,
+            },
+          },
         }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <SearchIcon color="action" />
+              <SearchIcon color="action" aria-hidden="true" />
             </InputAdornment>
           ),
           'aria-label': 'Search products',
@@ -320,23 +331,30 @@ export default function Header() {
         }}
         autoComplete="off"
       />
-      <Popper open={searchFocused && (searchResults.length > 0 || recentSearches.length > 0)} anchorEl={searchAnchorEl} placement="bottom-start" style={{ zIndex: 1301, minWidth: 320 }}>
-        <Paper elevation={3} sx={{ mt: 1, borderRadius: 2, boxShadow: '0 8px 32px 0 rgba(31,38,135,0.10)' }}>
+      <Popper
+        open={searchFocused && (searchResults.length > 0 || recentSearches.length > 0)}
+        anchorEl={searchAnchorEl}
+        placement="bottom"
+        transition
+        disablePortal
+        sx={{ width: searchAnchorEl?.clientWidth, zIndex: 1201 }}
+      >
+        <Paper elevation={3} sx={{ mt: 0.5, borderRadius: 2, boxShadow: '0 8px 32px 0 rgba(31,38,135,0.10)' }}>
           <List dense id="search-autocomplete-list" role="listbox">
             {search.trim() && searchResults.length > 0 ? (
               searchResults.map((result, idx) => (
                 <ListItem key={result.id} disablePadding selected={highlightedIndex === idx} role="option" aria-selected={highlightedIndex === idx}>
                   <ListItemButton component={Link} href={`/products/${result.id}`} sx={{ gap: 2 }} onClick={() => saveRecentSearch(result.name)}>
                     <ListItemAvatar>
-                      <Avatar src={result.image} alt={result.name} variant="rounded" sx={{ width: 48, height: 48, mr: 1 }} />
+                      <Avatar src={result.image} alt={result.name} variant="rounded" sx={{ width: 40, height: 40, mr: 1 }} />
                     </ListItemAvatar>
                     <ListItemText
                       primary={result.name}
                       secondary={result.description}
-                      primaryTypographyProps={{ fontWeight: 700, color: 'text.primary' }}
-                      secondaryTypographyProps={{ color: 'text.secondary', fontSize: '0.85rem' }}
+                      primaryTypographyProps={{ fontWeight: 700, color: '#1e293b' }}
+                      secondaryTypographyProps={{ color: '#64748b', fontSize: '0.85rem' }}
                     />
-                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'secondary.main', ml: 2 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 700, color: '#10b981', ml: 2 }}>
                       {formatPrice(result.salePrice ?? result.price)}
                     </Typography>
                   </ListItemButton>
@@ -346,7 +364,7 @@ export default function Header() {
               recentSearches.map((term, idx) => (
                 <ListItem key={term} disablePadding selected={highlightedIndex === idx} role="option" aria-selected={highlightedIndex === idx}>
                   <ListItemButton onClick={() => { setSearch(term); setSearchFocused(false); }}>
-                    <ListItemText primary={term} primaryTypographyProps={{ fontWeight: 700, color: 'primary.main' }} />
+                    <ListItemText primary={term} primaryTypographyProps={{ fontWeight: 700, color: '#2563eb' }} />
                   </ListItemButton>
                 </ListItem>
               ))
@@ -361,52 +379,71 @@ export default function Header() {
   const actionsDesktop = (
     <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2, ml: 4 }}>
       <Tooltip title="Wishlist">
-        <IconButton component={Link} href="/wishlist" aria-label="Wishlist" sx={{ color: '#ef4444', position: 'relative' }}>
+        <IconButton component={Link} href="/wishlist" aria-label={`Wishlist: ${wishlistCount} items`} sx={{ color: '#ef4444', position: 'relative' }}>
           <Badge badgeContent={wishlistCount} color="error" overlap="circular" sx={{ '& .MuiBadge-badge': { fontWeight: 700 } }}>
             <FavoriteIcon />
           </Badge>
         </IconButton>
       </Tooltip>
       <Tooltip title="Cart">
-        <IconButton component={Link} href="/cart" aria-label="Cart" sx={{ color: '#2563eb', position: 'relative' }}>
+        <IconButton component={Link} href="/cart" aria-label={`Cart: ${cartCount} items`} sx={{ color: '#2563eb', position: 'relative' }}>
           <Badge badgeContent={cartCount} color="primary" overlap="circular" sx={{ '& .MuiBadge-badge': { fontWeight: 700 } }}>
             <ShoppingCartIcon />
           </Badge>
         </IconButton>
       </Tooltip>
-      <Tooltip title={isAuthenticated ? 'Account' : 'Login'}>
-        <IconButton
-          onClick={isAuthenticated ? handleUserMenuOpen : undefined}
-          component={isAuthenticated ? 'button' : Link}
-          href={isAuthenticated ? undefined : '/auth/login'}
-          aria-label="Account"
-          sx={{ color: '#1e293b', ml: 1 }}
-        >
-          {isAuthenticated ? (
-            <Avatar sx={{ width: 32, height: 32, bgcolor: '#2563eb', fontWeight: 700 }}>
-              {user?.firstName?.[0] || <PersonIcon />}
-            </Avatar>
-          ) : (
+      {isAuthenticated ? (
+        <>
+          <Tooltip title="Account">
+            <IconButton
+              onClick={handleUserMenuOpen}
+              aria-label="Open user menu"
+              aria-controls={Boolean(anchorEl) ? 'user-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={Boolean(anchorEl) ? 'true' : undefined}
+              sx={{ color: '#1e293b', ml: 1 }}
+            >
+              <Avatar sx={{ width: 32, height: 32, bgcolor: '#2563eb', fontWeight: 700 }}>
+                {user?.name?.[0] || <PersonIcon />}
+              </Avatar>
+            </IconButton>
+          </Tooltip>
+          <Menu
+            id="user-menu"
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleUserMenuClose}
+            MenuListProps={{
+              'aria-labelledby': 'user-menu-button',
+            }}
+          >
+            <MenuItem component={Link} href="/profile" onClick={handleUserMenuClose}>
+              <AccountCircleIcon sx={{ mr: 1 }} /> My Profile
+            </MenuItem>
+            <MenuItem component={Link} href="/profile?tab=orders" onClick={handleUserMenuClose}>
+              <ShoppingBagIcon sx={{ mr: 1 }} /> My Orders
+            </MenuItem>
+            <MenuItem component={Link} href="/profile?tab=settings" onClick={handleUserMenuClose}>
+              <SettingsIcon sx={{ mr: 1 }} /> Account Settings
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleLogout} sx={{ color: '#ef4444' }}>
+              <LogoutIcon sx={{ mr: 1 }} /> Logout
+            </MenuItem>
+          </Menu>
+        </>
+      ) : (
+        <Tooltip title="Login/Register">
+          <IconButton
+            component={Link}
+            href={'/auth/login'}
+            aria-label="Login or Register"
+            sx={{ color: '#1e293b', ml: 1 }}
+          >
             <PersonIcon />
-          )}
-        </IconButton>
-      </Tooltip>
-      {/* User menu (dropdown) */}
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleUserMenuClose}>
-        <MenuItem component={Link} href="/profile">
-          <AccountCircleIcon sx={{ mr: 1 }} /> My Profile
-        </MenuItem>
-        <MenuItem component={Link} href="/profile?tab=orders">
-          <ShoppingBagIcon sx={{ mr: 1 }} /> My Orders
-        </MenuItem>
-        <MenuItem component={Link} href="/profile?tab=settings">
-          <SettingsIcon sx={{ mr: 1 }} /> Settings
-        </MenuItem>
-        <Divider />
-        <MenuItem onClick={handleLogout} sx={{ color: '#ef4444' }}>
-          <LogoutIcon sx={{ mr: 1 }} /> Logout
-        </MenuItem>
-      </Menu>
+          </IconButton>
+        </Tooltip>
+      )}
     </Box>
   );
 
@@ -466,7 +503,7 @@ export default function Header() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon color="action" />
+                  <SearchIcon color="action" aria-hidden="true" />
                 </InputAdornment>
               ),
               'aria-label': 'Search products',
@@ -512,15 +549,14 @@ export default function Header() {
             </Paper>
           )}
           {/* Navigation links */}
-          <List aria-label="Main navigation" role="menu" sx={{ flex: 1 }}>
+          <List aria-label="Main navigation" sx={{ flex: 1 }}>
             {navLinks.map((link) => (
               <ListItem key={link.href} disablePadding>
-                <ListItemButton component={Link} href={link.href} role="menuitem" tabIndex={0} sx={{ borderRadius: 2, fontWeight: 700, transition: 'background 0.2s', '&:hover, &:focus': { background: alpha('#2563eb', 0.08) } }}>
+                <ListItemButton component={Link} href={link.href} sx={{ borderRadius: 2, fontWeight: 700, transition: 'background 0.2s', '&:hover, &:focus': { background: alpha('#2563eb', 0.08) } }}>
                   <ListItemText primary={link.label} />
                 </ListItemButton>
               </ListItem>
             ))}
-
           </List>
           {/* ... existing drawer content ... */}
         </Box>

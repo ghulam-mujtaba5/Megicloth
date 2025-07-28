@@ -1,101 +1,58 @@
-.page {
-  --gray-rgb: 0, 0, 0;
-  --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
-  --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
+/* Homepage Specific Styles - Aligned with Brand Identity */
 
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-
-  display: grid;
-  grid-template-rows: 20px 1fr 20px;
-  align-items: center;
-  justify-items: center;
-  min-height: 100svh;
-  padding: 80px;
-  gap: 64px;
-  font-family: var(--font-geist-sans);
-}
-
-@media (prefers-color-scheme: dark) {
-  .page {
-    --gray-rgb: 255, 255, 255;
-    --gray-alpha-200: rgba(var(--gray-rgb), 0.145);
-    --gray-alpha-100: rgba(var(--gray-rgb), 0.06);
-
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
-  }
-}
-
-.main {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  grid-row-start: 2;
-}
-
-.main ol {
-  font-family: var(--font-geist-mono);
-  padding-left: 0;
-  margin: 0;
-  font-size: 14px;
-  line-height: 24px;
-  letter-spacing: -0.01em;
-  list-style-position: inside;
-}
-
-.main li:not(:last-of-type) {
-  margin-bottom: 8px;
-}
-
-.main code {
-  font-family: inherit;
-  background: var(--gray-alpha-100);
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-weight: 600;
-}
-
-.ctas {
-  display: flex;
-  gap: 16px;
-}
-
-.ctas a {
-  appearance: none;
-  border-radius: 128px;
-  height: 48px;
-  padding: 0 20px;
-  border: none;
-  border: 1px solid transparent;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
-  cursor: pointer;
+/* Featured Brands Section */
+.brandLogoBox {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
+  height: 80px; /* Increased height for better visibility */
+  padding: 16px;
+  background-color: var(--neutral-100);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  filter: grayscale(100%);
+  opacity: 0.8;
 }
 
-a.primary {
-  background: var(--foreground);
-  color: var(--background);
-  gap: 8px;
+.brandLogoBox:hover {
+  background-color: var(--neutral-200);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  filter: grayscale(0%);
+  opacity: 1;
 }
 
-a.secondary {
-  border-color: var(--gray-alpha-200);
-  min-width: 158px;
+.brandImage {
+  height: 60px;
+  width: auto;
+  object-fit: contain; /* Ensures logo aspect ratio is maintained */
+  mix-blend-mode: multiply; /* Helps blend PNGs with background */
 }
 
-.footer {
-  grid-row-start: 3;
-  display: flex;
-  gap: 24px;
+/* Newsletter Section */
+.newsletterContainer {
+  background-color: var(--primary-50);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+  border: 1px solid var(--primary-100);
+}
+
+.newsletterImage {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.newsletterContent {
+  padding: 2rem;
+}
+
+@media (min-width: 900px) {
+  .newsletterContent {
+    padding: 3rem;
+  }
 }
 
 .footer a {
