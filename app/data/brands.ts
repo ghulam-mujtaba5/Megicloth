@@ -23,7 +23,7 @@ export const brands: Brand[] = [
   {
     id: '4',
     name: 'Sapphire',
-    logo: 'https://pk.sapphireonline.pk/cdn/shop/files/logo-new.png?v=1614755679',
+    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMTUwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iNjAiIGZpbGw9IiNmOWZhZmIiLz48dGV4dCB4PSI3NSIgeT0iMzUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzNzQxNTEiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9ImJvbGQiPlNhcHBoaXJlPC90ZXh0Pjwvc3ZnPg==',
   },
 
   {

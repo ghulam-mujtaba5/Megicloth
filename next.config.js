@@ -23,8 +23,26 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'pk.sapphireonline.pk',
       },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.alkaramstudio.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pk.khaadi.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.sanasafinaz.com',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   // Handle font loading issues
   async headers() {
