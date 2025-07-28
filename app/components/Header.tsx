@@ -433,11 +433,11 @@ export default function Header() {
           </Menu>
         </>
       ) : (
-        <Tooltip title="Login/Register">
+        <Tooltip title="Login">
           <IconButton
             component={Link}
             href={'/auth/login'}
-            aria-label="Login or Register"
+            aria-label="Login"
             sx={{ color: '#1e293b', ml: 1 }}
           >
             <PersonIcon />
