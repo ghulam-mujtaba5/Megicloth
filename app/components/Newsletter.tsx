@@ -40,25 +40,14 @@ const Newsletter = () => {
                       label="Email Address"
                       variant="outlined"
                       fullWidth
-                      sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', fontFamily: 'var(--font-inter)', backgroundColor: '#fff' } }}
+                      className={styles.emailInput}
                     />
                     <Button
                       variant="contained"
                       type="submit"
                       size="large"
                       startIcon={<MailOutlineIcon />}
-                      sx={{
-                        borderRadius: '12px',
-                        py: '15px',
-                        px: 4,
-                        whiteSpace: 'nowrap',
-                        fontFamily: 'var(--font-poppins)',
-                        fontWeight: 600,
-                        backgroundColor: 'var(--primary-600)',
-                        '&:hover': {
-                          backgroundColor: 'var(--primary-700)',
-                        },
-                      }}
+                      className={styles.subscribeButton}
                     >
                       Subscribe
                     </Button>

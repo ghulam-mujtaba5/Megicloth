@@ -1,0 +1,14 @@
+.section {
+  margin-bottom: 3rem;
+}
+
+.title {
+  font-weight: 800 !important;
+  margin-bottom: 1rem !important;
+  color: var(--slate-800);
+}
+
+.text {
+  font-size: 1.1rem !important;
+  color: var(--slate-600);
+}

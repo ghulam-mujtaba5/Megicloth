@@ -1,0 +1,48 @@
+.section {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.title {
+  font-weight: 800 !important;
+  margin-bottom: 2rem !important;
+  color: var(--slate-800);
+}
+
+.valueItem {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.avatar {
+  width: 64px !important;
+  height: 64px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: 1rem !important;
+}
+
+.valueTitle {
+  font-weight: 700 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.valueText {
+  color: var(--slate-500);
+}
+
+.qualityIcon {
+  background-color: var(--blue-600) !important;
+}
+
+.authenticityIcon {
+  background-color: var(--emerald-500) !important;
+}
+
+.innovationIcon {
+  background-color: var(--amber-500) !important;
+}
+
+.customerIcon {
+  background-color: var(--rose-600) !important;
+}

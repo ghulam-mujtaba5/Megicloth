@@ -42,6 +42,7 @@ const FabricSearch = ({ onSearchChange }: FabricSearchProps) => {
             placeholder="Search for fabrics, colors, brands..."
             value={searchQuery}
             onChange={handleSearchChange}
+            className={styles.searchInput}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -55,7 +56,6 @@ const FabricSearch = ({ onSearchChange }: FabricSearchProps) => {
                   </IconButton>
                 </InputAdornment>
               ),
-              sx: { borderRadius: '12px', fontFamily: 'var(--font-inter)' }
             }}
           />
         </Box>

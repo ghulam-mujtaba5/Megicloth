@@ -37,6 +37,25 @@
   gap: 1rem;
 }
 
+.emailInput :global(.MuiOutlinedInput-root) {
+  border-radius: 12px;
+  font-family: var(--font-inter);
+  background-color: var(--neutral-white);
+}
+
+.subscribeButton {
+  border-radius: 12px !important;
+  padding: 15px 2rem !important;
+  white-space: nowrap;
+  font-family: var(--font-poppins) !important;
+  font-weight: 600 !important;
+  background-color: var(--primary-600) !important;
+}
+
+.subscribeButton:hover {
+  background-color: var(--primary-700) !important;
+}
+
 .image {
   width: 100%;
   height: 100%;
