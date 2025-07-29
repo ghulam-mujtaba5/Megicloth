@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
-import { Container, Box, Typography, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, CircularProgress } from '@mui/material';
+import { Container, Box, Typography, Grid, List, ListItemButton, ListItemIcon, ListItemText, Paper, CircularProgress } from '@mui/material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -22,7 +22,7 @@ const accountNavLinks = [
 ];
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
