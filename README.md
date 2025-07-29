@@ -180,12 +180,21 @@ megicloth/
 ## 🔧 Configuration
 
 ### Environment Variables
-Create a `.env.local` file in the root directory:
+Create a `.env.local` file in the root directory and add the following (in addition to any existing variables):
 
 ```env
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_SITE_NAME=Megicloth
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+DEFAULT_ADMIN_EMAIL=admin@megicloth.com
+DEFAULT_ADMIN_PASSWORD=adminpassword
 ```
+
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+- `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role key (never expose publicly)
+- `DEFAULT_ADMIN_EMAIL`: The default admin email for local/dev testing
+- `DEFAULT_ADMIN_PASSWORD`: The default admin password for local/dev testing
+
+> ⚠️ **Never use the default admin credentials in production. This script is strictly for development/testing.**
 
 ### TypeScript Configuration
 The project uses strict TypeScript configuration for better type safety and development experience.
