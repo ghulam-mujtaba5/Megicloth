@@ -1,3 +1,7 @@
+# Megicloth Development Roadmap (2025)
+
+This roadmap tracks all major milestones, their status, and alignment with hackathon and production goals.
+
 ### **Megicloth Development Roadmap**
 
 ---

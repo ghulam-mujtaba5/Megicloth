@@ -45,7 +45,7 @@ export default function ProductDialog({ open, onClose, product }: ProductDialogP
 
   useEffect(() => {
     setFormData(getInitialFormData());
-  }, [product, open]);
+  }, [product, open, getInitialFormData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;

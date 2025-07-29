@@ -75,7 +75,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
 
   const [formState, formAction] = useFormState(addReview, { errors: {} });
 
-  const reviews = product?.reviews || [];
+  const reviews = useMemo(() => product?.reviews || [], [product]);
 
   const finalPrice = useMemo(() => {
     if (!product) return 0;

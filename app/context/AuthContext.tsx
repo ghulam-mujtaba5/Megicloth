@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         addresses: profileData.addresses || [],
         preferences: profileData.preferences,
         email: supabaseUser.email || '',
-        role: supabaseUser.role || 'user',
+        role: profileData.role || 'user',
         wishlist: profileData.wishlist?.map((w: any) => w.product_id) || [],
         wishlistProducts: wishlistProducts,
       };

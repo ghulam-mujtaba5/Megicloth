@@ -35,6 +35,12 @@ To become the leading online destination for premium unstitched fabrics in Pakis
 | Error     | Red        | `#ef4444` | Error messages, validation        |
 | Neutral   | Gray       | `#64748b` | Secondary text, borders, backgrounds|
 
+> **Note:** All brand colors and typography are enforced through CSS Modules in each component and a single `GlobalStyles.tsx` for root-level variables and resets. This ensures strict brand consistency across the app.
+| Secondary | Green      | `#10b981` | Success states, promotions         |
+| Warning   | Orange     | `#f59e0b` | Alerts, notifications             |
+| Error     | Red        | `#ef4444` | Error messages, validation        |
+| Neutral   | Gray       | `#64748b` | Secondary text, borders, backgrounds|
+
 ### Typography
 
 *   **Headings:** Poppins (Bold, Semi-Bold)

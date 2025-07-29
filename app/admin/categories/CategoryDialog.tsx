@@ -32,7 +32,7 @@ export default function CategoryDialog({ open, onClose, category }: CategoryDial
 
   useEffect(() => {
     setFormData(getInitialFormData());
-  }, [category, open]);
+  }, [category, open, getInitialFormData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

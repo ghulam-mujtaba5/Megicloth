@@ -51,6 +51,11 @@ A modern, mobile-first e-commerce platform for premium unstitched fabrics, built
 - **TypeScript**: Type-safe development
 - **Material-UI (MUI)**: Component library and design system
 - **Emotion**: CSS-in-JS styling
+- **CSS Modules**: All component styles are modular and scoped; no global CSS files are used except for foundational styles via a single `GlobalStyles.tsx`.
+
+### Backend & Auth
+- **Supabase**: Managed Postgres DB, Auth, Storage, and Realtime
+- **Role-Based Access Control**: Uses a `role` field in the `profiles` table (`user` or `admin`). Admin features are protected in the app and enforced in Supabase policies.
 
 ### Development Tools
 - **ESLint**: Code linting and formatting
@@ -107,14 +112,12 @@ megicloth/
 ├── app/                          # Next.js App Router
 │   ├── cart/                     # Shopping cart page
 │   ├── checkout/                 # Checkout process
-│   ├── components/               # Reusable UI components
+│   ├── components/               # Reusable UI components (all use CSS Modules)
 │   │   ├── Header.tsx           # Navigation header
 │   │   └── ProductCard.tsx      # Product display card
 │   ├── context/                  # React context providers
-│   │   └── CartContext.tsx      # Shopping cart state management
-│   ├── data/                     # Static data and mock APIs
+│   ├── data/                     # Static/fake data for dev
 │   │   └── products.ts          # Product catalog data
-│   ├── globals.css              # Global styles and design system
 │   ├── layout.tsx               # Root layout component
 │   ├── page.tsx                 # Home page
 │   └── products/                # Product pages
@@ -126,7 +129,7 @@ megicloth/
 └── README.md                    # Project documentation
 ```
 
-## 🎯 Key Components
+## 🧑‍💻 Key Components & Practices
 
 ### CartContext
 - **State Management**: Centralized cart state with React Context
@@ -134,17 +137,19 @@ megicloth/
 - **Validation**: Stock checking and quantity validation
 - **Performance**: Memoized calculations and optimized re-renders
 
-### ProductCard
-- **Responsive Design**: Adapts to different screen sizes
-- **Interactive Elements**: Add to cart, favorites, and quick view
-- **Loading States**: Skeleton loaders for better UX
-- **Accessibility**: ARIA labels and keyboard navigation
-
 ### Header
 - **Navigation**: Clean navigation with cart indicator
 - **Mobile Menu**: Collapsible mobile navigation
 - **Search Integration**: Global search functionality
 - **Cart Preview**: Quick cart overview
+
+### CSS & Styling
+- **No global CSS files**: All UI styling is done via CSS Modules for each component, ensuring modularity and no style bleed. Only foundational styles (CSS variables, resets, and fonts) are injected via `GlobalStyles.tsx` in the root layout.
+
+### Admin Access Control
+- **Supabase Role Field**: The `profiles` table includes a `role` column (`user` or `admin`).
+- **Automated Admin Setup**: The admin account’s role is set to `admin` in Supabase. The Next.js AuthContext fetches and uses the `role` for access checks, ensuring robust admin-only access to protected routes and features.
+- **Production Ready**: All access control is enforced both client-side (UI) and in Supabase Row Level Security (RLS) policies.
 
 ## 🎨 Design System
 
@@ -205,14 +210,15 @@ The application can be deployed to any platform that supports Node.js:
 ## 🧪 Testing
 
 ### Manual Testing Checklist
-- [ ] Home page loads correctly
-- [ ] Product listing with filters works
-- [ ] Product detail pages display properly
-- [ ] Add to cart functionality
-- [ ] Checkout process completion
-- [ ] Mobile responsiveness
-- [ ] Form validation
-- [ ] Error handling
+- [x] Home page loads correctly
+- [x] Product listing with filters works
+- [x] Product detail pages display properly
+- [x] Add to cart functionality
+- [x] Checkout process completion
+- [x] Mobile responsiveness
+- [x] Form validation
+- [x] Error handling
+- [x] Admin access control (Supabase role-based)
 
 ### Performance Testing
 - Lighthouse score > 90 for all metrics
@@ -259,11 +265,22 @@ For support and questions:
 *Megicloth - Premium Unstitched Fabrics*
 
 
-testing credentials:
+## 🔑 Supabase Setup & Admin Roles
+
+### Supabase Project
+- Project URL: https://buqkvkzderfmhsqxgkeb.supabase.co
+- Public Anon Key: (see `.env.local`)
+
+### Profiles Table
+- Add a `role` column (default: `user`).
+- Set the primary admin account’s role to `admin`.
+- Use Supabase Row Level Security (RLS) to restrict admin actions.
+- The app’s AuthContext fetches and uses the `role` for protected admin features.
+
+### Testing Credentials
 
 Admin Email: admin@megicloth.com
 Admin Password: adminpassword
-There is also a regular user account for testing:
 
-User Email: user@example.com
+Regular User Email: user@example.com
 User Password: password
