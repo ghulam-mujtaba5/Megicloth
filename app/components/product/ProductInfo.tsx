@@ -1,23 +1,14 @@
 "use client";
 
-import { Product } from "../../data/products";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Chip from "@mui/material/Chip";
-import Rating from "@mui/material/Rating";
-import Switch from '@mui/material/Switch';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import TextField from "@mui/material/TextField";
-import IconButton from "@mui/material/IconButton";
-import Alert from "@mui/material/Alert";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import ShareIcon from "@mui/icons-material/Share";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import SecurityIcon from "@mui/icons-material/Security";
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import { Product } from "../../types";
+import { 
+  Typography, Button, Chip, Rating, Switch, FormControlLabel, 
+  IconButton, Divider, Stack, Paper
+} from "@mui/material";
+import { 
+  ShoppingCart, Favorite, FavoriteBorder, Share, Add, Remove, 
+  LocalShipping, Security, Replay
+} from "@mui/icons-material";
 
 interface ProductInfoProps {
   product: Product;
@@ -35,30 +26,6 @@ interface ProductInfoProps {
   onStitchingChange: (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void;
 }
 
-const glassCardSx = {
-  borderRadius: 4,
-  background: 'rgba(255,255,255,0.65)',
-  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
-  border: '1px solid rgba(255,255,255,0.25)',
-  overflow: 'hidden',
-  p: { xs: 2, md: 4 },
-};
-
-const neoButtonSx = {
-  background: '#f7fafc',
-  boxShadow: '2px 2px 8px #e2e8f0, -2px -2px 8px #ffffff',
-  borderRadius: 2,
-  fontWeight: 700,
-  color: '#2563eb',
-  '&:hover': {
-    background: '#e2e8f0',
-    color: '#1e40af',
-    boxShadow: '0 4px 16px #2563eb22',
-  },
-};
-
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('en-PK', {
     style: 'currency',
@@ -68,19 +35,9 @@ const formatPrice = (price: number) => {
 };
 
 export default function ProductInfo({ 
-  product, 
-  reviews, 
-  averageRating, 
-  finalPrice, 
-  isFavorite, 
-  addStitching, 
-  quantity, 
-  onAddToCart, 
-  onBuyNow, 
-  onQuantityChange, 
-  onToggleFavorite, 
-  onShare, 
-  onStitchingChange 
+  product, reviews, averageRating, finalPrice, isFavorite, addStitching, 
+  quantity, onAddToCart, onBuyNow, onQuantityChange, onToggleFavorite, 
+  onShare, onStitchingChange 
 }: ProductInfoProps) {
 
   const discountPercentage = product.salePrice 
@@ -88,144 +45,127 @@ export default function ProductInfo({
     : 0;
 
   return (
-    <Box sx={glassCardSx}>
-      <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-        {product.tags?.map((tag, index) => (
-          <Chip
-            key={index}
-            label={tag}
-            size="small"
-            variant="outlined"
-            sx={{
-              fontSize: '0.75rem',
-              fontWeight: 500,
-              borderColor: '#e2e8f0',
-              color: '#64748b',
-            }}
-          />
-        ))}
-      </Box>
+    <Stack spacing={3} sx={{ pt: { xs: 2, md: 0 } }}>
+      {/* Stock & SKU */}
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Chip 
+          label={product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+          color={product.stock > 0 ? 'success' : 'error'}
+          size="small"
+          sx={{ fontWeight: 700, borderRadius: '6px' }}
+        />
+        <Typography variant="caption" color="text.secondary">SKU: {product.sku}</Typography>
+      </Stack>
 
-      <Typography
-        variant="h3"
-        sx={{
-          fontSize: { xs: '1.75rem', md: '2.5rem' },
-          fontWeight: 800,
-          mb: 2,
-          color: '#1e293b',
-          lineHeight: 1.2,
-        }}
-      >
+      {/* Title */}
+      <Typography variant="h4" component="h1" fontWeight={700}>
         {product.name}
       </Typography>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <Rating
-          value={averageRating}
-          precision={0.1}
-          readOnly
-          sx={{
-            '& .MuiRating-iconFilled': {
-              color: '#fbbf24',
-            },
-          }}
-        />
-        <Typography variant="body2" sx={{ ml: 1, color: '#64748b' }}>
-          ({reviews.length} reviews)
+      {/* Rating */}
+      <Stack direction="row" alignItems="center" spacing={1}>
+        <Rating value={averageRating} precision={0.1} readOnly />
+        <Typography variant="body2" color="text.secondary">
+          ({reviews.length} customer reviews)
         </Typography>
-      </Box>
+      </Stack>
 
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 700,
-              color: '#10b981',
-              fontSize: { xs: '1.75rem', md: '2rem' },
-            }}
-          >
-            {formatPrice(finalPrice)}
+      {/* Price */}
+      <Stack direction="row" alignItems="flex-end" spacing={2}>
+        <Typography variant="h3" fontWeight={700} color="primary.main">
+          {formatPrice(finalPrice)}
+        </Typography>
+        {product.salePrice && (
+          <Typography variant="h5" fontWeight={500} color="text.secondary" sx={{ textDecoration: 'line-through' }}>
+            {formatPrice(product.price)}
           </Typography>
-          {product.salePrice && (
-            <Typography
-              variant="h5"
-              sx={{
-                textDecoration: 'line-through',
-                color: '#94a3b8',
-                fontWeight: 600,
-              }}
-            >
-              {formatPrice(product.price)}
-            </Typography>
-          )}
-          {discountPercentage > 0 && (
-            <Chip label={`${discountPercentage}% OFF`} color="success" size="small" sx={{ fontWeight: 700 }} />
-          )}
-        </Box>
-      </Box>
+        )}
+        {discountPercentage > 0 && (
+          <Chip label={`${discountPercentage}% OFF`} color="error" size="small" sx={{ fontWeight: 700, height: 'auto', py: 0.5 }} />
+        )}
+      </Stack>
 
-      {product.stitchingAvailable && (
-        <FormControlLabel
-          control={<Switch checked={addStitching} onChange={onStitchingChange} />}
-          label={`Add Stitching (+${formatPrice(product.stitchingCost || 0)})`}
-          sx={{ mb: 2 }}
-        />
-      )}
+      <Divider />
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <TextField
-          type="number"
-          label="Qty"
-          value={quantity}
-          onChange={(e) => onQuantityChange(parseInt(e.target.value, 10))}
-          inputProps={{ min: 1, max: product.stock, step: 1 }}
-          sx={{ width: '80px' }}
-        />
+      {/* Description */}
+      <Typography variant="body1" color="text.secondary">
+        {product.description}
+      </Typography>
+
+      {/* Options */}
+      <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: 'grey.200' }}>
+        <Stack spacing={2}>
+          {product.stitchingAvailable && (
+            <FormControlLabel
+              control={<Switch checked={addStitching} onChange={onStitchingChange} />}
+              label={`Add Stitching (+${formatPrice(product.stitchingCost || 0)})`}
+              sx={{ justifyContent: 'space-between', ml: 0 }}
+            />
+          )}
+          <Stack direction="row" alignItems="center" justifyContent="space-between">
+            <Typography fontWeight={500}>Quantity:</Typography>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ border: '1px solid', borderColor: 'grey.300', borderRadius: '8px' }}>
+              <IconButton size="small" onClick={() => onQuantityChange(Math.max(1, quantity - 1))} disabled={quantity <= 1}>
+                <Remove fontSize="small" />
+              </IconButton>
+              <Typography fontWeight={700} sx={{ width: '2rem', textAlign: 'center' }}>{quantity}</Typography>
+              <IconButton size="small" onClick={() => onQuantityChange(Math.min(product.stock, quantity + 1))} disabled={quantity >= product.stock}>
+                <Add fontSize="small" />
+              </IconButton>
+            </Stack>
+          </Stack>
+        </Stack>
+      </Paper>
+
+      {/* Actions */}
+      <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }}>
         <Button
           variant="contained"
-          color="primary"
           size="large"
-          startIcon={<ShoppingCartIcon />}
+          startIcon={<ShoppingCart />}
           onClick={onAddToCart}
-          sx={{ flexGrow: 1, py: 1.5, fontWeight: 700 }}
+          disabled={product.stock === 0}
+          sx={{ flex: 2, py: 1.5, fontWeight: 700 }}
         >
           Add to Cart
         </Button>
-        <IconButton onClick={onToggleFavorite} sx={neoButtonSx}>
-          {isFavorite ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
+        <Button
+          variant="outlined"
+          size="large"
+          onClick={onBuyNow}
+          disabled={product.stock === 0}
+          sx={{ flex: 1, py: 1.5, fontWeight: 700 }}
+        >
+          Buy Now
+        </Button>
+        <IconButton onClick={onToggleFavorite} sx={{ border: '1px solid', borderColor: 'grey.300', borderRadius: '8px' }}>
+          {isFavorite ? <Favorite color="error" /> : <FavoriteBorder />}
         </IconButton>
-        <IconButton onClick={onShare} sx={neoButtonSx}>
-          <ShareIcon />
+        <IconButton onClick={onShare} sx={{ border: '1px solid', borderColor: 'grey.300', borderRadius: '8px' }}>
+          <Share />
         </IconButton>
-      </Box>
+      </Stack>
 
-      <Button
-        variant="contained"
-        color="secondary"
-        fullWidth
-        size="large"
-        onClick={onBuyNow}
-        sx={{ mb: 3, py: 1.5, fontWeight: 700 }}
-      >
-        Buy Now
-      </Button>
+      <Divider />
 
-      <Alert icon={<VerifiedUserIcon />} severity="success" sx={{ borderRadius: 2, background: '#eefbf3' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <SecurityIcon />
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            Secure payment & 7-day returns
-          </Typography>
-        </Box>
-      </Alert>
+      {/* Trust Badges */}
+      <Stack direction="row" spacing={2} justifyContent="center" sx={{ flexWrap: 'wrap', gap: 2 }}>
+        <Stack alignItems="center" spacing={1}>
+          <LocalShipping />
+          <Typography variant="caption" align="center">Free Shipping on orders over {formatPrice(2500)}</Typography>
+        </Stack>
+        <Divider orientation="vertical" flexItem />
+        <Stack alignItems="center" spacing={1}>
+          <Replay />
+          <Typography variant="caption" align="center">7-Day Easy Returns</Typography>
+        </Stack>
+        <Divider orientation="vertical" flexItem />
+        <Stack alignItems="center" spacing={1}>
+          <Security />
+          <Typography variant="caption" align="center">100% Secure Payments</Typography>
+        </Stack>
+      </Stack>
 
-      {product.deliveryTime && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 2, color: 'text.secondary' }}>
-          <LocalShippingIcon />
-          <Typography variant="body2">Estimated Delivery: {product.deliveryTime || '2-3 business days'}</Typography>
-        </Box>
-      )}
-    </Box>
+    </Stack>
   );
 }

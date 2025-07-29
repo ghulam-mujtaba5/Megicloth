@@ -41,6 +41,7 @@ import {
   Delete,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
+import EditProfileDialog from "../components/profile/EditProfileDialog";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -65,10 +66,11 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, isLoading, updateProfile, addAddress, removeAddress } = useAuth();
+  const { user, isLoading, updateProfile, addAddress, removeAddress } = useAuth();
   const { orders } = useOrders();
   const router = useRouter();
-  const [tabValue, setTabValue] = useState(0);
+    const [tabValue, setTabValue] = useState(0);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [addAddressDialog, setAddAddressDialog] = useState(false);
   const [newAddress, setNewAddress] = useState({
     type: "home" as const,
@@ -84,10 +86,10 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isLoading && !user) {
       router.push("/auth/login");
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [user, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -113,7 +115,7 @@ export default function ProfilePage() {
         toast.success("Address added successfully!");
         setAddAddressDialog(false);
         setNewAddress({
-          type: "home",
+          type: "home" as const,
           firstName: "",
           lastName: "",
           address: "",
@@ -218,16 +220,21 @@ export default function ProfilePage() {
                 <Grid container spacing={3} alignItems="center">
                   <Grid item>
                     <Avatar
-                      src={user.avatar}
+                      src={user.avatarUrl || '/placeholder-avatar.png'}
                       sx={{ width: 80, height: 80, border: "3px solid white" }}
                     >
-                      {user.firstName[0]}{user.lastName[0]}
+                      {user.firstName?.[0]}{user.lastName?.[0]}
                     </Avatar>
                   </Grid>
                   <Grid item xs>
-                    <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-                      {user.firstName} {user.lastName}
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                        {user.firstName} {user.lastName}
+                      </Typography>
+                      <Button variant="outlined" size="small" onClick={() => setEditProfileOpen(true)}>
+                        Edit Profile
+                      </Button>
+                    </Box>
                     <Typography variant="body1" sx={{ opacity: 0.9, mb: 1 }}>
                       {user.email}
                     </Typography>
@@ -313,7 +320,7 @@ export default function ProfilePage() {
                         Member Since
                       </Typography>
                       <Typography variant="body1">
-                        {new Date(user.createdAt).toLocaleDateString()}
+                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                       </Typography>
                     </Box>
                     <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
@@ -321,7 +328,7 @@ export default function ProfilePage() {
                         Last Login
                       </Typography>
                       <Typography variant="body1">
-                        {new Date(user.lastLogin).toLocaleDateString()}
+                        {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'N/A'}
                       </Typography>
                     </Box>
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -431,7 +438,7 @@ export default function ProfilePage() {
             </Box>
             
             <Grid container spacing={2}>
-              {user.addresses.map((address) => (
+              {user.addresses?.map((address) => (
                 <Grid item xs={12} md={6} key={address.id}>
                   <Card>
                     <CardContent>
@@ -490,8 +497,17 @@ export default function ProfilePage() {
                     <FormControlLabel
                       control={
                         <Switch
-                          checked={user.preferences.notifications}
-                          onChange={(e) => updateProfile({ preferences: { ...user.preferences, notifications: e.target.checked } })}
+                          checked={user.preferences?.emailNotifications || false}
+                          onChange={(e) => updateProfile({ preferences: { ...(user.preferences || {}), emailNotifications: e.target.checked } })}
+                        />
+                      }
+                      label="Email Notifications"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={user.preferences?.pushNotifications || false}
+                          onChange={(e) => updateProfile({ preferences: { ...(user.preferences || {}), pushNotifications: e.target.checked } })}
                         />
                       }
                       label="Push Notifications"
@@ -499,8 +515,8 @@ export default function ProfilePage() {
                     <FormControlLabel
                       control={
                         <Switch
-                          checked={user.preferences.newsletter}
-                          onChange={(e) => updateProfile({ preferences: { ...user.preferences, newsletter: e.target.checked } })}
+                          checked={user.preferences?.newsletter || false}
+                          onChange={(e) => updateProfile({ preferences: { ...(user.preferences || {}), newsletter: e.target.checked } })}
                         />
                       }
                       label="Newsletter"
@@ -508,8 +524,8 @@ export default function ProfilePage() {
                     <FormControlLabel
                       control={
                         <Switch
-                          checked={user.preferences.marketing}
-                          onChange={(e) => updateProfile({ preferences: { ...user.preferences, marketing: e.target.checked } })}
+                          checked={user.preferences?.marketing || false}
+                          onChange={(e) => updateProfile({ preferences: { ...(user.preferences || {}), marketing: e.target.checked } })}
                         />
                       }
                       label="Marketing Emails"
@@ -651,6 +667,13 @@ export default function ProfilePage() {
             </Button>
           </DialogActions>
         </Dialog>
+
+        <EditProfileDialog 
+          open={editProfileOpen} 
+          onClose={() => setEditProfileOpen(false)} 
+          user={user} 
+        />
+
       </Container>
     </Box>
   );

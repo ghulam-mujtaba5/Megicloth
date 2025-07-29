@@ -1,20 +1,19 @@
 "use client";
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
-import type { Product } from "../data/products";
+import { createContext, useContext, ReactNode, useCallback, useMemo, useState, useEffect } from "react";
+import type { Product } from "../types";
+import { useAuth } from "./AuthContext";
+import toast from 'react-hot-toast';
+import { supabase } from "../lib/supabaseClient";
 
-export type WishlistItem = Product & {
-  addedAt: string;
-};
+export type WishlistItem = Product;
 
 interface WishlistContextType {
   wishlist: WishlistItem[];
+  loading: boolean;
   addToWishlist: (product: Product) => void;
   removeFromWishlist: (id: string) => void;
-  clearWishlist: () => void;
   isInWishlist: (id: string) => boolean;
   getWishlistCount: () => number;
-  moveToCart: (id: string) => void;
-  moveAllToCart: () => void;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
@@ -26,116 +25,91 @@ export function useWishlist() {
 }
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
+  const { user, addToWishlist: authAddToWishlist, removeFromWishlist: authRemoveFromWishlist, isAuthenticated } = useAuth();
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Load wishlist from localStorage on mount
+  const wishlistIds = useMemo(() => user?.wishlist || [], [user?.wishlist]);
+
   useEffect(() => {
-    try {
-      const stored = typeof window !== 'undefined' ? localStorage.getItem('megicloth_wishlist') : null;
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.every(item => 
-          typeof item.id === 'string' && 
-          typeof item.addedAt === 'string'
-        )) {
-          setWishlist(parsed);
-        }
+    const fetchWishlistProducts = async () => {
+      if (wishlistIds.length === 0) {
+        setWishlist([]);
+        setLoading(false);
+        return;
       }
-    } catch (error) {
-      console.error('Error loading wishlist from localStorage:', error);
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('megicloth_wishlist');
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .in('id', wishlistIds);
+
+      if (error) {
+        console.error("Error fetching wishlist products:", error);
+        toast.error("Could not fetch your wishlist.");
+        setWishlist([]);
+      } else {
+        setWishlist(data as WishlistItem[]);
       }
-    } finally {
-      setIsInitialized(true);
+      setLoading(false);
+    };
+
+    if (isAuthenticated) {
+      fetchWishlistProducts();
     }
-  }, []);
-
-  // Save wishlist to localStorage whenever it changes
-  useEffect(() => {
-    if (isInitialized && typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('megicloth_wishlist', JSON.stringify(wishlist));
-      } catch (error) {
-        console.error('Error saving wishlist to localStorage:', error);
-      }
+     else {
+      setWishlist([]);
+      setLoading(false);
     }
-  }, [wishlist, isInitialized]);
+  }, [wishlistIds, isAuthenticated]);
 
-  const addToWishlist = useCallback((product: Product) => {
-    setWishlist((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-      if (existing) {
-        return prev; // Already in wishlist
-      }
-      return [...prev, { ...product, addedAt: new Date().toISOString() }];
-    });
-  }, []);
+  const addToWishlist = useCallback(async (product: Product) => {
+    if (!isAuthenticated) {
+      toast.error("Please log in to add items to your wishlist.");
+      return;
+    }
+    const toastId = toast.loading('Adding to wishlist...');
+    const { success, error } = await authAddToWishlist(product.id);
+    if (success) {
+      toast.success('Added to wishlist!', { id: toastId });
+    } else {
+      toast.error(error || 'Failed to add to wishlist.', { id: toastId });
+    }
+  }, [isAuthenticated, authAddToWishlist]);
 
-  const removeFromWishlist = useCallback((id: string) => {
-    setWishlist((prev) => prev.filter((item) => item.id !== id));
-  }, []);
-
-  const clearWishlist = useCallback(() => {
-    setWishlist([]);
-  }, []);
+  const removeFromWishlist = useCallback(async (id: string) => {
+    if (!isAuthenticated) return;
+    const toastId = toast.loading('Removing from wishlist...');
+    const { success, error } = await authRemoveFromWishlist(id);
+    if (success) {
+      toast.success('Removed from wishlist.', { id: toastId });
+    } else {
+      toast.error(error || 'Failed to remove from wishlist.', { id: toastId });
+    }
+  }, [isAuthenticated, authRemoveFromWishlist]);
 
   const isInWishlist = useCallback((id: string) => {
-    return wishlist.some(item => item.id === id);
-  }, [wishlist]);
+    return wishlistIds.includes(id);
+  }, [wishlistIds]);
 
   const getWishlistCount = useCallback(() => {
-    return wishlist.length;
-  }, [wishlist]);
-
-  const moveToCart = useCallback((id: string) => {
-    // This would integrate with CartContext
-    // For now, just remove from wishlist
-    removeFromWishlist(id);
-  }, [removeFromWishlist]);
-
-  const moveAllToCart = useCallback(() => {
-    // This would integrate with CartContext
-    // For now, just clear wishlist
-    clearWishlist();
-  }, [clearWishlist]);
-
-  // Validate wishlist data integrity
-  useEffect(() => {
-    if (isInitialized) {
-      const validWishlist = wishlist.filter(item => 
-        item.id && 
-        item.name &&
-        item.price > 0 &&
-        item.addedAt
-      );
-      
-      if (validWishlist.length !== wishlist.length) {
-        console.warn('Invalid wishlist items detected, cleaning up...');
-        setWishlist(validWishlist);
-      }
-    }
-  }, [wishlist, isInitialized]);
+    return wishlistIds.length;
+  }, [wishlistIds]);
 
   const contextValue = useMemo(() => ({
     wishlist,
+    loading,
     addToWishlist,
     removeFromWishlist,
-    clearWishlist,
     isInWishlist,
     getWishlistCount,
-    moveToCart,
-    moveAllToCart,
   }), [
     wishlist,
+    loading,
     addToWishlist,
     removeFromWishlist,
-    clearWishlist,
     isInWishlist,
     getWishlistCount,
-    moveToCart,
-    moveAllToCart,
   ]);
 
   return (
@@ -143,4 +117,4 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
       {children}
     </WishlistContext.Provider>
   );
-} 
+}

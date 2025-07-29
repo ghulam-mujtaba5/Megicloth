@@ -1,5 +1,5 @@
 import type { Metadata, ResolvingMetadata } from 'next';
-import { products } from "../../data/products";
+import { fetchProductById, fetchRelatedProducts } from "../../lib/data";
 import ProductClientPage from './ProductClientPage';
 
 type Props = {
@@ -10,7 +10,7 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const product = products.find(p => p.id === params.id);
+  const product = await fetchProductById(params.id);
 
   if (!product) {
     return {
@@ -34,7 +34,7 @@ export async function generateMetadata(
       siteName: 'Megicloth',
       images: [
         {
-          url: product.image,
+          url: product.images[0],
           width: 800,
           height: 600,
           alt: product.name,
@@ -53,11 +53,11 @@ export async function generateMetadata(
   };
 }
 
-export default function ProductDetailPage({ params }: Props) {
-  const product = products.find(p => p.id === params.id);
-  const relatedProducts = product ? products.filter(
-    (p) => p.category === product.category && p.id !== product.id
-  ).slice(0, 8) : [];
+export default async function ProductDetailPage({ params }: Props) {
+  const product = await fetchProductById(params.id);
+  const relatedProducts = product
+    ? await fetchRelatedProducts(product.category, product.id)
+    : [];
 
   return <ProductClientPage product={product} relatedProducts={relatedProducts} />;
 }

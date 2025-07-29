@@ -42,7 +42,7 @@ const nextConfig = {
     ],
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    contentSecurityPolicy: "default-src 'self'; img-src 'self' images.unsplash.com pk.sapphireonline.pk www.gulahmedshop.com placehold.co www.alkaramstudio.com pk.khaadi.com www.sanasafinaz.com; script-src 'none'; sandbox;"
   },
   // Handle font loading issues
   async headers() {

@@ -1,6 +1,8 @@
 "use client";
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
-import type { Product } from "../data/products";
+import type { Product } from "../types";
+import { useAuth } from './AuthContext';
+import { supabase } from '../lib/supabaseClient';
 
 export type CartItem = Product & { quantity: number };
 
@@ -18,6 +20,7 @@ interface CartContextType {
   getCartCount: () => number;
   isInCart: (id: string) => boolean;
   getCartItem: (id: string) => CartItem | undefined;
+  loading: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -29,161 +32,201 @@ export function useCart() {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage for guest users
   useEffect(() => {
-    try {
-      const stored = typeof window !== 'undefined' ? localStorage.getItem('megicloth_cart') : null;
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.every(item => 
-          typeof item.id === 'string' && 
-          typeof item.quantity === 'number' &&
-          item.quantity > 0
-        )) {
-          setCart(parsed);
+    if (!user) {
+      try {
+        const stored = localStorage.getItem('megicloth_cart');
+        if (stored) {
+          setCart(JSON.parse(stored));
         }
-      }
-    } catch (error) {
-      console.error('Error loading cart from localStorage:', error);
-      // Clear corrupted cart data
-      if (typeof window !== 'undefined') {
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
         localStorage.removeItem('megicloth_cart');
       }
-    } finally {
-      setIsInitialized(true);
+      setLoading(false);
     }
-  }, []);
+  }, [user]);
 
-  // Save cart to localStorage whenever it changes
+  // Save cart to localStorage for guest users
   useEffect(() => {
-    if (isInitialized && typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('megicloth_cart', JSON.stringify(cart));
-      } catch (error) {
-        console.error('Error saving cart to localStorage:', error);
-      }
+    if (!user) {
+      localStorage.setItem('megicloth_cart', JSON.stringify(cart));
     }
-  }, [cart, isInitialized]);
+  }, [cart, user]);
 
-  // Memoized cart calculations
-  const { subtotal, discount, shippingCost, total } = useMemo(() => {
-    const subtotal = cart.reduce((sum, item) => sum + (item.salePrice ?? item.price) * item.quantity, 0);
-    const discount = 0; // Placeholder for discount logic
-    const shippingCost = subtotal > 5000 ? 0 : 200; // Example shipping logic
-    const total = subtotal - discount + shippingCost;
-    return { subtotal, discount, shippingCost, total };
-  }, [cart]);
+  // Fetch, merge, and manage cart for logged-in users
+  useEffect(() => {
+    if (user) {
+      const syncCart = async () => {
+        setLoading(true);
 
-  const cartCount = useMemo(() => {
-    return cart.reduce((sum, item) => sum + item.quantity, 0);
-  }, [cart]);
+        // 1. Fetch DB cart
+        const { data: dbCartItems, error: dbError } = await supabase
+          .from('cart_items')
+          .select('quantity, products(*)')
+          .eq('user_id', user.id);
 
-  const addToCart = useCallback((product: Product, quantity: number = 1) => {
-    if (product.stock === 0) {
-      console.warn('Cannot add out-of-stock product to cart');
-      return;
-    }
-
-    if (quantity <= 0) {
-      console.warn('Quantity must be greater than 0');
-      return;
-    }
-
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-      
-      if (existing) {
-        // Check if adding more would exceed stock
-        const newQuantity = existing.quantity + quantity;
-        if (newQuantity > (product.stock ?? Infinity)) {
-          console.warn('Cannot add more items than available stock');
-          return prev;
+        if (dbError) {
+          console.error('Error fetching cart from DB:', dbError);
+          setLoading(false);
+          return;
         }
-        
-        return prev.map((item) =>
-          item.id === product.id 
-            ? { ...item, quantity: newQuantity }
-            : item
-        );
+
+        const dbCart = dbCartItems
+          .map(item => {
+            // Supabase returns the related product in an array, so we take the first element.
+            const product = Array.isArray(item.products) ? item.products[0] : item.products;
+            if (!product) return null;
+            return { ...(product as Product), quantity: item.quantity };
+          })
+          .filter((item): item is CartItem => item !== null);
+
+        // 2. Get local cart
+        const localCart: CartItem[] = JSON.parse(localStorage.getItem('megicloth_cart') || '[]');
+
+        // 3. Merge carts
+        const mergedCart = [...dbCart];
+        for (const localItem of localCart) {
+          const dbItem = mergedCart.find(item => item.id === localItem.id);
+          if (dbItem) {
+            dbItem.quantity += localItem.quantity; // Combine quantities
+          } else {
+            mergedCart.push(localItem);
+          }
+        }
+
+        // 4. Sync merged cart back to DB
+        const upsertData = mergedCart.map(item => ({
+          user_id: user.id,
+          product_id: item.id,
+          quantity: item.quantity,
+        }));
+
+        const { error: upsertError } = await supabase.from('cart_items').upsert(upsertData, { onConflict: 'user_id, product_id' });
+
+        if (upsertError) {
+          console.error('Error syncing merged cart to DB:', upsertError);
+        } else {
+          // 5. Clear local storage and update state
+          localStorage.removeItem('megicloth_cart');
+          setCart(mergedCart);
+        }
+
+        setLoading(false);
+      };
+
+      syncCart();
+    }
+  }, [user]);
+
+  const addToCart = useCallback(async (product: Product, quantity: number = 1) => {
+    if (user) {
+      const { data, error } = await supabase
+        .from('cart_items')
+        .select('quantity')
+        .eq('user_id', user.id)
+        .eq('product_id', product.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116: row not found, which is fine
+        console.error('Error fetching cart item:', error);
+      }
+
+      const newQuantity = (data?.quantity || 0) + quantity;
+
+      const { error: upsertError } = await supabase
+        .from('cart_items')
+        .upsert({ user_id: user.id, product_id: product.id, quantity: newQuantity }, { onConflict: 'user_id, product_id' });
+
+      if (upsertError) {
+        console.error('Error adding to cart:', upsertError);
       } else {
-        // Check if initial quantity exceeds stock
-        if (quantity > (product.stock ?? Infinity)) {
-          console.warn('Cannot add more items than available stock');
-          return prev;
-        }
-        
-        return [...prev, { ...product, quantity }];
+        setCart(prev => {
+          const existing = prev.find(item => item.id === product.id);
+          if (existing) {
+            return prev.map(item => item.id === product.id ? { ...item, quantity: newQuantity } : item);
+          } else {
+            return [...prev, { ...product, quantity }];
+          }
+        });
       }
-    });
-  }, []);
+    } else {
+      // Guest user logic
+      setCart(prev => {
+        const existing = prev.find(item => item.id === product.id);
+        if (existing) {
+          return prev.map(item => item.id === product.id ? { ...item, quantity: existing.quantity + quantity } : item);
+        } else {
+          return [...prev, { ...product, quantity }];
+        }
+      });
+    }
+  }, [user]);
 
-  const removeFromCart = useCallback((id: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  }, []);
+  const removeFromCart = useCallback(async (id: string) => {
+    if (user) {
+      const { error } = await supabase.from('cart_items').delete().match({ user_id: user.id, product_id: id });
+      if (error) {
+        console.error('Error removing from cart:', error);
+      } else {
+        setCart(prev => prev.filter(item => item.id !== id));
+      }
+    } else {
+      setCart(prev => prev.filter(item => item.id !== id));
+    }
+  }, [user]);
 
-  const updateQuantity = useCallback((id: string, quantity: number) => {
+  const updateQuantity = useCallback(async (id: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(id);
       return;
     }
 
-    setCart((prev) =>
-      prev.map((item) => {
-        if (item.id === id) {
-          // Prevent exceeding stock
-          const maxQty = item.stock ?? quantity;
-          const newQuantity = Math.min(quantity, maxQty);
-          
-          if (newQuantity !== quantity) {
-            console.warn('Quantity adjusted to available stock');
-          }
-          
-          return { ...item, quantity: newQuantity };
-        }
-        return item;
-      })
-    );
-  }, [removeFromCart]);
-
-  const clearCart = useCallback(() => {
-    setCart([]);
-  }, []);
-
-  const getCartTotal = useCallback(() => {
-    return subtotal;
-  }, [subtotal]);
-
-  const getCartCount = useCallback(() => {
-    return cartCount;
-  }, [cartCount]);
-
-  const isInCart = useCallback((id: string) => {
-    return cart.some(item => item.id === id);
-  }, [cart]);
-
-  const getCartItem = useCallback((id: string) => {
-    return cart.find(item => item.id === id);
-  }, [cart]);
-
-  // Validate cart data integrity
-  useEffect(() => {
-    if (isInitialized) {
-      const validCart = cart.filter(item => 
-        item.id && 
-        typeof item.quantity === 'number' && 
-        item.quantity > 0 &&
-        item.price > 0
-      );
-      
-      if (validCart.length !== cart.length) {
-        console.warn('Invalid cart items detected, cleaning up...');
-        setCart(validCart);
+    if (user) {
+      const { error } = await supabase.from('cart_items').update({ quantity }).match({ user_id: user.id, product_id: id });
+      if (error) {
+        console.error('Error updating quantity:', error);
+      } else {
+        setCart(prev => prev.map(item => item.id === id ? { ...item, quantity } : item));
       }
+    } else {
+      setCart(prev => prev.map(item => item.id === id ? { ...item, quantity } : item));
     }
-  }, [cart, isInitialized]);
+  }, [user, removeFromCart]);
+
+  const clearCart = useCallback(async () => {
+    if (user) {
+      const { error } = await supabase.from('cart_items').delete().match({ user_id: user.id });
+      if (error) {
+        console.error('Error clearing cart:', error);
+      } else {
+        setCart([]);
+      }
+    } else {
+      setCart([]);
+    }
+  }, [user]);
+
+  // Memoized cart calculations
+  const { subtotal, discount, shippingCost, total } = useMemo(() => {
+    const subtotal = cart.reduce((sum, item) => sum + (item.salePrice ?? item.price) * item.quantity, 0);
+    const discount = 0; // Placeholder for discount logic
+    const shippingCost = subtotal > 50 ? 0 : 5; // Example shipping logic
+    const total = subtotal - discount + shippingCost;
+    return { subtotal, discount, shippingCost, total };
+  }, [cart]);
+
+  const cartCount = useMemo(() => cart.reduce((sum, item) => sum + item.quantity, 0), [cart]);
+
+  const getCartTotal = useCallback(() => subtotal, [subtotal]);
+  const getCartCount = useCallback(() => cartCount, [cartCount]);
+  const isInCart = useCallback((id: string) => cart.some(item => item.id === id), [cart]);
+  const getCartItem = useCallback((id: string) => cart.find(item => item.id === id), [cart]);
 
   const contextValue = useMemo(() => ({
     cart,
@@ -199,17 +242,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     getCartCount,
     isInCart,
     getCartItem,
-  }), [
-    cart,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    getCartTotal,
-    getCartCount,
-    isInCart,
-    getCartItem,
-  ]);
+    loading,
+  }), [cart, addToCart, removeFromCart, updateQuantity, clearCart, subtotal, discount, shippingCost, total, getCartTotal, getCartCount, isInCart, getCartItem, loading]);
 
   return (
     <CartContext.Provider value={contextValue}>

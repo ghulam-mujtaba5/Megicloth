@@ -4,7 +4,8 @@ import { Suspense } from 'react';
 import { Box, Container, Grid, Typography, Breadcrumbs, Link as MuiLink, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent } from "@mui/material";
 import Link from 'next/link';
 import ProductCard from "../components/product/ProductCard";
-import { products } from "../data/products";
+import { fetchProducts } from '../lib/data';
+import { Product } from '../types/index';
 import FiltersSidebar from "../components/common/FiltersSidebar";
 import { useMemo, useState, useEffect } from "react";
 import { Skeleton } from "@mui/material";
@@ -15,6 +16,7 @@ const ShopPageContent = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   const { filters, sortOrder } = useMemo(() => {
@@ -28,36 +30,22 @@ const ShopPageContent = () => {
     return { filters, sortOrder };
   }, [searchParams]);
 
-  const sortedAndFilteredProducts = useMemo(() => {
-    let sorted = [...products];
-
-    switch (sortOrder) {
-      case 'price-asc':
-        sorted.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        sorted.sort((a, b) => b.price - a.price);
-        break;
-      case 'newest':
-      default:
-        sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
-    }
-
-    return sorted.filter(product => {
-      const { categories, priceRange, availability } = filters;
-      const categoryMatch = categories.length === 0 || categories.includes(product.category);
-      const priceMatch = product.price >= priceRange[0] && product.price <= priceRange[1];
-      const availabilityMatch = availability === 'in-stock' ? product.stock > 0 : product.stock === 0;
-      return categoryMatch && priceMatch && availabilityMatch;
-    });
-  }, [filters, sortOrder]);
-
   useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, [searchParams]);
+    const getProducts = async () => {
+      setLoading(true);
+      try {
+        const fetchedProducts = await fetchProducts(filters, sortOrder);
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+        // Optionally, set an error state and display a message to the user
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getProducts();
+  }, [filters, sortOrder]);
 
   const handleFilterChange = (newFilters: any) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -117,8 +105,8 @@ const ShopPageContent = () => {
                   <Skeleton width="60%" />
                 </Grid>
               ))
-            ) : sortedAndFilteredProducts.length > 0 ? (
-              sortedAndFilteredProducts.map((product) => (
+            ) : products.length > 0 ? (
+              products.map((product) => (
                 <Grid item xs={12} sm={6} md={4} key={product.id}>
                   <ProductCard product={product} />
                 </Grid>

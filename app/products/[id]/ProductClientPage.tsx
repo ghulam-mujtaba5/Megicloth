@@ -29,7 +29,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import ProductImageGallery from '../../components/product/ProductImageGallery';
 import ProductInfo from '../../components/product/ProductInfo';
-import { Product } from '../../data/products';
+import { Product } from '../../types';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -54,272 +54,165 @@ function TabPanel(props: TabPanelProps) {
 }
 
 interface ProductClientPageProps {
-  product: Product | undefined;
+  product: Product | null;
   relatedProducts: Product[];
 }
 
 export default function ProductClientPage({ product, relatedProducts }: ProductClientPageProps) {
   const { addToCart } = useCart();
-  const [quantity, setQuantity] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [tabValue, setTabValue] = useState(0);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [reviews, setReviews] = useState<any[]>([]);
-  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
-  const [addStitching, setAddStitching] = useState(false);
   const router = useRouter();
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const finalPrice = useMemo(() => {
+  const [quantity, setQuantity] = useState(1);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [addStitching, setAddStitching] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [tabValue, setTabValue] = useState(0);
+  
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' | 'info' | 'warning' });
+
+  useEffect(() => {
+    if (product) setReviews(product.reviews || []);
+  }, [product]);
+
+    const finalPrice = useMemo(() => {
     if (!product) return 0;
-    const basePrice = product.salePrice || product.price;
-    return addStitching ? basePrice + (product.stitchingCost || 0) : basePrice;
+    const basePrice = product.salePrice ?? product.price;
+    return addStitching ? basePrice + (product.stitchingCost ?? 0) : basePrice;
   }, [product, addStitching]);
 
   const averageRating = useMemo(() => {
-    if (reviews.length === 0) return 0;
-    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-    return totalRating / reviews.length;
-  }, [reviews]);
-
-  useEffect(() => {
-    if (product) {
-      setReviews(product.reviews || []);
-    }
-  }, [product]);
+    if (reviews.length === 0) return product?.rating || 0;
+    return reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+  }, [reviews, product?.rating]);
 
   if (!product) {
     return (
-      <Box sx={{ textAlign: 'center', py: 10 }}>
+      <Container sx={{ textAlign: 'center', py: 10 }}>
         <Typography variant="h4" component="h1">Product Not Found</Typography>
-        <Typography sx={{ mt: 2 }}>The product you are looking for does not exist or may have been moved.</Typography>
+        <Typography sx={{ mt: 2 }}>The product you are looking for does not exist.</Typography>
         <Link href="/products" passHref>
           <Button variant="contained" sx={{ mt: 3 }}>Back to Shop</Button>
         </Link>
-      </Box>
+      </Container>
     );
   }
 
-  const handleStitchingChange = (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-    setAddStitching(checked);
-  };
-
-  const showSnackbar = (message: string) => {
-    setSnackbarMessage(message);
-    setSnackbarOpen(true);
+  const showSnackbar = (message: string, severity: 'success' | 'error' | 'info' | 'warning' = 'success') => {
+    setSnackbar({ open: true, message, severity });
   };
 
   const handleAddToCart = () => {
-    if (product) {
-      addToCart(product, quantity);
-      showSnackbar(`${product.name} added to cart!`);
-    } else {
-      showSnackbar("Could not add product to cart.");
-    }
+    addToCart({ ...product, quantity, price: finalPrice });
+    showSnackbar(`${product.name} added to cart!`);
+  };
+
+  const handleBuyNow = () => {
+    addToCart({ ...product, quantity, price: finalPrice });
+    router.push('/cart');
   };
 
   const handleQuantityChange = (newQuantity: number) => {
-    if (newQuantity > 0 && newQuantity <= (product?.stock || 0)) {
-      setQuantity(newQuantity);
-    }
+    if (newQuantity >= 1 && newQuantity <= product.stock) setQuantity(newQuantity);
   };
 
   const handleToggleFavorite = () => {
     setIsFavorite(!isFavorite);
-    showSnackbar(isFavorite ? "Removed from favorites" : "Added to favorites");
+    showSnackbar(isFavorite ? 'Removed from favorites' : 'Added to favorites', 'info');
+  };
+
+  const handleShare = async () => {
+    try {
+      await navigator.share({ title: product.name, text: product.description, url: window.location.href });
+    } catch (error) {
+      navigator.clipboard.writeText(window.location.href);
+      showSnackbar('Link copied to clipboard!', 'info');
+    }
   };
 
   const handleReviewSubmit = (newReview: any) => {
     setReviews([newReview, ...reviews]);
-    showSnackbar("Thank you for your review!");
-  };
-
-  const handleBuyNow = () => {
-    if (product) {
-      addToCart(product, quantity);
-      router.push('/cart');
-    } else {
-      showSnackbar("Could not process purchase.");
-    }
-  };
-
-  const handleShare = async () => {
-    if (navigator.share && product) {
-      try {
-        await navigator.share({
-          title: product.name,
-          text: `Check out this amazing product: ${product.name}`,
-          url: window.location.href,
-        });
-        showSnackbar("Product shared successfully!");
-      } catch (error) {
-        showSnackbar("Failed to share product.");
-      }
-    }
+    showSnackbar('Thank you for your review!');
   };
 
   return (
     <>
-      <Box sx={{ background: '#f8fafc', py: { xs: 2, md: 3 } }}>
-        <Container maxWidth="xl">
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+        <Box mb={3}>
           <Link href="/products" passHref>
-            <Button startIcon={<ArrowBackIcon />} sx={{ mb: 2, color: 'text.secondary', fontWeight: 600 }}>
-              Back to Products
-            </Button>
+            <Button startIcon={<ArrowBackIcon />} variant="text">Back to Collection</Button>
           </Link>
-          <Grid container spacing={{ xs: 3, md: 5 }}>
-            <Grid item xs={12} md={6}>
-              <ProductImageGallery images={product.images} productName={product.name} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <ProductInfo
-                product={product}
-                reviews={reviews}
-                averageRating={averageRating}
-                finalPrice={finalPrice}
-                quantity={quantity}
-                onQuantityChange={handleQuantityChange}
-                onAddToCart={handleAddToCart}
-                onBuyNow={handleBuyNow}
-                onToggleFavorite={handleToggleFavorite}
-                isFavorite={isFavorite}
-                onShare={handleShare}
-                addStitching={addStitching}
-                onStitchingChange={handleStitchingChange}
-              />
-            </Grid>
+        </Box>
+        <Grid container spacing={{ xs: 2, md: 6 }}>
+          <Grid item xs={12} md={6} lg={7}>
+            <ProductImageGallery images={product.images} productName={product.name} />
           </Grid>
-        </Container>
-      </Box>
+          <Grid item xs={12} md={6} lg={5}>
+            <ProductInfo 
+              product={product}
+              reviews={reviews}
+              averageRating={averageRating}
+              finalPrice={finalPrice}
+              isFavorite={isFavorite}
+              addStitching={addStitching}
+              quantity={quantity}
+              onAddToCart={handleAddToCart}
+              onBuyNow={handleBuyNow}
+              onQuantityChange={handleQuantityChange}
+              onToggleFavorite={handleToggleFavorite}
+              onShare={handleShare}
+              onStitchingChange={(_, checked) => setAddStitching(checked)}
+            />
+          </Grid>
+        </Grid>
+      </Container>
 
-      <Box sx={{ py: { xs: 4, md: 6 } }}>
+      <Box sx={{ bgcolor: 'grey.50', py: { xs: 5, md: 8 } }}>
         <Container maxWidth="lg">
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={tabValue} onChange={(_, val) => setTabValue(val)} aria-label="product details tabs">
-              <Tab label="Description" />
-              <Tab label="Specifications" />
-              <Tab label="Reviews" />
-              <Tab label="Shipping & Returns" />
-            </Tabs>
-          </Box>
-
+          <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)} centered sx={{ mb: 4, borderBottom: 1, borderColor: 'divider' }}>
+            <Tab label="Details & Care" />
+            <Tab label={`Reviews (${reviews.length})`} />
+          </Tabs>
           <TabPanel value={tabValue} index={0}>
-            <Typography variant="body1" sx={{ lineHeight: 1.8 }}>
-              {product.description}
-            </Typography>
+            <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}><Typography><strong>Fabric:</strong> {product.fabric}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><strong>Collection:</strong> {product.collection}</Typography></Grid>
+                <Grid item xs={12}><Typography><strong>Care:</strong> Machine wash cold, tumble dry low.</Typography></Grid>
+            </Grid>
           </TabPanel>
-
           <TabPanel value={tabValue} index={1}>
-            <Box>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Fabric</Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>{product.fabricType}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Measurements</Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>{product.measurements}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">SKU</Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>{product.sku}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Care</Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                      Machine wash cold, tumble dry low
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Box>
-          </TabPanel>
-
-          <TabPanel value={tabValue} index={2}>
             <ReviewForm onSubmit={handleReviewSubmit} />
             <Divider sx={{ my: 4 }} />
-            <Box>
+            <Stack spacing={2}>
               {reviews.length > 0 ? (
                 reviews.map((review, index) => (
-                  <Card key={index} sx={{ mb: 2, p: 2, background: '#f8fafc' }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="h6">{review.author}</Typography>
-                      <Rating value={review.rating} readOnly />
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      {review.text}
-                    </Typography>
+                  <Card key={index} variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
+                      <Typography variant="subtitle1" fontWeight={600}>{review.author}</Typography>
+                      <Rating value={review.rating} readOnly size="small" />
+                    </Stack>
+                    <Typography variant="body2" color="text.secondary">{review.text}</Typography>
                   </Card>
                 ))
-              ) : (
-                <Typography>No reviews yet. Be the first to review!</Typography>
-              )}
-            </Box>
-          </TabPanel>
-
-          <TabPanel value={tabValue} index={3}>
-            <Box>
-              <Typography variant="h6" sx={{ mb: 2 }}>Shipping Information</Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <LocalShippingIcon sx={{ color: '#10b981' }} />
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  Standard Delivery: {product.deliveryTime || '2-3 business days'}
-                </Typography>
-              </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Free shipping on all orders above PKR 2,500.
-              </Typography>
-
-              <Typography variant="h6" sx={{ mb: 2 }}>Return Policy</Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <RefreshIcon sx={{ color: '#2563eb' }} />
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  7-Day Return Policy
-                </Typography>
-              </Box>
-              <Typography variant="body2" color="text.secondary">
-                Easy returns within 7 days. Return shipping is free
-              </Typography>
-            </Box>
+              ) : <Typography align="center" color="text.secondary">Be the first to review this product!</Typography>}
+            </Stack>
           </TabPanel>
         </Container>
       </Box>
 
-      <Box sx={{ mt: { xs: 5, md: 8 }, mb: 4 }}>
-        <Container maxWidth="lg">
-          <Typography variant="h4" sx={{ mb: 3, fontWeight: 700, textAlign: 'center' }}>
-            You Might Also Like
-          </Typography>
-          <Swiper
-            modules={[Navigation]}
-            spaceBetween={30}
-            slidesPerView={isMobile ? 1 : 4}
-            navigation
-          >
-            {relatedProducts.map(relatedProduct => (
-              <SwiperSlide key={relatedProduct.id}>
-                <ProductCard product={relatedProduct} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </Container>
-      </Box>
+      <Container maxWidth="xl" sx={{ py: { xs: 5, md: 8 } }}>
+        <Typography variant="h4" component="h2" fontWeight={700} textAlign="center" mb={4}>You Might Also Like</Typography>
+        <Swiper modules={[Navigation]} spaceBetween={isMobile ? 16 : 24} slidesPerView={isMobile ? 2 : 4} navigation>
+          {relatedProducts.map(p => <SwiperSlide key={p.id}><ProductCard product={p} /></SwiperSlide>)}
+        </Swiper>
+      </Container>
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={4000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        TransitionComponent={Slide}
-      >
-        <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
-          {snackbarMessage}
+      <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar(prev => ({...prev, open: false}))} TransitionComponent={Slide} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={() => setSnackbar(prev => ({...prev, open: false}))} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
         </Alert>
       </Snackbar>
-
-      <SizeGuideDialog open={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} />
     </>
   );
 }

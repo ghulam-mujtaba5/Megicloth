@@ -13,21 +13,21 @@ import { ReactNode } from 'react';
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
-      <ProductProvider>
-        <HomepageProvider>
-          <CartProvider>
-            <OrderProvider>
-              <WishlistProvider>
-                <CategoryProvider>
+      <CartProvider>
+        <WishlistProvider>
+          <OrderProvider>
+            <ProductProvider>
+              <CategoryProvider>
+                <HomepageProvider>
                   <BlogProvider>
                     {children}
                   </BlogProvider>
-                </CategoryProvider>
-              </WishlistProvider>
-            </OrderProvider>
-          </CartProvider>
-        </HomepageProvider>
-      </ProductProvider>
+                </HomepageProvider>
+              </CategoryProvider>
+            </ProductProvider>
+          </OrderProvider>
+        </WishlistProvider>
+      </CartProvider>
     </AuthProvider>
   );
 }
