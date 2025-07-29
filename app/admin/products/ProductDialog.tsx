@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, MenuItem } from '@mui/material';
 import { useProducts } from '../../context/ProductContext';
 import { useCategories } from '../../context/CategoryContext';
-import { Product } from '../../data/products';
+import { Product } from '../../types';
 
 interface ProductDialogProps {
   open: boolean;
@@ -15,7 +15,7 @@ interface ProductDialogProps {
 export default function ProductDialog({ open, onClose, product }: ProductDialogProps) {
   const { addProduct, updateProduct } = useProducts();
   const { categories } = useCategories();
-  const getInitialFormData = () => {
+  const getInitialFormData = (): Product => {
     if (product) {
       return { ...product };
     }
@@ -24,15 +24,13 @@ export default function ProductDialog({ open, onClose, product }: ProductDialogP
       name: '',
       description: '',
       price: 0,
-      image: '',
       images: [],
-      group: '',
       category: '',
       stock: 0,
-      sku: '',
       createdAt: new Date().toISOString(),
       salePrice: 0,
       rating: 0,
+      reviews: [],
     };
   };
 
@@ -52,7 +50,7 @@ export default function ProductDialog({ open, onClose, product }: ProductDialogP
       updateProduct({ ...formData });
     } else {
       // Only pass allowed fields to addProduct
-      const { id, rating, reviews, ...newProductData } = formData;
+      const { id, rating, reviews, reviewsCount, ...newProductData } = formData;
       addProduct(newProductData);
     }
     onClose();
@@ -67,7 +65,6 @@ export default function ProductDialog({ open, onClose, product }: ProductDialogP
                 <TextField name="category" label="Category" value={formData.category} onChange={handleChange} select fullWidth margin="dense">
           {categories.map(cat => <MenuItem key={cat.id} value={cat.name}>{cat.name}</MenuItem>)}
         </TextField>
-        <TextField name="image" label="Image URL" value={formData.image} onChange={handleChange} fullWidth margin="dense" />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>

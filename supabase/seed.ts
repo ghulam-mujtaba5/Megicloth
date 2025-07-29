@@ -36,20 +36,20 @@ async function seedProducts() {
     name: product.name,
     description: product.description,
     price: product.price,
-    image: product.image,
+
     images: product.images,
-    group: product.group, // 'group' is a reserved keyword, but Supabase client handles it
+
     category: product.category,
     stock: product.stock,
     sku: product.sku,
     created_at: product.createdAt, // Use the mock creation date
     sale_price: product.salePrice,
-    delivery_time: product.deliveryTime,
+
     stitching_available: product.stitchingAvailable,
     stitching_cost: product.stitchingCost,
-    tags: product.tags,
-    fabric_type: product.fabricType,
-    measurements: product.measurements,
+
+    fabric: product.fabric,
+
   }));
 
   // 3. Insert the new products

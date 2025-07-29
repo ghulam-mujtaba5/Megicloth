@@ -1,7 +1,7 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import { products, Product } from "../data/products";
+import { products } from '@/app/data/products';
 import { useCart } from "../context/CartContext";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -15,9 +15,11 @@ type Props = { params: { id: string } };
 
 export default function ProductDetail({ params }: Props) {
   const { addToCart } = useCart();
-  const product = products.find((p: Product) => p.id === params.id);
+  const product = products.find((p) => p.id === params.id);
   if (!product) return notFound();
-  const imageUrl = product.image.startsWith('http') ? product.image : 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80';
+  const imageUrl = Array.isArray(product.images) && product.images.length > 0
+    ? (product.images[0].startsWith('http') ? product.images[0] : 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80')
+    : 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80';
   return (
     <Container maxWidth="md" sx={{ minHeight: "80vh", py: { xs: 2, sm: 4 } }}>
       <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: { xs: 3, md: 6 }, alignItems: { xs: "center", md: "flex-start" }, background: "#fff", borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", p: { xs: 2, sm: 4 } }}>

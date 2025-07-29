@@ -71,7 +71,7 @@ export default function CategoryPage() {
                   }}>
                     <CardMedia
                       component="img"
-                      image={product.image}
+                      image={product.images[0]}
                       alt={product.name}
                       sx={{ height: 220, objectFit: 'cover', borderTopLeftRadius: 4, borderTopRightRadius: 4 }}
                     />

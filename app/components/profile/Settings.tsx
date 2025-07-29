@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useAuth } from '@/app/context/AuthContext';
+import { User } from '@/app/types';
 import { Box, Typography, Card, CardContent, Grid, FormControlLabel, Switch, Button, Divider } from '@mui/material';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -13,8 +14,8 @@ const Settings = () => {
     return null;
   }
 
-  const handlePreferenceChange = async (preference: 'newsletter' | 'marketing' | 'notifications', value: boolean) => {
-    const currentPreferences = user.preferences || { newsletter: false, marketing: false, notifications: false };
+  const handlePreferenceChange = async (preference: keyof NonNullable<User['preferences']>, value: boolean) => {
+    const currentPreferences = user.preferences || {};
     const updatedPreferences = { ...currentPreferences, [preference]: value };
 
     try {
@@ -40,8 +41,8 @@ const Settings = () => {
               <FormControlLabel
                 control={
                   <Switch
-                    checked={user.preferences?.notifications ?? true}
-                    onChange={(e) => handlePreferenceChange('notifications', e.target.checked)}
+                    checked={user.preferences?.emailNotifications ?? true}
+                    onChange={(e) => handlePreferenceChange('emailNotifications', e.target.checked)}
                   />
                 }
                 label="Order and Shipping Updates"

@@ -69,7 +69,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
       return;
     }
     const toastId = toast.loading('Adding to wishlist...');
-    const { success, error } = await authAddToWishlist(product.id);
+    const { success, error } = await authAddToWishlist(product);
     if (success) {
       toast.success('Added to wishlist!', { id: toastId });
     } else {

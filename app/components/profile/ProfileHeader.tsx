@@ -34,15 +34,15 @@ export default function ProfileHeader() {
             <Grid container spacing={3} alignItems="center">
               <Grid item>
                 <Avatar
-                  src={user.avatar_url}
+                  src={user.avatarUrl}
                   sx={{ width: { xs: 60, md: 80 }, height: { xs: 60, md: 80 }, border: '3px solid white' }}
                 >
-                  {user.first_name?.[0] || ''}{user.last_name?.[0] || ''}
+                  {user.firstName?.[0] || ''}{user.lastName?.[0] || ''}
                 </Avatar>
               </Grid>
               <Grid item xs>
                 <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1.5rem', md: '2.125rem' } }}>
-                  {user.first_name} {user.last_name}
+                  {user.firstName} {user.lastName}
                 </Typography>
                 <Typography variant="body1" sx={{ opacity: 0.9, mb: 1 }}>
                   {user.email}

@@ -11,6 +11,7 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Rating from "@mui/material/Rating";
 import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Slide from "@mui/material/Slide";
@@ -18,11 +19,11 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import Link from "next/link";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import RefreshIcon from "@mui/icons-material/Refresh";
+
+
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import SizeGuideDialog from "../../components/product/SizeGuideDialog";
+
 import ProductCard from "../../components/product/ProductCard";
 import ReviewForm from "../../components/product/ReviewForm";
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -104,12 +105,12 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
   };
 
   const handleAddToCart = () => {
-    addToCart({ ...product, quantity, price: finalPrice });
+    addToCart({ ...product, price: finalPrice });
     showSnackbar(`${product.name} added to cart!`);
   };
 
   const handleBuyNow = () => {
-    addToCart({ ...product, quantity, price: finalPrice });
+    addToCart({ ...product, price: finalPrice });
     router.push('/cart');
   };
 

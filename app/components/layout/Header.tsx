@@ -346,7 +346,7 @@ export default function Header() {
                 <ListItem key={result.id} disablePadding selected={highlightedIndex === idx} role="option" aria-selected={highlightedIndex === idx}>
                   <ListItemButton component={Link} href={`/products/${result.id}`} sx={{ gap: 2 }} onClick={() => saveRecentSearch(result.name)}>
                     <ListItemAvatar>
-                      <Avatar src={result.image} alt={result.name} variant="rounded" sx={{ width: 40, height: 40, mr: 1 }} />
+                      <Avatar src={result.images[0]} alt={result.name} variant="rounded" sx={{ width: 40, height: 40, mr: 1 }} />
                     </ListItemAvatar>
                     <ListItemText
                       primary={result.name}
@@ -522,7 +522,7 @@ export default function Header() {
                     <ListItem key={result.id} disablePadding selected={mobileHighlightedIndex === idx} role="option" aria-selected={mobileHighlightedIndex === idx}>
                       <ListItemButton component={Link} href={`/products/${result.id}`} sx={{ gap: 2 }} onClick={() => saveRecentSearch(result.name)}>
                         <ListItemAvatar>
-                          <Avatar src={result.image} alt={result.name} variant="rounded" sx={{ width: 40, height: 40, mr: 1 }} />
+                          <Avatar src={result.images[0]} alt={result.name} variant="rounded" sx={{ width: 40, height: 40, mr: 1 }} />
                         </ListItemAvatar>
                         <ListItemText
                           primary={result.name}
