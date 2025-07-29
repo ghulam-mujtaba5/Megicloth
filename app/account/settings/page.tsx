@@ -35,7 +35,7 @@ const ProfileSettingsPage = () => {
               <TextField
                 fullWidth
                 label="Full Name"
-                defaultValue={user?.name || 'John Doe'}
+                defaultValue={user ? `${user.firstName} ${user.lastName}` : 'John Doe'}
                 variant="outlined"
               />
             </Grid>
