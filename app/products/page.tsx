@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import styles from './ProductsPage.module.css';
 import ProductsClient from "./ProductsClient";
 import { getProducts, getCategories } from "@/app/lib/data/products";
 
@@ -34,7 +35,7 @@ export default async function ProductsPage({
   } catch (error) {
     console.error('Products page error:', error);
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <div className={styles.centered}>
         <h2>Something went wrong loading products.</h2>
         <p>Please try again later or contact support if the problem persists.</p>
       </div>

@@ -3,7 +3,12 @@ import { createContext, useContext, ReactNode, useCallback, useMemo, useState, u
 import type { Product } from "../types";
 import { useAuth } from "./AuthContext";
 import toast from 'react-hot-toast';
-import { supabase } from "../lib/supabaseClient";
+import {
+  getWishlist as getWishlistServer,
+  addToWishlist as addToWishlistServer,
+  removeFromWishlist as removeFromWishlistServer,
+  clearWishlist as clearWishlistServer,
+} from "@/app/lib/actions/wishlist";
 
 export type WishlistItem = Product;
 
@@ -25,76 +30,96 @@ export function useWishlist() {
 }
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
-  const { user, addToWishlist: authAddToWishlist, removeFromWishlist: authRemoveFromWishlist, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const wishlistIds = useMemo(() => user?.wishlist || [], [user?.wishlist]);
-
+  // Load wishlist on mount or auth change
   useEffect(() => {
-    const fetchWishlistProducts = async () => {
-      if (wishlistIds.length === 0) {
-        setWishlist([]);
-        setLoading(false);
-        return;
-      }
+    const loadWishlist = async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .in('id', wishlistIds);
-
-      if (error) {
-        console.error("Error fetching wishlist products:", error);
-        toast.error("Could not fetch your wishlist.");
-        setWishlist([]);
+      if (isAuthenticated) {
+        // Merge guest wishlist into server on login
+        const guestWishlistRaw = localStorage.getItem('megicloth_wishlist');
+        if (guestWishlistRaw) {
+          try {
+            const guestWishlist: WishlistItem[] = JSON.parse(guestWishlistRaw);
+            for (const item of guestWishlist) {
+              await addToWishlistServer(item.id);
+            }
+            localStorage.removeItem('megicloth_wishlist');
+          } catch (e) { localStorage.removeItem('megicloth_wishlist'); }
+        }
+        // Fetch from server
+        const serverWishlist = await getWishlistServer();
+        setWishlist(Array.isArray(serverWishlist[0]) ? serverWishlist[0] : serverWishlist);
       } else {
-        setWishlist(data as WishlistItem[]);
+        // Guest: load from localStorage
+        try {
+          const stored = localStorage.getItem('megicloth_wishlist');
+          setWishlist(stored ? JSON.parse(stored) : []);
+        } catch {
+          setWishlist([]);
+        }
       }
       setLoading(false);
     };
+    loadWishlist();
+  }, [isAuthenticated]);
 
-    if (isAuthenticated) {
-      fetchWishlistProducts();
+  // Persist guest wishlist to localStorage
+  useEffect(() => {
+    if (!isAuthenticated) {
+      localStorage.setItem('megicloth_wishlist', JSON.stringify(wishlist));
     }
-     else {
+  }, [wishlist, isAuthenticated]);
+
+  // Add to wishlist
+  const addToWishlist = useCallback(async (product: Product) => {
+    if (isAuthenticated) {
+      setLoading(true);
+      await addToWishlistServer(product.id);
+      const updated = await getWishlistServer();
+      setWishlist(Array.isArray(updated[0]) ? updated[0] : updated);
+      setLoading(false);
+      toast.success('Added to wishlist!');
+    } else {
+      setWishlist(prev => prev.some(p => p.id === product.id) ? prev : [...prev, product]);
+      toast.success('Added to wishlist!');
+    }
+  }, [isAuthenticated]);
+
+  // Remove from wishlist
+  const removeFromWishlist = useCallback(async (id: string) => {
+    if (isAuthenticated) {
+      setLoading(true);
+      await removeFromWishlistServer(id);
+      const updated = await getWishlistServer();
+      setWishlist(Array.isArray(updated[0]) ? updated[0] : updated);
+      setLoading(false);
+      toast.success('Removed from wishlist.');
+    } else {
+      setWishlist(prev => prev.filter(p => p.id !== id));
+      toast.success('Removed from wishlist.');
+    }
+  }, [isAuthenticated]);
+
+  // Clear wishlist
+  const clearWishlist = useCallback(async () => {
+    if (isAuthenticated) {
+      setLoading(true);
+      await clearWishlistServer();
       setWishlist([]);
       setLoading(false);
-    }
-  }, [wishlistIds, isAuthenticated]);
-
-  const addToWishlist = useCallback(async (product: Product) => {
-    if (!isAuthenticated) {
-      toast.error("Please log in to add items to your wishlist.");
-      return;
-    }
-    const toastId = toast.loading('Adding to wishlist...');
-    const { success, error } = await authAddToWishlist(product);
-    if (success) {
-      toast.success('Added to wishlist!', { id: toastId });
+      toast.success('Wishlist cleared.');
     } else {
-      toast.error(error || 'Failed to add to wishlist.', { id: toastId });
+      setWishlist([]);
+      toast.success('Wishlist cleared.');
     }
-  }, [isAuthenticated, authAddToWishlist]);
+  }, [isAuthenticated]);
 
-  const removeFromWishlist = useCallback(async (id: string) => {
-    if (!isAuthenticated) return;
-    const toastId = toast.loading('Removing from wishlist...');
-    const { success, error } = await authRemoveFromWishlist(id);
-    if (success) {
-      toast.success('Removed from wishlist.', { id: toastId });
-    } else {
-      toast.error(error || 'Failed to remove from wishlist.', { id: toastId });
-    }
-  }, [isAuthenticated, authRemoveFromWishlist]);
-
-  const isInWishlist = useCallback((id: string) => {
-    return wishlistIds.includes(id);
-  }, [wishlistIds]);
-
-  const getWishlistCount = useCallback(() => {
-    return wishlistIds.length;
-  }, [wishlistIds]);
+  const isInWishlist = useCallback((id: string) => wishlist.some(p => p.id === id), [wishlist]);
+  const getWishlistCount = useCallback(() => wishlist.length, [wishlist]);
 
   const contextValue = useMemo(() => ({
     wishlist,
@@ -103,14 +128,8 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     removeFromWishlist,
     isInWishlist,
     getWishlistCount,
-  }), [
-    wishlist,
-    loading,
-    addToWishlist,
-    removeFromWishlist,
-    isInWishlist,
-    getWishlistCount,
-  ]);
+    clearWishlist,
+  }), [wishlist, loading, addToWishlist, removeFromWishlist, isInWishlist, getWishlistCount, clearWishlist]);
 
   return (
     <WishlistContext.Provider value={contextValue}>

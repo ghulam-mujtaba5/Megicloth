@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useOrders } from "../context/OrderContext";
+import { getUserOrders } from "../lib/actions/orderTracking";
 import { useRouter } from "next/navigation";
 import {
   Container,
@@ -67,7 +67,22 @@ function TabPanel(props: TabPanelProps) {
 
 export default function ProfilePage() {
   const { user, isLoading, updateProfile, addAddress, removeAddress } = useAuth();
-  const { orders } = useOrders();
+  const [orders, setOrders] = useState<any[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (tabValue === 1 && user) {
+      setOrdersLoading(true);
+      getUserOrders().then(res => {
+        setOrders(res || []);
+        setOrdersLoading(false);
+      }).catch(() => {
+        setOrdersError('Failed to load orders.');
+        setOrdersLoading(false);
+      });
+    }
+  }, [tabValue, user]);
   const router = useRouter();
     const [tabValue, setTabValue] = useState(0);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
@@ -348,7 +363,15 @@ export default function ProfilePage() {
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
               Order History
             </Typography>
-            {orders.length === 0 ? (
+            {ordersLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+                <Typography>Loading orders...</Typography>
+              </Box>
+            ) : ordersError ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+                <Typography color="error">{ordersError}</Typography>
+              </Box>
+            ) : orders.length === 0 ? (
               <Card>
                 <CardContent sx={{ textAlign: "center", py: 4 }}>
                   <ShoppingBag sx={{ fontSize: 60, color: "text.secondary", mb: 2 }} />
@@ -366,34 +389,26 @@ export default function ProfilePage() {
                   <Card key={order.id} sx={{ mb: 2 }}>
                     <CardContent>
                       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          {order.id}
-                        </Typography>
-                        <Chip
-                          label={order.status}
-                          color={getStatusColor(order.status) as any}
-                          size="small"
-                        />
+                        <Typography variant="subtitle2" color="text.secondary">Order #{order.id.slice(-6).toUpperCase()}</Typography>
+                        <Chip label={order.status || 'pending'} color={getStatusColor(order.status)} size="small" />
                       </Box>
-                      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          Date: {new Date(order.date).toLocaleDateString()}
-                        </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                          Rs. {order.total.toLocaleString()}
-                        </Typography>
-                      </Box>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        Placed: {new Date(order.created_at).toLocaleString()}
+                      </Typography>
+                      <List dense>
+                        {order.order_items?.map((item: any) => (
+                          <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                            <Typography>{item.name} x{item.quantity}</Typography>
+                            <Typography sx={{ fontWeight: 500 }}>
+                              Rs {item.price.toLocaleString()} x {item.quantity} = Rs {(item.price * item.quantity).toLocaleString()}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </List>
                       <Divider sx={{ my: 1 }} />
-                      {order.items.map((item, itemIndex) => (
-                        <Box key={itemIndex} sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                          <Typography variant="body2">
-                            {item.name} x{item.quantity}
-                          </Typography>
-                          <Typography variant="body2">
-                            Rs. {item.price.toLocaleString()}
-                          </Typography>
-                        </Box>
-                      ))}
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                        Total: Rs {order.total.toLocaleString()}
+                      </Typography>
                     </CardContent>
                   </Card>
                 ))}

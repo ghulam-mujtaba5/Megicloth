@@ -32,29 +32,34 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import LockIcon from '@mui/icons-material/Lock';
 
 export default function WishlistPage() {
-  const { wishlist, removeFromWishlist } = useWishlist();
+  const { wishlist, removeFromWishlist, clearWishlist, loading } = useWishlist();
   const { addToCart } = useCart();
 
-  const handleMoveToCart = (productId: string) => {
+  const handleMoveToCart = async (productId: string) => {
     const product = wishlist.find(item => item.id === productId);
     if (product) {
-      addToCart(product, 1);
-      removeFromWishlist(productId);
+      await addToCart(product, 1);
+      await removeFromWishlist(productId);
       toast.success("Product moved to cart!");
     }
   };
 
-  const handleRemoveFromWishlist = (productId: string) => {
-    removeFromWishlist(productId);
+  const handleRemoveFromWishlist = async (productId: string) => {
+    await removeFromWishlist(productId);
     toast.success("Product removed from wishlist");
   };
 
-  const handleMoveAllToCart = () => {
-    wishlist.forEach(product => {
-      addToCart(product, 1);
-    });
-    moveAllToCart();
+  const handleMoveAllToCart = async () => {
+    for (const product of wishlist) {
+      await addToCart(product, 1);
+      await removeFromWishlist(product.id);
+    }
     toast.success("All products moved to cart!");
+  };
+
+  const handleClearWishlist = async () => {
+    await clearWishlist();
+    toast.success("Wishlist cleared!");
   };
 
   const formatPrice = (price: number) => {

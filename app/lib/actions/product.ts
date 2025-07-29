@@ -11,6 +11,70 @@ const ReviewSchema = z.object({
   productId: z.string(),
 });
 
+// --- Product CRUD ---
+
+const ProductSchema = z.object({
+  name: z.string().min(2),
+  description: z.string().min(10),
+  category: z.string().min(2),
+  price: z.number().min(0),
+  stock: z.number().int().min(0),
+  image: z.string().url().optional(),
+});
+
+export async function getAllProducts() {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('Error fetching products:', error);
+    return [];
+  }
+  return data;
+}
+
+export async function createProduct(values: z.infer<typeof ProductSchema>) {
+  const supabase = createClient();
+  const validated = ProductSchema.safeParse(values);
+  if (!validated.success) {
+    return { error: validated.error.flatten().fieldErrors };
+  }
+  const { data, error } = await supabase.from('products').insert([validated.data]).select().single();
+  if (error) {
+    return { error: error.message };
+  }
+  revalidatePath('/admin/products');
+  return { success: true, product: data };
+}
+
+export async function updateProduct(id: string, values: z.infer<typeof ProductSchema>) {
+  const supabase = createClient();
+  const validated = ProductSchema.safeParse(values);
+  if (!validated.success) {
+    return { error: validated.error.flatten().fieldErrors };
+  }
+  const { data, error } = await supabase.from('products').update(validated.data).eq('id', id).select().single();
+  if (error) {
+    return { error: error.message };
+  }
+  revalidatePath('/admin/products');
+  return { success: true, product: data };
+}
+
+export async function deleteProduct(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from('products').delete().eq('id', id);
+  if (error) {
+    return { error: error.message };
+  }
+  revalidatePath('/admin/products');
+  return { success: true };
+}
+
+// --- Reviews ---
+
 export async function addReview(prevState: any, formData: FormData) {
   const validatedFields = ReviewSchema.safeParse({
     rating: Number(formData.get('rating')),

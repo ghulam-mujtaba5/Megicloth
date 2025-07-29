@@ -1,6 +1,8 @@
 import type { Metadata, ResolvingMetadata } from 'next';
+import styles from './ProductDetail.module.css';
 import { getProductById, getRelatedProducts } from "@/app/lib/data/products";
 import ProductClientPage from './ProductClientPage';
+import type { Product } from '@/app/types';
 
 type Props = {
   params: { id: string }
@@ -57,13 +59,14 @@ export default async function ProductDetailPage({ params }: Props) {
   const product = await getProductById(params.id);
   if (!product) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <div className={styles.centered}>
         <h2>Product Not Found</h2>
         <p>The product you are looking for does not exist or could not be loaded.</p>
       </div>
     );
   }
-  let relatedProducts = [];
+  
+  let relatedProducts: Product[] = [];
   try {
     relatedProducts = await getRelatedProducts(product.category, product.id);
   } catch (error) {

@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { useOrders } from '../context/OrderContext';
-import { useProducts } from '../context/ProductContext';
+import { createOrder } from '../lib/actions/orders';
 import { Container, Typography, Box, Button, Snackbar, Stepper, Step, StepLabel, Grid, Alert } from '@mui/material';
 
 import ShippingForm from '../components/checkout/ShippingForm';
@@ -17,8 +16,7 @@ import CheckoutOrderSummary from '../components/checkout/CheckoutOrderSummary';
 export default function CheckoutClientPage() {
   const { cart, clearCart, total } = useCart();
   const { user } = useAuth();
-  const { addOrder } = useOrders();
-  const { decreaseStock } = useProducts();
+
   const router = useRouter();
 
   const [formValues, setFormValues] = useState({ 
@@ -51,29 +49,36 @@ export default function CheckoutClientPage() {
     setFormValues(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) {
       setSnackbar({ open: true, message: 'Please correct the errors before proceeding.', severity: 'error' });
       return;
     }
-
     setIsSubmitting(true);
-
     const shippingDetails = { ...formValues };
-
-    addOrder(cart, total, shippingDetails, paymentMethod, formValues.orderNotes);
-
-    cart.forEach(item => {
-      decreaseStock(item.id, item.quantity);
+    const orderResult = await createOrder(undefined, {
+      cart,
+      total,
+      shipping: {
+        name: shippingDetails.name,
+        email: shippingDetails.email,
+        address: shippingDetails.address,
+        phone: shippingDetails.phone,
+      },
+      paymentMethod,
+      orderNotes: shippingDetails.orderNotes,
     });
-
-    clearCart();
-    setActiveStep(1);
-    
-    setTimeout(() => {
+    if (orderResult && orderResult.success) {
+      clearCart();
+      setActiveStep(1);
+      setTimeout(() => {
         router.push('/profile?tab=orders');
-    }, 4000);
+      }, 4000);
+    } else {
+      setSnackbar({ open: true, message: orderResult.error || 'Failed to place order.', severity: 'error' });
+    }
+    setIsSubmitting(false);
   };
 
   if (activeStep === 1) {
