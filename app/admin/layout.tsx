@@ -42,25 +42,17 @@ const navItems = [
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
+  // Only check localStorage for admin_logged_in
   useEffect(() => {
-    if (!isLoading && (!isAuthenticated || user?.role !== 'admin')) {
-      router.push('/auth/login');
+    if (typeof window !== 'undefined') {
+      const isLoggedIn = localStorage.getItem('admin_logged_in') === 'true';
+      if (!isLoggedIn) {
+        router.push('/admin/login');
+      }
     }
-  }, [isAuthenticated, isLoading, user, router]);
-
-  if (isLoading || !isAuthenticated || user?.role !== 'admin') {
-    return (
-      <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <Box sx={{ textAlign: 'center' }}>
-          <CircularProgress />
-          <Typography sx={{ mt: 2 }}>Verifying access...</Typography>
-        </Box>
-      </Container>
-    );
-  }
+  }, [router]);
 
   return (
     <CategoryProvider>

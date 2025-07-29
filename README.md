@@ -293,3 +293,8 @@ Admin Password: adminpassword
 
 Regular User Email: user@example.com
 User Password: password
+
+How to use:
+
+Go to /admin/login.
+Enter the username and password (default: admin / admin123)
