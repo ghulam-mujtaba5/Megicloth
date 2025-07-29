@@ -1,7 +1,7 @@
 'use client';
 
-import { products } from '../data/products';
-import ProductCard from './ProductCard';
+import { products } from '../../data/products';
+import ProductCard from '../product/ProductCard';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';

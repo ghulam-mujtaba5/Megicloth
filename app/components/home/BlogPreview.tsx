@@ -3,13 +3,13 @@
 import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Grid, Typography } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Link from 'next/link';
-import { posts } from '../data/posts';
+import { Post, posts } from '../../data/posts';
 import styles from './BlogPreview.module.css';
 
 const BlogPreview = () => {
   // Get the 3 most recent posts
   const latestPosts = posts
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .sort((a: Post, b: Post) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 3);
 
   return (
@@ -21,7 +21,7 @@ const BlogPreview = () => {
         Get the latest tips, trends, and style inspiration.
       </Typography>
       <Grid container spacing={4} className={styles.gridContainer}>
-        {latestPosts.map((post) => (
+        {latestPosts.map((post: Post) => (
           <Grid item xs={12} md={4} key={post.id}>
             <Card className={styles.card}>
               <CardActionArea component={Link} href={`/blog/${post.id}`} sx={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}>

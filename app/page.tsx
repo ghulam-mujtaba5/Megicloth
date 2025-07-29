@@ -2,18 +2,18 @@
 
 import { useState } from 'react';
 import Box from '@mui/material/Box';
-import HeroCarousel from './components/HeroCarousel';
-import TrendingProducts from './components/TrendingProducts';
-import Testimonials from './components/Testimonials';
-import InstagramFeed from './components/InstagramFeed';
-import BlogPreview from './components/BlogPreview';
-import HighlightedFeatures from './components/HighlightedFeatures';
-import QuickAccessCategories from './components/QuickAccessCategories';
-import Newsletter from './components/Newsletter';
-import ScrollTopButton from './components/ScrollTopButton';
-import FabricSearch from './components/FabricSearch';
-import FeaturedBrands from './components/FeaturedBrands';
-import ProductsGrid from './components/ProductsGrid';
+import HeroCarousel from './components/home/HeroCarousel';
+import TrendingProducts from './components/home/TrendingProducts';
+import Testimonials from './components/home/Testimonials';
+import InstagramFeed from './components/home/InstagramFeed';
+import BlogPreview from './components/home/BlogPreview';
+import HighlightedFeatures from './components/home/HighlightedFeatures';
+import QuickAccessCategories from './components/home/QuickAccessCategories';
+import Newsletter from './components/home/Newsletter';
+import FeaturedBrands from './components/home/FeaturedBrands';
+import ScrollTopButton from './components/common/ScrollTopButton';
+import FabricSearch from './components/common/FabricSearch';
+import ProductsGrid from './components/product/ProductsGrid';
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');

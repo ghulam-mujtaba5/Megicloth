@@ -12,7 +12,7 @@ import CardMedia from "@mui/material/CardMedia";
 import Fade from "@mui/material/Fade";
 import Button from "@mui/material/Button";
 import Link from "next/link";
-import Seo from "../../components/Seo";
+import Seo from "../../components/common/Seo";
 
 export default function CategoryPage() {
   const params = useParams();

@@ -3,7 +3,7 @@
 import React from 'react';
 import { useWishlist } from '../../context/WishlistContext';
 import { Box, Typography, Grid, Button } from '@mui/material';
-import ProductCard from '../../components/ProductCard';
+import ProductCard from '../../components/product/ProductCard';
 import Link from 'next/link';
 
 const WishlistPage = () => {

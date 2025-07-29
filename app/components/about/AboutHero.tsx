@@ -2,7 +2,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Fade from '@mui/material/Fade';
 import styles from './AboutHero.module.css';
-import React from 'react';
 
 const AboutHero = () => {
   return (

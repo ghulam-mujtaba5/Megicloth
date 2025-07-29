@@ -5,7 +5,7 @@ import { Container, Box, Typography, Grid, Card, CardMedia, CardActionArea, Link
 import Link from 'next/link';
 import { categoryData } from '../data/categories';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import Seo from '../components/Seo';
+import Seo from '../components/common/Seo';
 
 const CategoriesPage = () => {
   return (

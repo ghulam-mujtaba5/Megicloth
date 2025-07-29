@@ -1,10 +1,10 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Container, Grid, Skeleton } from '@mui/material';
-import { products } from '../data/products';
+import { Box, Container, Grid, Skeleton } from '@mui/material';
+import { products } from '../../data/products';
 import ProductCard from './ProductCard';
-import styles from './ProductsGrid.module.css';
+
 
 interface ProductsGridProps {
   searchQuery: string;
@@ -22,7 +22,7 @@ const ProductsGrid = ({ searchQuery, loading }: ProductsGridProps) => {
   }, [searchQuery]);
 
   return (
-    <section aria-label="Our Products" className={styles.section}>
+    <Box component="section" aria-label="Our Products" sx={{ pb: 8 }}>
       <Container maxWidth="lg">
         <Grid container spacing={4}>
           {(loading ? Array.from(new Array(8)) : filteredProducts).map((product, index) => (
@@ -36,7 +36,7 @@ const ProductsGrid = ({ searchQuery, loading }: ProductsGridProps) => {
           ))}
         </Grid>
       </Container>
-    </section>
+    </Box>
   );
 };
 

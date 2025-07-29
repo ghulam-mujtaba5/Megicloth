@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import Fade from "@mui/material/Fade";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import Seo from "../components/Seo";
+import Seo from "../components/common/Seo";
 
 export default function ShippingPage() {
   return (

@@ -2,9 +2,9 @@
 
 import React, { useState, useCallback } from "react";
 import Link from "next/link";
-import { useCart } from "../context/CartContext";
-import { useWishlist } from "../context/WishlistContext";
-import type { Product } from "../data/products";
+import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
+import type { Product } from "../../data/products";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";

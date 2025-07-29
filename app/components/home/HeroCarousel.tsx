@@ -5,7 +5,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation, EffectFade } from 'swiper/modules';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useHomepage } from '../context/HomepageContext';
+import { useHomepage } from '../../context/HomepageContext';
 import { Box, Typography, Button, useTheme, useMediaQuery } from '@mui/material';
 import styles from './HeroCarousel.module.css';
 

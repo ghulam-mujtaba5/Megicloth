@@ -4,12 +4,12 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { products, Product } from "../data/products";
 import { categoryData } from "../data/categories";
-import ProductCard from "../components/ProductCard";
+import ProductCard from "../components/product/ProductCard";
 import {
   Container, Typography, Box, TextField, Grid, Select, MenuItem, 
   FormControl, InputLabel, Slider, Paper, useTheme, useMediaQuery, Button
 } from "@mui/material";
-import Seo from "../components/Seo";
+import Seo from "../components/common/Seo";
 
 const useDebounce = (value: string, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);

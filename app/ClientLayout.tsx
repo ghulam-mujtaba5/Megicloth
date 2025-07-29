@@ -1,7 +1,7 @@
 "use client";
 
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
 import { ThemeProvider as MuiThemeProvider, createTheme } from "@mui/material/styles";
 import { Box } from '@mui/material';
 import CssBaseline from "@mui/material/CssBaseline";

@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import Fade from "@mui/material/Fade";
-import Seo from "../components/Seo";
+import Seo from "../components/common/Seo";
 
 export default function PrivacyPage() {
   return (

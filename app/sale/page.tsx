@@ -3,9 +3,9 @@
 import React from 'react';
 import { Container, Typography, Grid, Box } from '@mui/material';
 import { products } from '../data/products';
-import ProductCard from '../components/ProductCard';
-import Seo from '../components/Seo';
-import Breadcrumbs from '../components/Breadcrumbs';
+import ProductCard from '../components/product/ProductCard';
+import Seo from '../components/common/Seo';
+import Breadcrumbs from '../components/common/Breadcrumbs';
 
 const SalePage = () => {
   const saleProducts = products.filter(p => p.salePrice && p.salePrice < p.price);
@@ -17,9 +17,7 @@ const SalePage = () => {
         description="Don't miss out on the biggest sale of the season. Shop your favorite unstitched fabrics at unbeatable prices."
       />
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Breadcrumbs 
-          links={[{ href: '/', name: 'Home' }, { name: 'Sale' }]}
-        />
+        <Breadcrumbs />
         <Box sx={{ textAlign: 'center', my: 4 }}>
           <Typography 
             variant="h3" 

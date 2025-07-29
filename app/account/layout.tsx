@@ -12,7 +12,7 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import Seo from '../components/Seo';
+import Seo from '../components/common/Seo';
 
 const accountNavLinks = [
   { text: 'Orders', href: '/account', icon: <ShoppingBagOutlinedIcon /> },
@@ -22,17 +22,17 @@ const accountNavLinks = [
 ];
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated, loading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       router.push('/login');
     }
-  }, [loading, isAuthenticated, router]);
+  }, [isLoading, isAuthenticated, router]);
 
-  if (loading || !isAuthenticated) {
+  if (isLoading || !isAuthenticated) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
         <CircularProgress />

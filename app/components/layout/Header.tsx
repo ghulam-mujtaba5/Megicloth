@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
-import { useWishlist } from "../context/WishlistContext";
+import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../context/WishlistContext";
 
 import { useState, useEffect, useCallback } from "react";
 import AppBar from "@mui/material/AppBar";
@@ -46,8 +46,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Popper from "@mui/material/Popper";
 import Paper from "@mui/material/Paper";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
-import { products } from "../data/products";
-import React from "react";
+import { products } from "../../data/products";
 
 const RECENT_SEARCHES_KEY = 'megicloth_recent_searches';
 

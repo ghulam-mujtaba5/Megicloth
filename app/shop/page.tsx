@@ -3,9 +3,9 @@
 import { Suspense } from 'react';
 import { Box, Container, Grid, Typography, Breadcrumbs, Link as MuiLink, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent } from "@mui/material";
 import Link from 'next/link';
-import ProductCard from "../components/ProductCard";
+import ProductCard from "../components/product/ProductCard";
 import { products } from "../data/products";
-import FiltersSidebar from "../components/FiltersSidebar";
+import FiltersSidebar from "../components/common/FiltersSidebar";
 import { useMemo, useState, useEffect } from "react";
 import { Skeleton } from "@mui/material";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';

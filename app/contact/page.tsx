@@ -14,7 +14,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import Alert from "@mui/material/Alert";
 import { useState } from "react";
-import Seo from "../components/Seo";
+import Seo from "../components/common/Seo";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });

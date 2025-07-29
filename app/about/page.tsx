@@ -3,11 +3,11 @@
 "use client";
 
 import Container from "@mui/material/Container";
-import Seo from "../components/Seo";
+import Seo from "../components/common/Seo";
 import styles from './page.module.css';
-import AboutHero from '../components/AboutHero';
-import MissionVision from '../components/MissionVision';
-import OurValues from '../components/OurValues';
+import AboutHero from '../components/about/AboutHero';
+import MissionVision from '../components/about/MissionVision';
+import OurValues from '../components/about/OurValues';
 
 export default function AboutPage() {
   return (
