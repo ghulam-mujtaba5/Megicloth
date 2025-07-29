@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { products } from "../data/products";
-import { categoryData } from "../data/categories";
+
 import ProductCard from "../components/product/ProductCard";
 import ProductFilters from "../components/product/ProductFilters";
 import {
@@ -30,7 +30,6 @@ export default function ProductsClient() {
 
   // State for filters
   const [search, setSearch] = useState(searchParams.get('q') || "");
-  const [selectedGroup, setSelectedGroup] = useState(searchParams.get('group') || 'All');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
   const [priceRange, setPriceRange] = useState<number[]>([parseInt(searchParams.get('minPrice') || '0'), parseInt(searchParams.get('maxPrice') || '5000')]);
   const [sortOption, setSortOption] = useState(searchParams.get('sort') || 'newest');
@@ -38,21 +37,18 @@ export default function ProductsClient() {
   
   const debouncedSearch = useDebounce(search, 300);
 
-  const availableCategories = useMemo(() => {
-    if (selectedGroup === 'All') return [];
-    return categoryData.find(g => g.name === selectedGroup)?.categories || [];
-  }, [selectedGroup]);
+  
 
   const updateURL = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
     if (debouncedSearch) params.set('q', debouncedSearch); else params.delete('q');
-    if (selectedGroup !== 'All') params.set('group', selectedGroup); else params.delete('group');
+    
     if (selectedCategory !== 'All') params.set('category', selectedCategory); else params.delete('category');
     if (priceRange[0] > 0) params.set('minPrice', priceRange[0].toString()); else params.delete('minPrice');
     if (priceRange[1] < 5000) params.set('maxPrice', priceRange[1].toString()); else params.delete('maxPrice');
     if (sortOption !== 'newest') params.set('sort', sortOption); else params.delete('sort');
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [debouncedSearch, selectedGroup, selectedCategory, priceRange, sortOption, pathname, router, searchParams]);
+  }, [debouncedSearch, selectedCategory, priceRange, sortOption, pathname, router, searchParams]);
 
   useEffect(() => {
     updateURL();
@@ -61,7 +57,7 @@ export default function ProductsClient() {
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = products.filter(p => {
       const searchMatch = debouncedSearch ? p.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || p.description.toLowerCase().includes(debouncedSearch.toLowerCase()) : true;
-      const groupMatch = selectedGroup === 'All' || p.group === selectedGroup;
+      const groupMatch = true;
       const categoryMatch = selectedCategory === 'All' || p.category === selectedCategory;
       const priceMatch = (p.salePrice ?? p.price) >= priceRange[0] && (p.salePrice ?? p.price) <= priceRange[1];
       return searchMatch && groupMatch && categoryMatch && priceMatch;
@@ -84,11 +80,11 @@ export default function ProductsClient() {
     }
 
     return filtered;
-  }, [debouncedSearch, selectedGroup, selectedCategory, priceRange, sortOption]);
+  }, [debouncedSearch, selectedCategory, priceRange, sortOption]);
 
   const handleResetFilters = () => {
     setSearch('');
-    setSelectedGroup('All');
+    
     setSelectedCategory('All');
     setPriceRange([0, 5000]);
     setSortOption('newest');
@@ -96,12 +92,11 @@ export default function ProductsClient() {
 
   const filterProps = {
     search, setSearch,
-    selectedGroup, setSelectedGroup,
+    
     selectedCategory, setSelectedCategory,
     priceRange, setPriceRange,
     sortOption, setSortOption,
-    handleResetFilters,
-    availableCategories
+    handleResetFilters
   };
 
   return (

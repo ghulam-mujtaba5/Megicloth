@@ -14,19 +14,13 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  List,
-  ListItemButton,
-  ListItemText,
-  Divider,
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { categoryData } from '../../data/categories';
+
 
 interface ProductFiltersProps {
   search: string;
   setSearch: (value: string) => void;
-  selectedGroup: string;
-  setSelectedGroup: (value: string) => void;
   selectedCategory: string;
   setSelectedCategory: (value: string) => void;
   priceRange: number[];
@@ -34,22 +28,18 @@ interface ProductFiltersProps {
   sortOption: string;
   setSortOption: (value: string) => void;
   handleResetFilters: () => void;
-  availableCategories: { name: string; description: string }[];
 }
 
 export default function ProductFilters({
   search,
   setSearch,
-  selectedGroup,
-  setSelectedGroup,
   selectedCategory,
   setSelectedCategory,
   priceRange,
   setPriceRange,
   sortOption,
   setSortOption,
-  handleResetFilters,
-  availableCategories
+  handleResetFilters
 }: ProductFiltersProps) {
 
   return (
@@ -61,35 +51,15 @@ export default function ProductFilters({
       
       <TextField fullWidth label="Search products..." value={search} onChange={e => setSearch(e.target.value)} size="small" sx={{ mb: 2 }}/>
 
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Category</Typography>
-        </AccordionSummary>
-        <AccordionDetails sx={{ p: 0 }}>
-          <List disablePadding>
-            <ListItemButton selected={selectedGroup === 'All'} onClick={() => { setSelectedGroup('All'); setSelectedCategory('All'); }}>
-              <ListItemText primary="All Products" />
-            </ListItemButton>
-            {categoryData.map(group => (
-              <Box key={group.name}>
-                <Divider />
-                <ListItemButton selected={selectedGroup === group.name && selectedCategory === 'All'} onClick={() => { setSelectedGroup(group.name); setSelectedCategory('All'); }}>
-                  <ListItemText primary={group.name} sx={{ fontWeight: 'bold' }} />
-                </ListItemButton>
-                {selectedGroup === group.name && (
-                  <List disablePadding sx={{ pl: 2 }}>
-                    {availableCategories.map(category => (
-                      <ListItemButton key={category.name} selected={selectedCategory === category.name} onClick={() => setSelectedCategory(category.name)}>
-                        <ListItemText primary={category.name} />
-                      </ListItemButton>
-                    ))}
-                  </List>
-                )}
-              </Box>
-            ))}
-          </List>
-        </AccordionDetails>
-      </Accordion>
+      <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+  <InputLabel>Category</InputLabel>
+  <Select value={selectedCategory} label="Category" onChange={e => setSelectedCategory(e.target.value)}>
+    <MenuItem value="All">All Products</MenuItem>
+    <MenuItem value="Men">Men</MenuItem>
+    <MenuItem value="Women">Women</MenuItem>
+    {/* Add more categories as needed */}
+  </Select>
+</FormControl>
 
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
