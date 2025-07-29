@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import { Delete, Search, Edit } from '@mui/icons-material';
 import type { User } from '@/app/types';
-import { updateUserRole, deleteUser, updateUser } from '@/app/lib/actions/users';
+import { createClient } from '@/app/lib/supabase/client';
 import UserDialog from './UserDialog';
 
 interface UsersClientPageProps {
@@ -35,24 +35,24 @@ export default function UsersClientPage({ initialUsers }: UsersClientPageProps) 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
+  const supabase = createClient();
+
   const handleRoleChange = async (userId: string, newRole: string) => {
-    const res = await updateUserRole(userId, newRole);
-    if (res.success) {
+    const { error } = await supabase.from('users').update({ role: newRole }).eq('id', userId);
+    if (!error) {
       setUsers(users.map(u => u.id === userId ? { ...u, role: newRole as 'admin' | 'user' } : u));
     } else {
-      // TODO: Replace with a more robust notification system (e.g., Snackbar)
-      alert(res.error || 'Failed to update user role.');
+      alert(error.message || 'Failed to update user role.');
     }
   };
 
   const handleDelete = async (userId: string) => {
     if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
-    const res = await deleteUser(userId);
-    if (res.success) {
+    const { error } = await supabase.from('users').delete().eq('id', userId);
+    if (!error) {
       setUsers(users.filter(u => u.id !== userId));
     } else {
-      // TODO: Replace with a more robust notification system (e.g., Snackbar)
-      alert(res.error || 'Failed to delete user.');
+      alert(error.message || 'Failed to delete user.');
     }
   };
 
@@ -69,14 +69,14 @@ export default function UsersClientPage({ initialUsers }: UsersClientPageProps) 
   const handleSaveUser = async (userData: Partial<User>) => {
     if (!selectedUser) return;
 
-    const result = await updateUser(selectedUser.id, userData);
+    const { id, email, role, ...updatableData } = userData;
+    const { data, error } = await supabase.from('users').update(updatableData).eq('id', selectedUser.id).select().single();
 
-    if (result.success && result.user) {
-      setUsers(users.map(u => u.id === result.user!.id ? result.user! : u));
+    if (!error && data) {
+      setUsers(users.map(u => u.id === data.id ? data as User : u));
       handleCloseDialog();
     } else {
-      // TODO: Replace with a more robust notification system (e.g., Snackbar)
-      alert(result.error || 'Failed to update user.');
+      alert(error?.message || 'Failed to update user.');
     }
   };
 

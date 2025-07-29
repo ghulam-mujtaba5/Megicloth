@@ -21,7 +21,7 @@ export default async function LoyaltyHistory() {
           Points History
         </Typography>
         <Typography sx={{ color: 'text.secondary' }}>
-          You don't have any points history yet. Start shopping to earn points!
+          You don&apos;t have any points history yet. Start shopping to earn points!
         </Typography>
       </Paper>
     );

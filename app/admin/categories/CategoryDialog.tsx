@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } from '@mui/material';
 import { useCategories } from '../../context/CategoryContext';
 import { Category } from '../../context/CategoryContext';
@@ -14,7 +14,7 @@ interface CategoryDialogProps {
 export default function CategoryDialog({ open, onClose, category }: CategoryDialogProps) {
   const { addCategory, updateCategory } = useCategories();
   
-  const getInitialFormData = () => {
+  const getInitialFormData = useCallback(() => {
     if (category) {
       // Ensure imageUrl is included even if missing from older data
       return { ...category, imageUrl: category.imageUrl ?? '' };
@@ -26,13 +26,13 @@ export default function CategoryDialog({ open, onClose, category }: CategoryDial
       imageUrl: '',
       createdAt: '',
     };
-  };
+  }, [category]);
 
   const [formData, setFormData] = useState(getInitialFormData());
 
   useEffect(() => {
     setFormData(getInitialFormData());
-  }, [category, open, getInitialFormData]);
+  }, [getInitialFormData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
