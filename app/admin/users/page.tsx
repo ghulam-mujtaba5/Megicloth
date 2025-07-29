@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { getAllUsers, updateUserRole, deleteUser } from '@/app/lib/actions/users';
 import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Select, MenuItem } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import type { User } from '@/app/types';
@@ -13,7 +12,8 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     setLoading(true);
-    getAllUsers()
+    fetch('/api/admin/users')
+      .then(res => res.json())
       .then((data: User[]) => {
         setUsers(data || []);
         setLoading(false);
@@ -25,7 +25,11 @@ export default function AdminUsersPage() {
   }, []);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
-    const res = await updateUserRole(userId, newRole);
+    const res = await fetch('/api/admin/users', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, newRole })
+    }).then(r => r.json());
     if (res.success) {
       setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
     } else {
@@ -35,7 +39,11 @@ export default function AdminUsersPage() {
 
   const handleDelete = async (userId: string) => {
     if (!window.confirm('Delete this user?')) return;
-    const res = await deleteUser(userId);
+    const res = await fetch('/api/admin/users', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    }).then(r => r.json());
     if (res.success) {
       setUsers(users.filter(u => u.id !== userId));
     } else {

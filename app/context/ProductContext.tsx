@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
-import { products as initialProducts, Product } from '../data/products';
+import { products as initialProducts } from '../data/products';
+import type { Product } from '@/app/types';
 
 interface ProductContextType {
   products: Product[];

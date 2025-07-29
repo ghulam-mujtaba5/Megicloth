@@ -4,12 +4,12 @@ import { Box, Container, Grid, Typography } from '@mui/material';
 import Image from 'next/image';
 
 const brands = [
-  { name: 'Brand 1', src: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=80&q=80&grayscale&1' },
-  { name: 'Brand 2', src: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=80&q=80&grayscale&2' },
-  { name: 'Brand 3', src: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=80&q=80&grayscale&3' },
-  { name: 'Brand 4', src: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=80&q=80&grayscale&4' },
-  { name: 'Brand 5', src: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=80&q=80&grayscale&5' },
-  { name: 'Brand 6', src: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=80&q=80&grayscale&6' },
+  { name: 'Nike', src: 'https://images.unsplash.com/photo-1555952494-0408982e3e1b?w=150&h=80&fit=crop' },
+  { name: 'Adidas', src: 'https://images.unsplash.com/photo-1519068916283-e28c74422002?w=150&h=80&fit=crop' },
+  { name: 'Social Media', src: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=150&h=80&fit=crop' },
+  { name: 'Apple', src: 'https://images.unsplash.com/photo-1570751057628-64941a54d20d?w=150&h=80&fit=crop' },
+  { name: 'Instagram', src: 'https://images.unsplash.com/photo-1611262588024-d12430b98920?w=150&h=80&fit=crop' },
+  { name: 'Spotify', src: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=150&h=80&fit=crop' },
 ];
 
 const FeaturedBrands = () => {
@@ -45,10 +45,6 @@ const FeaturedBrands = () => {
                   '&:hover': {
                     transform: 'translateY(-4px)',
                     boxShadow: 3,
-                    '& img': {
-                      filter: 'grayscale(0%)',
-                      opacity: 1,
-                    },
                   },
                 }}
               >
@@ -59,9 +55,7 @@ const FeaturedBrands = () => {
                   height={50}
                   style={{
                     objectFit: 'contain',
-                    filter: 'grayscale(80%)',
-                    opacity: 0.7,
-                    transition: 'filter 0.3s ease, opacity 0.3s ease',
+                    transition: 'transform 0.3s ease',
                   }}
                 />
               </Box>

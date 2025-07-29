@@ -19,6 +19,7 @@ import {
   IconButton
 } from '@mui/material';
 import { Visibility } from '@mui/icons-material';
+import styles from './Orders.module.css';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -55,16 +56,16 @@ export default function AdminOrdersPage() {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 3 }}>
+    <Box className={styles.pageContainer}>
+      <Typography variant="h4" component="h1" className={styles.pageTitle}>
         Manage Orders
       </Typography>
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+        <Box className={styles.centeredBox}>
           <Typography>Loading orders...</Typography>
         </Box>
       ) : error ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+        <Box className={styles.centeredBox}>
           <Typography color="error">{error}</Typography>
         </Box>
       ) : (
@@ -87,7 +88,7 @@ export default function AdminOrdersPage() {
                   <TableCell>
                     {order.users?.first_name || order.shipping_name || '-'} {order.users?.last_name || ''}
                     <br />
-                    <span style={{ color: '#888', fontSize: 12 }}>{order.users?.email || order.shipping_email || '-'}</span>
+                    <span className={styles.customerSubtext}>{order.users?.email || order.shipping_email || '-'}</span>
                   </TableCell>
                   <TableCell>{order.created_at ? new Date(order.created_at).toLocaleDateString() : '-'}</TableCell>
                   <TableCell>Rs. {order.total?.toLocaleString?.() ?? '-'}</TableCell>
@@ -96,7 +97,7 @@ export default function AdminOrdersPage() {
                       value={order.status || 'pending'}
                       onChange={(e) => handleStatusChange(order.id, e)}
                       size="small"
-                      sx={{ minWidth: 120 }}
+                      className={styles.statusSelect}
                     >
                       <MenuItem value="pending">Pending</MenuItem>
                       <MenuItem value="processing">Processing</MenuItem>

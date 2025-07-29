@@ -123,7 +123,7 @@ export default function Footer() {
                 </Button>
               </Box>
               {newsletterStatus === 'success' && (
-                <Fade in={newsletterStatus === 'success'}>
+                <Fade in={newsletterStatus === 'success'} unmountOnExit>
                   <Box sx={{ display: 'flex', alignItems: 'center', color: '#10b981', mt: 2 }}>
                     <CheckCircleIcon sx={{ mr: 1 }} />
                     <Typography>Thank you for subscribing!</Typography>
@@ -132,7 +132,7 @@ export default function Footer() {
                 </Fade>
               )}
               {newsletterStatus === 'error' && (
-                <Fade in={newsletterStatus === 'error'}>
+                <Fade in={newsletterStatus === 'error'} unmountOnExit>
                   <Typography sx={{ color: '#ef4444', mt: 2 }}>Please enter a valid email address.</Typography>
                 </Fade>
               )}

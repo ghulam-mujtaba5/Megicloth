@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from '@/app/lib/supabase/server';
-import { cookies } from 'next/headers';
 import { z } from 'zod';
 
 const OrderItemSchema = z.object({
@@ -49,7 +48,7 @@ export async function updateOrderStatus(orderId: string, status: string) {
 }
 
 export async function createOrder(_prevState: any, values: z.infer<typeof OrderSchema>) {
-  const supabase = createClient(cookies());
+  const supabase = createClient();
   const { cart, total, shipping, paymentMethod, orderNotes } = values;
   const { data: { session } } = await supabase.auth.getSession();
   let userId: string | null = null;

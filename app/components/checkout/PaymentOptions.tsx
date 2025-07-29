@@ -3,8 +3,8 @@
 import { FormControl, FormControlLabel, Paper, Radio, RadioGroup, Typography } from '@mui/material';
 
 interface PaymentOptionsProps {
-  paymentMethod: string;
-  setPaymentMethod: (method: string) => void;
+  paymentMethod: 'cod' | 'payfast' | 'stripe';
+  setPaymentMethod: (method: 'cod' | 'payfast' | 'stripe') => void;
 }
 
 export default function PaymentOptions({ paymentMethod, setPaymentMethod }: PaymentOptionsProps) {
@@ -18,7 +18,7 @@ export default function PaymentOptions({ paymentMethod, setPaymentMethod }: Paym
           row
           name="paymentMethod"
           value={paymentMethod}
-          onChange={(e) => setPaymentMethod(e.target.value)}
+          onChange={(e) => setPaymentMethod(e.target.value as 'cod' | 'payfast' | 'stripe')}
         >
           <FormControlLabel value="cod" control={<Radio />} label="Cash on Delivery" />
           <FormControlLabel value="jazzcash" control={<Radio />} label="JazzCash" disabled />

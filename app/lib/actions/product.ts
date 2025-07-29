@@ -75,7 +75,7 @@ export async function deleteProduct(id: string) {
 
 // --- Reviews ---
 
-export async function addReview(prevState: any, formData: FormData) {
+export async function addReview(_: any, formData: FormData) {
   const validatedFields = ReviewSchema.safeParse({
     rating: Number(formData.get('rating')),
     text: formData.get('text'),

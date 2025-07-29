@@ -32,7 +32,7 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import LockIcon from '@mui/icons-material/Lock';
 
 export default function WishlistPage() {
-  const { wishlist, removeFromWishlist, clearWishlist, loading } = useWishlist();
+  const { wishlist, removeFromWishlist, clearWishlist } = useWishlist();
   const { addToCart } = useCart();
 
   const handleMoveToCart = async (productId: string) => {
@@ -102,7 +102,7 @@ export default function WishlistPage() {
     return (
       <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
         <Container maxWidth="md" sx={{ py: { xs: 4, md: 8 } }}>
-          <Fade in={true} timeout={800}>
+          <Fade in={true} timeout={800} unmountOnExit>
             <Box sx={{ textAlign: 'center' }}>
               {/* Glassy illustration container */}
               <Box
@@ -200,26 +200,45 @@ export default function WishlistPage() {
               >
                 My Wishlist
               </Typography>
-              <Button
-                variant="contained"
-                startIcon={<ShoppingCart />}
-                onClick={handleMoveAllToCart}
-                sx={{
-                  ...neoButtonSx,
-                  background: 'linear-gradient(45deg, #10b981, #059669)',
-                  color: '#ffffff',
-                  px: 3,
-                  py: 1.5,
-                  fontWeight: 700,
-                  borderRadius: 2,
-                  '&:hover': {
-                    background: 'linear-gradient(45deg, #059669, #047857)',
-                    transform: 'translateY(-1px)',
-                  },
-                }}
-              >
-                Move All to Cart
-              </Button>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button
+                  variant="contained"
+                  startIcon={<ShoppingCart />}
+                  onClick={handleMoveAllToCart}
+                  sx={{
+                    ...neoButtonSx,
+                    background: 'linear-gradient(45deg, #10b981, #059669)',
+                    color: '#ffffff',
+                    px: 3,
+                    py: 1.5,
+                    fontWeight: 700,
+                    borderRadius: 2,
+                    '&:hover': {
+                      background: 'linear-gradient(45deg, #059669, #047857)',
+                      transform: 'translateY(-1px)',
+                    },
+                  }}
+                >
+                  Move All to Cart
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<Delete />}
+                  onClick={handleClearWishlist}
+                  sx={{
+                    ...neoButtonSx,
+                    color: '#ef4444',
+                    borderColor: '#fca5a5',
+                    '&:hover': {
+                      background: '#fee2e2',
+                      color: '#b91c1c',
+                      borderColor: '#f87171',
+                    },
+                  }}
+                >
+                  Clear Wishlist
+                </Button>
+              </Box>
             </Box>
             <Typography
               variant="h6"
@@ -264,7 +283,7 @@ export default function WishlistPage() {
         <Grid container spacing={3} aria-label="Wishlist items" role="list">
           {wishlist.map((product, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={product.id} role="listitem">
-              <Fade in={true} timeout={500 + index * 80}>
+              <Fade in={true} timeout={500 + index * 80} unmountOnExit>
                 <Card
                   sx={neoCardSx}
                   aria-label={`Wishlist item: ${product.name}`}
@@ -275,7 +294,7 @@ export default function WishlistPage() {
                     <CardMedia
                       component="img"
                       height="200"
-                      image={product.image}
+                      image={product.images[0]}
                       alt={product.name}
                       sx={{ objectFit: 'cover' }}
                       loading="lazy"

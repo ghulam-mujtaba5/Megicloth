@@ -26,7 +26,7 @@ export default function CheckoutClientPage() {
     phone: user?.phone || '',
     orderNotes: ''
   });
-  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'payfast' | 'stripe'>('cod');
   const [errors, setErrors] = useState<{ name?: string; email?: string; address?: string; phone?: string }>({});
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);

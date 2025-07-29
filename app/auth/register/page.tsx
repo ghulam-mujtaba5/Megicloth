@@ -40,7 +40,7 @@ export default function RegisterPage() {
       phone: '',
       password: '',
       confirmPassword: '',
-      termsAccepted: false,
+      termsAccepted: true,
     },
   });
 
@@ -108,7 +108,7 @@ export default function RegisterPage() {
               </Typography>
             </Box>
 
-            <form onSubmit={form.handleSubmit(formAction)}>
+            <form onSubmit={form.handleSubmit((data) => formAction(data))}>
               {formErrors && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                   {formErrors.join(', ')}

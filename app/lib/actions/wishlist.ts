@@ -1,12 +1,11 @@
 "use server";
 
 import { createClient } from '@/app/lib/supabase/server';
-import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
 // Get all wishlist items for the current user
 export async function getWishlist() {
-  const supabase = createClient(cookies());
+  const supabase = createClient();
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return [];
 
@@ -25,7 +24,7 @@ export async function getWishlist() {
 
 // Add a product to the user's wishlist
 export async function addToWishlist(productId: string) {
-  const supabase = createClient(cookies());
+  const supabase = createClient();
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return [];
 
@@ -40,7 +39,7 @@ export async function addToWishlist(productId: string) {
 
 // Remove a product from the user's wishlist
 export async function removeFromWishlist(productId: string) {
-  const supabase = createClient(cookies());
+  const supabase = createClient();
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return [];
 
@@ -55,7 +54,7 @@ export async function removeFromWishlist(productId: string) {
 
 // Clear the user's wishlist
 export async function clearWishlist() {
-  const supabase = createClient(cookies());
+  const supabase = createClient();
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return [];
 

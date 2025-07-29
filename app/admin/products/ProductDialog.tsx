@@ -31,6 +31,13 @@ export default function ProductDialog({ open, onClose, product }: ProductDialogP
       salePrice: 0,
       rating: 0,
       reviews: [],
+      brand: '',
+      reviewsCount: 0,
+      isNew: true,
+      onSale: false,
+      hasVariants: false,
+      sku: '',
+      tags: [],
     };
   };
 
@@ -50,8 +57,8 @@ export default function ProductDialog({ open, onClose, product }: ProductDialogP
       updateProduct({ ...formData });
     } else {
       // Only pass allowed fields to addProduct
-      const { id, rating, reviews, reviewsCount, ...newProductData } = formData;
-      addProduct(newProductData);
+      const { id, rating, reviews, ...newProductData } = formData;
+      addProduct({ ...newProductData, createdAt: new Date().toISOString() });
     }
     onClose();
   };  return (

@@ -1,0 +1,24 @@
+.pageContainer {
+  padding: 24px;
+}
+
+.pageTitle {
+  font-weight: bold;
+  margin-bottom: 24px;
+}
+
+.centeredBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.customerSubtext {
+  color: #888;
+  font-size: 12px;
+}
+
+.statusSelect {
+  min-width: 120px;
+}

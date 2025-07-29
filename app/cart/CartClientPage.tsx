@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useTransition } from 'react';
+import { useState, useMemo, useTransition, useEffect } from 'react';
 import { Container, Grid, Typography, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Button, CircularProgress, Box } from '@mui/material';
 import type { CartItem } from '@/app/types';
 import { updateCartItem, removeFromCart, clearCart, addToCart, getCart } from '@/app/lib/actions/cart';

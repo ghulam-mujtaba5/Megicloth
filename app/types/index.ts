@@ -22,6 +22,7 @@ export interface Product {
   reviews?: Review[];
   quantity?: number; // for cart
   stitchingAvailable?: boolean;
+  createdAt: string;
 }
 
 export interface Review {
@@ -30,7 +31,7 @@ export interface Review {
   author: string;
   rating: number;
   text: string;
-  created_at: string;
+  createdAt: string;
 }
 
 export interface Address {

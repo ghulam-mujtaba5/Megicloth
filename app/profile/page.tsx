@@ -67,6 +67,8 @@ function TabPanel(props: TabPanelProps) {
 
 export default function ProfilePage() {
   const { user, isLoading, updateProfile, addAddress, removeAddress } = useAuth();
+  const router = useRouter();
+  const [tabValue, setTabValue] = useState(0);
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState<string | null>(null);
@@ -83,8 +85,6 @@ export default function ProfilePage() {
       });
     }
   }, [tabValue, user]);
-  const router = useRouter();
-    const [tabValue, setTabValue] = useState(0);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [addAddressDialog, setAddAddressDialog] = useState(false);
   const [newAddress, setNewAddress] = useState({

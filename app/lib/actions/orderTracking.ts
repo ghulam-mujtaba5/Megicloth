@@ -1,11 +1,10 @@
 "use server";
 
 import { createClient } from '@/app/lib/supabase/server';
-import { cookies } from 'next/headers';
 
 // Get all orders for the authenticated user
 export async function getUserOrders() {
-  const supabase = createClient(cookies());
+  const supabase = createClient();
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return [];
   const { data, error } = await supabase

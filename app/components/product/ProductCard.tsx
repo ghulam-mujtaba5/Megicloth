@@ -119,7 +119,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </Tooltip>
         </Box>
 
-        <Fade in={isHovered} timeout={300}>
+        <Fade in={isHovered} timeout={300} unmountOnExit>
           <Box sx={{ position: 'absolute', bottom: 12, left: 12, right: 12, zIndex: 2 }}>
             <Button
               fullWidth

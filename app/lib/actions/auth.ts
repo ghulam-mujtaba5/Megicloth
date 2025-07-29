@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation';
 import { registerFormSchema } from '@/app/lib/schemas';
 
 import type { z } from 'zod';
-import type { registerFormSchema } from './schemas';
 
 type RegisterFormValues = z.infer<typeof registerFormSchema>;
 

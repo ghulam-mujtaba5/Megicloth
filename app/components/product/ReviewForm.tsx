@@ -7,7 +7,7 @@ import { useFormStatus } from 'react-dom';
 interface ReviewFormProps {
   productId: string;
   formAction: (payload: FormData) => void;
-  formState: { errors: any; success?: boolean };
+  formState: { errors?: any; success?: boolean };
 }
 
 function SubmitButton() {
@@ -39,7 +39,7 @@ export default function ReviewForm({ productId, formAction, formState }: ReviewF
         <Rating
           name="rating-display"
           value={rating}
-          onChange={(event, newValue) => {
+          onChange={(_, newValue) => {
             setRating(newValue);
           }}
         />

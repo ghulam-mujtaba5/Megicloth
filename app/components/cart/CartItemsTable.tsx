@@ -6,7 +6,7 @@ import {
   TableContainer, TableHead, TableRow, TextField, Typography, Avatar 
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { CartItem } from '../../context/CartContext';
+import type { CartItem } from '../../types';
 
 interface CartItemsTableProps {
   items: CartItem[];

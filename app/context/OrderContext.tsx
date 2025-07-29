@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useAuth } from './AuthContext';
-import { CartItem } from './CartContext';
+import type { CartItem } from '../types';
 
 export interface Order {
   id: string;

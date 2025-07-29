@@ -1,30 +1,4 @@
-export type Review = {
-  id: string;
-  author: string;
-  rating: number;
-  text: string;
-  createdAt: string;
-};
-
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  salePrice?: number;
-  category: string;
-  images: string[];
-  stock: number;
-  rating?: number;
-  reviews?: Review[];
-  reviewsCount?: number;
-  createdAt: string;
-  sku?: string;
-  fabric?: string;
-  collection?: string;
-  stitchingAvailable?: boolean;
-  stitchingCost?: number;
-}
+import type { Product } from '@/app/types';
 
 export const products: Product[] = [
   {
@@ -49,6 +23,12 @@ export const products: Product[] = [
     stitchingAvailable: true,
     stitchingCost: 800,
     fabric: 'Lawn',
+    brand: 'MegiCloth',
+    reviewsCount: 0,
+    isNew: true,
+    onSale: true,
+    hasVariants: false,
+    tags: ['lawn', 'mens-fashion', 'summer', 'unstitched'],
   },
   {
     id: '2',
@@ -70,6 +50,12 @@ export const products: Product[] = [
     stitchingAvailable: true,
     stitchingCost: 1200,
     fabric: 'Lawn',
+    brand: 'MegiCloth',
+    reviewsCount: 0,
+    isNew: true,
+    onSale: true,
+    hasVariants: false,
+    tags: ['lawn', 'womens-fashion', 'luxury', 'unstitched', '3-piece'],
   },
   {
     id: '3',
@@ -87,6 +73,12 @@ export const products: Product[] = [
     stitchingAvailable: true,
     stitchingCost: 800,
     fabric: 'Wash & Wear',
+    brand: 'MegiCloth',
+    reviewsCount: 0,
+    isNew: false,
+    onSale: false,
+    hasVariants: false,
+    tags: ['wash-and-wear', 'mens-fashion', 'formal', 'unstitched'],
   },
   {
     id: '4',
@@ -105,5 +97,11 @@ export const products: Product[] = [
     stitchingAvailable: true,
     stitchingCost: 1500,
     fabric: 'Embroidered Lawn',
+    brand: 'MegiCloth',
+    reviewsCount: 0,
+    isNew: true,
+    onSale: true,
+    hasVariants: false,
+    tags: ['lawn', 'womens-fashion', 'embroidered', 'unstitched', '3-piece'],
   },
 ];
