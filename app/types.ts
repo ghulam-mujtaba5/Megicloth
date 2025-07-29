@@ -19,7 +19,7 @@ export interface Product {
   images: string[];
   reviews?: Review[];
   isPublished?: boolean;
-  brand?: string;
+  brand: string; // made required for type safety
   sku?: string;
   tags?: string[];
   isNew?: boolean;
@@ -70,16 +70,7 @@ export interface OrderItem extends Product {
   quantity: number;
 }
 
-export interface Post {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  author: string;
-  date: string;
-  tags?: string[];
-  imageUrl?: string;
-}
+
 
 export type CartItem = Product & {
   quantity: number;
@@ -124,8 +115,8 @@ export interface AdminOrder {
   paymentMethod: string;
   createdAt: string;
   users?: Partial<User>;
-  shippingName?: string;
-  shippingEmail?: string;
+  shippingName?: string; // maps to shipping_name in DB
+  shippingEmail?: string; // maps to shipping_email in DB
   shippingAddress?: any;
   items?: CartItem[];
 }

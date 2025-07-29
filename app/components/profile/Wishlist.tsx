@@ -32,11 +32,18 @@ const Wishlist = () => {
     <Box>
       <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold' }}>My Wishlist</Typography>
       <Grid container spacing={3}>
-        {wishlistItems.map((product: Product) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-            <ProductCard product={product} />
-          </Grid>
-        ))}
+        {wishlistItems.map((product: Product) => {
+          // Ensure all required fields, especially 'brand', are present
+          const safeProduct = {
+            ...product,
+            brand: product.brand || 'Unknown',
+          };
+          return (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={safeProduct.id}>
+              <ProductCard product={safeProduct} />
+            </Grid>
+          );
+        })}
       </Grid>
     </Box>
   );

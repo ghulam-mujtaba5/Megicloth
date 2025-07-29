@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import { Save, Search, CloudUpload, Download } from '@mui/icons-material';
 import { getAllProducts, updateStock, bulkUpdateStock } from '@/app/lib/actions/product';
+import styles from './InventoryPage.module.css';
 import Papa from 'papaparse';
 import type { Product } from '@/app/types';
 
@@ -215,7 +216,7 @@ const handleSaveStock = async (productId: string) => {
               accept=".csv"
               ref={fileInputRef}
               onChange={handleFileChange}
-              style={{ display: 'none' }}
+              className={styles.visuallyHidden}
               aria-label="Upload CSV for bulk inventory update"
             />
             <Button

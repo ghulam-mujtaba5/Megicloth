@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBlogPost, updateBlogPost } from '../../../../lib/actions/blog';
-import { Post } from '@/app/types';
+import type { Post } from '@/app/types';
 import { TextField, Button, Paper, Grid } from '@mui/material';
 
 interface EditPostFormProps {
@@ -31,9 +31,9 @@ export default function EditPostForm({ initialData, postId }: EditPostFormProps)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'tags') {
-      setFormState(prev => ({ ...prev, tags: value.split(',').map(tag => tag.trim()) }));
+      setFormState((prev: Partial<Post>) => ({ ...prev, tags: value.split(',').map(tag => tag.trim()) }));
     } else {
-      setFormState(prev => ({ ...prev, [name]: value }));
+      setFormState((prev: Partial<Post>) => ({ ...prev, [name]: value }));
     }
   };
 
