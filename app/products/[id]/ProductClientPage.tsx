@@ -1,8 +1,9 @@
 "use client";
 
-import { useCart } from "../../context/CartContext";
-import { useState, useEffect, useMemo } from "react";
+import { useCart } from "@/app/context/CartContext";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useFormState } from 'react-dom';
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -20,17 +21,17 @@ import Snackbar from "@mui/material/Snackbar";
 import Link from "next/link";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
-import ProductCard from "../../components/product/ProductCard";
-import ReviewForm from "../../components/product/ReviewForm";
+import ProductCard from "@/app/components/product/ProductCard";
+import ReviewForm from "@/app/components/product/ReviewForm";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
-import ProductImageGallery from '../../components/product/ProductImageGallery';
-import ProductInfo from '../../components/product/ProductInfo';
-import { Product } from '../../types';
+import ProductImageGallery from '@/app/components/product/ProductImageGallery';
+import ProductInfo from '@/app/components/product/ProductInfo';
+import { Product, Review } from '@/app/types';
+import { addReview } from '@/app/lib/actions/product';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -68,23 +69,22 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [addStitching, setAddStitching] = useState(false);
-  const [reviews, setReviews] = useState<any[]>([]);
   const [tabValue, setTabValue] = useState(0);
   
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' | 'info' | 'warning' });
 
-  useEffect(() => {
-    if (product) setReviews(product.reviews || []);
-  }, [product]);
+  const [formState, formAction] = useFormState(addReview, { errors: {} });
 
-    const finalPrice = useMemo(() => {
+  const reviews = product?.reviews || [];
+
+  const finalPrice = useMemo(() => {
     if (!product) return 0;
     const basePrice = product.salePrice ?? product.price;
     return addStitching ? basePrice + (product.stitchingCost ?? 0) : basePrice;
   }, [product, addStitching]);
 
   const averageRating = useMemo(() => {
-    if (reviews.length === 0) return product?.rating || 0;
+    if (!reviews || reviews.length === 0) return product?.rating || 0;
     return reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
   }, [reviews, product?.rating]);
 
@@ -105,12 +105,12 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
   };
 
   const handleAddToCart = () => {
-    addToCart({ ...product, price: finalPrice });
+    addToCart({ ...product, price: finalPrice, quantity });
     showSnackbar(`${product.name} added to cart!`);
   };
 
   const handleBuyNow = () => {
-    addToCart({ ...product, price: finalPrice });
+    addToCart({ ...product, price: finalPrice, quantity });
     router.push('/cart');
   };
 
@@ -130,11 +130,6 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
       navigator.clipboard.writeText(window.location.href);
       showSnackbar('Link copied to clipboard!', 'info');
     }
-  };
-
-  const handleReviewSubmit = (newReview: any) => {
-    setReviews([newReview, ...reviews]);
-    showSnackbar('Thank you for your review!');
   };
 
   return (
@@ -183,12 +178,12 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
             </Grid>
           </TabPanel>
           <TabPanel value={tabValue} index={1}>
-            <ReviewForm onSubmit={handleReviewSubmit} />
+            <ReviewForm productId={product.id} formAction={formAction} formState={formState} />
             <Divider sx={{ my: 4 }} />
             <Stack spacing={2}>
               {reviews.length > 0 ? (
-                reviews.map((review, index) => (
-                  <Card key={index} variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                reviews.map((review: Review) => (
+                  <Card key={review.id} variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
                       <Typography variant="subtitle1" fontWeight={600}>{review.author}</Typography>
                       <Rating value={review.rating} readOnly size="small" />
@@ -202,15 +197,26 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
         </Container>
       </Box>
 
-      <Container maxWidth="xl" sx={{ py: { xs: 5, md: 8 } }}>
-        <Typography variant="h4" component="h2" fontWeight={700} textAlign="center" mb={4}>You Might Also Like</Typography>
-        <Swiper modules={[Navigation]} spaceBetween={isMobile ? 16 : 24} slidesPerView={isMobile ? 2 : 4} navigation>
-          {relatedProducts.map(p => <SwiperSlide key={p.id}><ProductCard product={p} /></SwiperSlide>)}
+      <Container maxWidth="lg" sx={{ py: { xs: 5, md: 8 } }}>
+        <Typography variant="h4" component="h2" sx={{ fontWeight: 700, mb: 4, textAlign: 'center' }}>
+          You Might Also Like
+        </Typography>
+        <Swiper
+          modules={[Navigation]}
+          spaceBetween={isMobile ? 16 : 24}
+          slidesPerView={isMobile ? 2.2 : 4}
+          navigation
+        >
+          {relatedProducts.map(p => (
+            <SwiperSlide key={p.id}>
+              <ProductCard product={p} />
+            </SwiperSlide>
+          ))}
         </Swiper>
       </Container>
 
-      <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar(prev => ({...prev, open: false}))} TransitionComponent={Slide} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-        <Alert onClose={() => setSnackbar(prev => ({...prev, open: false}))} severity={snackbar.severity} sx={{ width: '100%' }}>
+      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })} TransitionComponent={Slide}>
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

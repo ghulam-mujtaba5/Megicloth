@@ -32,7 +32,7 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import LockIcon from '@mui/icons-material/Lock';
 
 export default function WishlistPage() {
-  const { wishlist, removeFromWishlist, moveAllToCart } = useWishlist();
+  const { wishlist, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
 
   const handleMoveToCart = (productId: string) => {

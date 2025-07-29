@@ -1,10 +1,8 @@
 "use client";
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
-import type { Product } from "../types";
+import type { Product, CartItem } from "../types";
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
-
-export type CartItem = Product & { quantity: number };
 
 interface CartContextType {
   cart: CartItem[];

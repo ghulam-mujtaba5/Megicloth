@@ -1,63 +1,74 @@
 "use client";
 
-import { Box, Button, TextField, Typography, Rating } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect, useRef } from 'react';
+import { Box, Button, TextField, Rating, Typography, Stack, Alert } from '@mui/material';
+import { useFormStatus } from 'react-dom';
 
-const ReviewForm = ({ onSubmit }: { onSubmit: (review: any) => void }) => {
-  const [name, setName] = useState('');
-  const [rating, setRating] = useState<number | null>(5);
-  const [comment, setComment] = useState('');
+interface ReviewFormProps {
+  productId: string;
+  formAction: (payload: FormData) => void;
+  formState: { errors: any; success?: boolean };
+}
 
-  const handleSubmit = () => {
-    const newReview = {
-      id: Date.now(),
-      name,
-      rating,
-      comment,
-      date: new Date().toISOString().split('T')[0],
-    };
-    onSubmit(newReview);
-    setName('');
-    setRating(5);
-    setComment('');
-  };
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" variant="contained" disabled={pending} sx={{ alignSelf: 'flex-start' }}>
+      {pending ? 'Submitting...' : 'Submit Review'}
+    </Button>
+  );
+}
+
+export default function ReviewForm({ productId, formAction, formState }: ReviewFormProps) {
+  const [rating, setRating] = useState<number | null>(4);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (formState.success) {
+      formRef.current?.reset();
+      setRating(4);
+    }
+  }, [formState]);
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4 }}>
+    <Box component="form" action={formAction} ref={formRef} noValidate sx={{ mt: 1 }}>
       <Typography variant="h6" gutterBottom>Write a Review</Typography>
-      <TextField
-        label="Your Name"
-        fullWidth
-        required
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        sx={{ mb: 2 }}
-      />
-      <Box sx={{ mb: 2 }}>
-        <Typography component="legend">Your Rating</Typography>
+      <Stack spacing={2}>
+        <input type="hidden" name="productId" value={productId} />
+        <input type="hidden" name="rating" value={rating || ''} />
         <Rating
-          name="rating"
+          name="rating-display"
           value={rating}
-          onChange={(_, newValue) => {
+          onChange={(event, newValue) => {
             setRating(newValue);
           }}
         />
-      </Box>
-      <TextField
-        label="Your Review"
-        fullWidth
-        required
-        multiline
-        rows={4}
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        sx={{ mb: 2 }}
-      />
-      <Button type="submit" variant="contained">
-        Submit Review
-      </Button>
+        {formState.errors?.rating && <Alert severity="error">{formState.errors.rating[0]}</Alert>}
+        
+        <TextField
+          label="Your Name"
+          name="author"
+          required
+          fullWidth
+          error={!!formState.errors?.author}
+          helperText={formState.errors?.author?.[0]}
+        />
+        <TextField
+          label="Your Review"
+          name="text"
+          required
+          fullWidth
+          multiline
+          rows={4}
+          error={!!formState.errors?.text}
+          helperText={formState.errors?.text?.[0]}
+        />
+
+        {formState.errors?._form && <Alert severity="error">{formState.errors._form[0]}</Alert>}
+        {formState.success && <Alert severity="success">Review submitted successfully!</Alert>}
+
+        <SubmitButton />
+      </Stack>
     </Box>
   );
-};
-
-export default ReviewForm;
+}

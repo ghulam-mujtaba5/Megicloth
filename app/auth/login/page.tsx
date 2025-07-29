@@ -1,8 +1,12 @@
 "use client";
-import { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useFormState } from 'react-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { loginWithEmailPassword, loginWithGoogle, loginWithFacebook, loginWithApple } from '@/app/auth/actions';
 import {
   Container,
   Box,
@@ -12,7 +16,8 @@ import {
   Divider,
   IconButton,
   InputAdornment,
-} from "@mui/material";
+  Alert,
+} from '@mui/material';
 import {
   Visibility,
   VisibilityOff,
@@ -21,77 +26,46 @@ import {
   Google,
   Facebook,
   Apple,
-} from "@mui/icons-material";
-import { motion } from "framer-motion";
-import toast from "react-hot-toast";
-import { alpha } from "@mui/material/styles";
+} from '@mui/icons-material';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
+import { alpha } from '@mui/material/styles';
+
+const loginSchema = z.object({
+  email: z.string().email('Please enter a valid email address.'),
+  password: z.string().min(6, 'Password must be at least 6 characters long.'),
+});
+
+type LoginFormInputs = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { login } = useAuth();
-  const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [state, formAction] = useFormState(loginWithEmailPassword, null);
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: "" }));
+  const formErrors = state?.errors && '_form' in state.errors ? state.errors._form : undefined;
+  const emailErrors = state?.errors && 'email' in state.errors ? state.errors.email : undefined;
+  const passwordErrors = state?.errors && 'password' in state.errors ? state.errors.password : undefined;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormInputs>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  useEffect(() => {
+    if (state?.message && state.errors) {
+      toast.error(state.message);
     }
-  };
+  }, [state]);
 
-  const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
+  
 
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
-    }
-
-    if (!formData.password.trim()) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
-
-    setIsLoading(true);
-    
-    try {
-      const result = await login(formData.email, formData.password);
-      
-      if (result.success) {
-        toast.success("Login successful! Welcome back.");
-        router.push("/");
-      } else {
-        toast.error(result.error || "Login failed. Please try again.");
-      }
-    } catch (error) {
-      toast.error("An unexpected error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSocialLogin = (provider: string) => {
-    toast(`${provider} login coming soon!`);
-  };
-
-  // Glassmorphism style for main card
   const glassCardSx = {
     borderRadius: 4,
     background: 'rgba(255,255,255,0.65)',
@@ -103,38 +77,39 @@ export default function LoginPage() {
     p: { xs: 3, md: 4 },
   };
 
-  // Neomorphic style for input fields
   const neoInputSx = {
-    background: '#f7fafc',
-    boxShadow: '2px 2px 8px #e2e8f0, -2px -2px 8px #ffffff',
-    borderRadius: 2,
     '& .MuiOutlinedInput-root': {
-      background: '#f7fafc',
+      background: alpha('#f0f2f5', 0.6),
       borderRadius: 2,
+      '& fieldset': {
+        borderColor: 'rgba(0, 0, 0, 0.1)',
+      },
+      '&:hover fieldset': {
+        borderColor: 'rgba(0, 0, 0, 0.2)',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: 'primary.main',
+        boxShadow: `0 0 0 2px ${alpha('#2563eb', 0.2)}`,
+      },
     },
   };
 
-  // Neomorphic style for buttons
   const neoButtonSx = {
-    background: '#f7fafc',
-    boxShadow: '2px 2px 8px #e2e8f0, -2px -2px 8px #ffffff',
     borderRadius: 2,
     fontWeight: 700,
-    color: '#2563eb',
+    textTransform: 'none',
     '&:hover': {
-      background: '#e2e8f0',
-      color: '#1e40af',
-      boxShadow: '0 4px 16px #2563eb22',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
     },
   };
 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        display: "flex",
-        alignItems: "center",
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
         py: 4,
       }}
     >
@@ -145,8 +120,7 @@ export default function LoginPage() {
           transition={{ duration: 0.7 }}
         >
           <Box sx={glassCardSx}>
-            {/* Header */}
-            <Box sx={{ textAlign: "center", mb: 4 }}>
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -156,10 +130,10 @@ export default function LoginPage() {
                   variant="h3"
                   sx={{
                     fontWeight: 900,
-                    background: "linear-gradient(45deg, #667eea, #764ba2)",
-                    backgroundClip: "text",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
+                    background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
                     mb: 1,
                     letterSpacing: '-1px',
                   }}
@@ -172,16 +146,19 @@ export default function LoginPage() {
               </Typography>
             </Box>
 
-            {/* Login Form */}
-            <Box component="form" onSubmit={handleSubmit} sx={{ mb: 3 }}>
+            <form action={formAction}>
+              {formErrors && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {formErrors.join(', ')}
+                </Alert>
+              )}
               <TextField
                 fullWidth
                 label="Email Address"
                 type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                error={!!errors.email}
-                helperText={errors.email}
+                {...register('email')}
+                error={!!emailErrors || !!errors.email}
+                helperText={emailErrors?.[0] || errors.email?.message}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -197,11 +174,10 @@ export default function LoginPage() {
               <TextField
                 fullWidth
                 label="Password"
-                type={showPassword ? "text" : "password"}
-                value={formData.password}
-                onChange={(e) => handleInputChange("password", e.target.value)}
-                error={!!errors.password}
-                helperText={errors.password}
+                type={showPassword ? 'text' : 'password'}
+                {...register('password')}
+                error={!!passwordErrors || !!errors.password}
+                helperText={passwordErrors?.[0] || errors.password?.message}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -225,14 +201,14 @@ export default function LoginPage() {
                 autoComplete="current-password"
               />
 
-              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
-                <Link href="/auth/forgot-password" style={{ textDecoration: "none" }}>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+                <Link href="/auth/forgot-password" style={{ textDecoration: 'none' }}>
                   <Typography
                     variant="body2"
                     sx={{
-                      color: "primary.main",
+                      color: 'primary.main',
                       fontWeight: 600,
-                      '&:hover': { textDecoration: "underline" },
+                      '&:hover': { textDecoration: 'underline' },
                     }}
                   >
                     Forgot password?
@@ -244,7 +220,7 @@ export default function LoginPage() {
                 type="submit"
                 fullWidth
                 variant="contained"
-                disabled={isLoading}
+                disabled={isSubmitting}
                 sx={{
                   ...neoButtonSx,
                   mb: 2,
@@ -252,52 +228,54 @@ export default function LoginPage() {
                   fontSize: '1.1rem',
                   background: 'linear-gradient(45deg, #2563eb, #1e40af)',
                   color: '#fff',
-                  boxShadow: '0 4px 16px #2563eb22',
+                  boxShadow: '0 4px 16px rgba(37, 99, 235, 0.25)',
                   '&:hover': {
                     background: 'linear-gradient(45deg, #1e40af, #2563eb)',
-                    color: '#fff',
                   },
                 }}
               >
-                {isLoading ? 'Signing in...' : 'Sign In'}
+                {isSubmitting ? 'Signing in...' : 'Sign In'}
               </Button>
-            </Box>
+            </form>
 
-            {/* Divider */}
-            <Divider sx={{ my: 3, fontWeight: 700, color: '#64748b' }}>or</Divider>
+            <Divider sx={{ my: 3, fontWeight: 700, color: '#64748b' }}>OR</Divider>
 
-            {/* Social Login Buttons */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
+              <form action={loginWithGoogle}>
               <Button
+                type="submit"
                 fullWidth
                 variant="outlined"
                 startIcon={<Google />}
-                onClick={() => handleSocialLogin('Google')}
-                sx={{ ...neoButtonSx, color: '#ea4335', borderColor: alpha('#ea4335', 0.2) }}
+                sx={{ ...neoButtonSx, color: '#ea4335', borderColor: alpha('#d1d5db', 0.8) }}
               >
                 Continue with Google
               </Button>
+            </form>
+              <form action={loginWithFacebook}>
               <Button
+                type="submit"
                 fullWidth
                 variant="outlined"
                 startIcon={<Facebook />}
-                onClick={() => handleSocialLogin('Facebook')}
-                sx={{ ...neoButtonSx, color: '#1877f3', borderColor: alpha('#1877f3', 0.2) }}
+                sx={{ ...neoButtonSx, color: '#1877f3', borderColor: alpha('#d1d5db', 0.8) }}
               >
                 Continue with Facebook
               </Button>
+              </form>
+              <form action={loginWithApple}>
               <Button
+                type="submit"
                 fullWidth
                 variant="outlined"
                 startIcon={<Apple />}
-                onClick={() => handleSocialLogin('Apple')}
-                sx={{ ...neoButtonSx, color: '#111', borderColor: alpha('#111', 0.2) }}
+                sx={{ ...neoButtonSx, color: '#111', borderColor: alpha('#d1d5db', 0.8) }}
               >
                 Continue with Apple
               </Button>
+              </form>
             </Box>
 
-            {/* Register Link */}
             <Box sx={{ textAlign: 'center', mt: 2 }}>
               <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 500 }}>
                 Don't have an account?{' '}
@@ -311,4 +289,4 @@ export default function LoginPage() {
       </Container>
     </Box>
   );
-} 
+}

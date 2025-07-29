@@ -1,5 +1,5 @@
 import type { Metadata, ResolvingMetadata } from 'next';
-import { fetchProductById, fetchRelatedProducts } from "../../lib/data";
+import { getProductById, getRelatedProducts } from "@/app/lib/data/products";
 import ProductClientPage from './ProductClientPage';
 
 type Props = {
@@ -10,7 +10,7 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const product = await fetchProductById(params.id);
+  const product = await getProductById(params.id);
 
   if (!product) {
     return {
@@ -54,9 +54,9 @@ export async function generateMetadata(
 }
 
 export default async function ProductDetailPage({ params }: Props) {
-  const product = await fetchProductById(params.id);
+  const product = await getProductById(params.id);
   const relatedProducts = product
-    ? await fetchRelatedProducts(product.category, product.id)
+    ? await getRelatedProducts(product.category, product.id)
     : [];
 
   return <ProductClientPage product={product} relatedProducts={relatedProducts} />;

@@ -1,44 +1,42 @@
 "use client";
 
+import { useEffect, useState } from 'react';
+import { useFormState } from 'react-dom';
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
 import Fade from "@mui/material/Fade";
-import Paper from "@mui/material/Paper";
-import EmailIcon from "@mui/icons-material/Email";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import Alert from "@mui/material/Alert";
-import { useState } from "react";
 import Seo from "../components/common/Seo";
+import ContactInfo from "../components/contact/ContactInfo";
+import ContactForm, { ContactFormValues } from "../components/contact/ContactForm";
+import { submitContactForm } from './actions';
+
+const initialState = {
+  message: '',
+  errors: {},
+};
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
+  const [state, formAction] = useFormState(submitContactForm, initialState);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setError("");
-  };
+  useEffect(() => {
+    if (state.message.startsWith('Success')) {
+      setIsSuccess(true);
+      setTimeout(() => setIsSuccess(false), 4000);
+    }
+    setIsLoading(false);
+  }, [state]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
-      setError("Please fill in all fields.");
-      return;
-    }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4000);
-    setForm({ name: "", email: "", message: "" });
+  const handleFormSubmit = (data: ContactFormValues) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    setIsLoading(true);
+    formAction(formData);
   };
 
   return (
@@ -74,67 +72,17 @@ export default function ContactPage() {
           <Grid container spacing={6}>
             <Grid item xs={12} md={7}>
               <Fade in={true} timeout={900}>
-                <Paper elevation={0} sx={{
-                  borderRadius: 4,
-                  background: '#ffffff',
-                  boxShadow: '0 4px 24px rgba(0,0,0,0.05)',
-                  p: { xs: 3, md: 4 },
-                  height: '100%'
-                }}>
-                  <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, color: '#1e293b' }}>Send Us a Message</Typography>
-                  <form onSubmit={handleSubmit} aria-label="Contact form">
-                    <TextField fullWidth label="Name" name="name" value={form.name} onChange={handleChange} sx={{ mb: 2 }} required />
-                    <TextField fullWidth label="Email" name="email" value={form.email} onChange={handleChange} sx={{ mb: 2 }} required type="email" />
-                    <TextField fullWidth label="Message" name="message" value={form.message} onChange={handleChange} sx={{ mb: 2 }} required multiline minRows={5} />
-                    {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-                    {submitted && <Alert severity="success" sx={{ mb: 2 }}>Thank you for your message! We'll be in touch soon.</Alert>}
-                    <Button type="submit" variant="contained" fullWidth sx={{ background: '#2563eb', color: '#fff', fontWeight: 700, borderRadius: 2, py: 1.5, fontSize: '1.1rem', '&:hover': { background: '#1e40af' } }}>
-                      Submit
-                    </Button>
-                  </form>
-                </Paper>
+                <ContactForm 
+                  onSubmit={handleFormSubmit} 
+                  isLoading={isLoading} 
+                  isSuccess={isSuccess} 
+                  error={state.message.startsWith('Error') ? state.message : null} 
+                />
               </Fade>
             </Grid>
             <Grid item xs={12} md={5}>
               <Fade in={true} timeout={1100}>
-                <Paper elevation={0} sx={{
-                  borderRadius: 4,
-                  background: '#ffffff',
-                  boxShadow: '0 4px 24px rgba(0,0,0,0.05)',
-                  p: { xs: 3, md: 4 },
-                  height: '100%'
-                }}>
-                  <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, color: '#1e293b' }}>Contact Information</Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2.5 }}>
-                    <EmailIcon sx={{ color: '#2563eb', mr: 1.5 }} />
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>Email</Typography>
-                      <Typography variant="body1" sx={{ color: '#475569' }}>support@megicloth.com</Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2.5 }}>
-                    <WhatsAppIcon sx={{ color: '#10b981', mr: 1.5 }} />
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>WhatsApp Support</Typography>
-                      <Typography variant="body1" sx={{ color: '#475569' }}>+92 300 1234567</Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2.5 }}>
-                    <LocationOnIcon sx={{ color: '#f59e0b', mr: 1.5 }} />
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>Store Location</Typography>
-                      <Typography variant="body1" sx={{ color: '#475569' }}>123 Textile Avenue, Lahore, Pakistan (Not a real address)</Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2.5 }}>
-                    <AccessTimeIcon sx={{ color: '#ef4444', mr: 1.5 }} />
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>Business Hours</Typography>
-                      <Typography variant="body1" sx={{ color: '#475569' }}>Monday - Saturday: 10:00 AM - 8:00 PM</Typography>
-                      <Typography variant="body1" sx={{ color: '#475569' }}>Sunday: Closed</Typography>
-                    </Box>
-                  </Box>
-                </Paper>
+                <ContactInfo />
               </Fade>
             </Grid>
           </Grid>

@@ -59,8 +59,8 @@ const FeaturedBrands = () => {
                   height={50}
                   style={{
                     objectFit: 'contain',
-                    filter: 'grayscale(100%)',
-                    opacity: 0.8,
+                    filter: 'grayscale(80%)',
+                    opacity: 0.7,
                     transition: 'filter 0.3s ease, opacity 0.3s ease',
                   }}
                 />

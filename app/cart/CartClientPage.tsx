@@ -1,25 +1,42 @@
 'use client';
 
-import { useState } from 'react';
-import { useCart } from '../context/CartContext';
+import { useState, useMemo } from 'react';
 import { Container, Grid, Typography, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import type { CartItem } from '@/app/types';
 
 import EmptyCart from '../components/cart/EmptyCart';
 import OrderSummary from '../components/cart/OrderSummary';
 import CartItemsTable from '../components/cart/CartItemsTable';
 
-export default function CartClientPage() {
-  const { cart, updateQuantity, removeFromCart, clearCart, subtotal, shippingCost } = useCart();
+interface CartClientPageProps {
+  initialCart: CartItem[];
+}
+
+export default function CartClientPage({ initialCart }: CartClientPageProps) {
+  const [cart, setCart] = useState(initialCart);
   const [snackbar, setSnackbar] = useState({ open: false, message: '' });
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  const { subtotal, shippingCost } = useMemo(() => {
+    const subtotal = cart.reduce((sum, item) => sum + (item.salePrice ?? item.price) * item.quantity, 0);
+    const shippingCost = subtotal > 50 ? 0 : 5; // Example shipping logic
+    return { subtotal, shippingCost };
+  }, [cart]);
+
+  const handleUpdateQuantity = (id: string, quantity: number) => {
+    // This will be replaced by a server action
+    setCart(prev => prev.map(item => item.id === id ? { ...item, quantity } : item));
+  };
+
   const handleRemoveItem = (id: string) => {
-    removeFromCart(id);
+    // This will be replaced by a server action
+    setCart(prev => prev.filter(item => item.id !== id));
     setSnackbar({ open: true, message: 'Item removed from cart' });
   };
 
   const handleClearCart = () => {
-    clearCart();
+    // This will be replaced by a server action
+    setCart([]);
     setDialogOpen(false);
     setSnackbar({ open: true, message: 'Cart has been cleared' });
   };
@@ -46,7 +63,7 @@ export default function CartClientPage() {
         <Grid item xs={12} md={8}>
           <CartItemsTable 
             items={cart} 
-            onUpdateQuantity={updateQuantity} 
+            onUpdateQuantity={handleUpdateQuantity} 
             onRemoveItem={handleRemoveItem}
             onClearCart={() => setDialogOpen(true)}
           />

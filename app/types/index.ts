@@ -4,26 +4,33 @@ export interface Product {
   description: string;
   price: number;
   salePrice?: number;
-  category: string;
   images: string[];
+  category: string;
+  brand: string;
   stock: number;
-  rating?: number;
-  reviews?: Review[];
-  reviewsCount?: number;
-  createdAt: string;
-  sku?: string;
+  rating: number;
+  reviewsCount: number;
+  isNew: boolean;
+  onSale: boolean;
+  hasVariants: boolean;
+  variants?: any; 
+  sku: string;
+  tags: string[];
+  stitchingCost?: number;
   fabric?: string;
   collection?: string;
+  reviews?: Review[];
+  quantity?: number; // for cart
   stitchingAvailable?: boolean;
-  stitchingCost?: number;
 }
 
 export interface Review {
   id: string;
+  product_id: string;
   author: string;
   rating: number;
-  text: string; // Changed from comment to text
-  createdAt: string;
+  text: string;
+  created_at: string;
 }
 
 export interface Address {
@@ -62,3 +69,5 @@ export interface User {
     marketing?: boolean;
   };
 }
+
+export type CartItem = Product & { quantity: number };

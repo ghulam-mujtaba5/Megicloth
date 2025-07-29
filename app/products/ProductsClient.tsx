@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { products } from "../data/products";
+import { type Product } from "@/app/types";
 
 import ProductCard from "../components/product/ProductCard";
 import ProductFilters from "../components/product/ProductFilters";
@@ -21,82 +21,59 @@ const useDebounce = (value: string, delay: number) => {
   return debouncedValue;
 };
 
-export default function ProductsClient() {
+export default function ProductsClient({ 
+  initialProducts,
+  categories,
+}: { 
+  initialProducts: Product[];
+  categories: string[];
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  // State for filters
+  // State for filters, initialized from URL search params
   const [search, setSearch] = useState(searchParams.get('q') || "");
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
-  const [priceRange, setPriceRange] = useState<number[]>([parseInt(searchParams.get('minPrice') || '0'), parseInt(searchParams.get('maxPrice') || '5000')]);
+  const [priceRange, setPriceRange] = useState<number[]>([parseInt(searchParams.get('minPrice') || '0'), parseInt(searchParams.get('maxPrice') || '10000')]);
   const [sortOption, setSortOption] = useState(searchParams.get('sort') || 'newest');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   
-  const debouncedSearch = useDebounce(search, 300);
+  const debouncedSearch = useDebounce(search, 500);
 
-  
-
+  // This callback updates the URL's search params whenever a filter changes.
+  // The parent server component (`page.tsx`) will then re-fetch the data.
   const updateURL = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
     if (debouncedSearch) params.set('q', debouncedSearch); else params.delete('q');
-    
     if (selectedCategory !== 'All') params.set('category', selectedCategory); else params.delete('category');
     if (priceRange[0] > 0) params.set('minPrice', priceRange[0].toString()); else params.delete('minPrice');
-    if (priceRange[1] < 5000) params.set('maxPrice', priceRange[1].toString()); else params.delete('maxPrice');
+    if (priceRange[1] < 10000) params.set('maxPrice', priceRange[1].toString()); else params.delete('maxPrice');
     if (sortOption !== 'newest') params.set('sort', sortOption); else params.delete('sort');
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   }, [debouncedSearch, selectedCategory, priceRange, sortOption, pathname, router, searchParams]);
 
+  // Effect to trigger URL update when filters change
   useEffect(() => {
     updateURL();
   }, [updateURL]);
 
-  const filteredAndSortedProducts = useMemo(() => {
-    let filtered = products.filter(p => {
-      const searchMatch = debouncedSearch ? p.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || p.description.toLowerCase().includes(debouncedSearch.toLowerCase()) : true;
-      const groupMatch = true;
-      const categoryMatch = selectedCategory === 'All' || p.category === selectedCategory;
-      const priceMatch = (p.salePrice ?? p.price) >= priceRange[0] && (p.salePrice ?? p.price) <= priceRange[1];
-      return searchMatch && groupMatch && categoryMatch && priceMatch;
-    });
-
-    switch (sortOption) {
-      case 'price-asc':
-        filtered.sort((a, b) => (a.salePrice ?? a.price) - (b.salePrice ?? b.price));
-        break;
-      case 'price-desc':
-        filtered.sort((a, b) => (b.salePrice ?? b.price) - (a.salePrice ?? a.price));
-        break;
-      case 'rating':
-        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-        break;
-      case 'newest':
-      default:
-        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
-    }
-
-    return filtered;
-  }, [debouncedSearch, selectedCategory, priceRange, sortOption]);
-
   const handleResetFilters = () => {
     setSearch('');
-    
     setSelectedCategory('All');
-    setPriceRange([0, 5000]);
+    setPriceRange([0, 10000]);
     setSortOption('newest');
   };
 
   const filterProps = {
     search, setSearch,
-    
     selectedCategory, setSelectedCategory,
     priceRange, setPriceRange,
     sortOption, setSortOption,
-    handleResetFilters
+    handleResetFilters,
+    categories, // Pass categories from server to filters
   };
 
   return (
@@ -126,7 +103,7 @@ export default function ProductsClient() {
           <Grid item xs={12} md={9}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography color="text.secondary">
-                Showing {filteredAndSortedProducts.length} of {products.length} products
+                Showing {initialProducts.length} products
               </Typography>
               <Button
                 variant="contained"
@@ -139,8 +116,8 @@ export default function ProductsClient() {
             </Box>
             
             <Grid container spacing={isMobile ? 2 : 3}>
-              {filteredAndSortedProducts.length > 0 ? (
-                filteredAndSortedProducts.map((product) => (
+              {initialProducts.length > 0 ? (
+                initialProducts.map((product) => (
                   <Grid item xs={6} sm={6} md={4} lg={3} key={product.id}>
                     <ProductCard product={product} />
                   </Grid>

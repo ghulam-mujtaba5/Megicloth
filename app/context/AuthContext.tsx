@@ -1,28 +1,15 @@
 "use client";
+
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "../lib/supabaseClient";
-import type { Product, User as AppUser, Address } from "../types";
-import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { createClient } from "../lib/supabase/client";
+import type { Product, User as AppUser, Address } from "@/app/types";
+import type { User as SupabaseUser, AuthChangeEvent, Session } from "@supabase/supabase-js";
 
-
-
-interface RegisterData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  phone?: string;
-}
-
-// Context type definition
 interface AuthContextType {
   user: AppUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; }>;
-  register: (userData: RegisterData) => Promise<{ success: boolean; error?: string; }>;
   logout: () => Promise<void>;
   updateProfile: (data: Partial<AppUser>) => Promise<{ success: boolean; error?: string; }>;
   addAddress: (address: Omit<Address, 'id'>) => Promise<{ success: boolean; error?: string; }>;
@@ -39,17 +26,17 @@ export function useAuth() {
   return ctx;
 }
 
-// The Provider Component
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const supabase = createClient();
 
   const fetchFullUserProfile = useCallback(async (supabaseUser: SupabaseUser): Promise<AppUser | null> => {
     try {
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, addresses(*), wishlist(*)')
         .eq('id', supabaseUser.id)
         .single();
 
@@ -58,11 +45,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return null;
       }
 
-
-
       let wishlistProducts: Product[] = [];
       if (profileData.wishlist && profileData.wishlist.length > 0) {
-        const { data: products, error } = await supabase.from('products').select('*').in('id', profileData.wishlist);
+        const { data: products, error } = await supabase.from('products').select('*').in('id', profileData.wishlist.map((w: any) => w.product_id));
         if (error) {
           console.error('Error fetching wishlist products:', error.message);
         } else {
@@ -78,12 +63,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         avatarUrl: profileData.avatar_url,
         createdAt: profileData.created_at,
         lastLogin: profileData.last_login,
-        isEmailVerified: profileData.isEmailVerified,
-        addresses: profileData.addresses?.map((addr: any): Address => ({ id: addr.id, type: addr.type, firstName: addr.first_name, lastName: addr.last_name, address: addr.address, city: addr.city, state: addr.state, postalCode: addr.postal_code, country: addr.country, phone: addr.phone, isDefault: addr.is_default })) || [],
+        isEmailVerified: supabaseUser.email_confirmed_at !== undefined,
+        addresses: profileData.addresses || [],
         preferences: profileData.preferences,
         email: supabaseUser.email || '',
         role: supabaseUser.role || 'user',
-        wishlist: profileData.wishlist || [],
+        wishlist: profileData.wishlist?.map((w: any) => w.product_id) || [],
         wishlistProducts: wishlistProducts,
       };
 
@@ -92,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Error in fetchFullUserProfile:', error);
       return null;
     }
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     const getSession = async () => {
@@ -100,13 +85,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         const fullUser = await fetchFullUserProfile(session.user);
         setUser(fullUser);
+      } else {
+        setUser(null);
       }
-      setIsLoading(false);
+      setIsLoading(false); // This should be called regardless of session status
     };
 
     getSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: AuthChangeEvent, session: Session | null) => {
       if (session?.user) {
         const fullUser = await fetchFullUserProfile(session.user);
         setUser(fullUser);
@@ -116,30 +103,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => {
-      subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
-  }, [fetchFullUserProfile]);
-
-  const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { success: !error, error: error?.message };
-  };
-
-  const register = async (userData: RegisterData) => {
-    const { error } = await supabase.auth.signUp({
-      email: userData.email,
-      password: userData.password,
-      options: {
-        data: {
-          first_name: userData.firstName,
-          last_name: userData.lastName,
-          phone: userData.phone,
-        },
-      },
-    });
-    if (error) return { success: false, error: error.message };
-    return { success: true };
-  };
+  }, [fetchFullUserProfile, supabase]);
 
   const logout = async () => {
     await supabase.auth.signOut();
@@ -155,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data.lastName !== undefined) updateData.last_name = data.lastName;
     if (data.phone !== undefined) updateData.phone = data.phone;
     if (data.avatarUrl !== undefined) updateData.avatar_url = data.avatarUrl;
-    if (data.addresses !== undefined) updateData.addresses = data.addresses.map((addr: Address) => ({ id: addr.id, type: addr.type, first_name: addr.firstName, last_name: addr.lastName, address: addr.address, city: addr.city, state: addr.state, postal_code: addr.postalCode, country: addr.country, phone: addr.phone, is_default: addr.isDefault }));
+    // Address updates should be handled by their own functions for clarity
     if (data.preferences !== undefined) updateData.preferences = data.preferences;
 
     const { error } = await supabase.from('profiles').update(updateData).eq('id', user.id);
@@ -170,28 +136,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const addAddress = async (address: Omit<Address, 'id'>) => {
-    if (!user || !user.addresses) return { success: false, error: 'User or addresses not loaded' };
-    const newAddress = { ...address, id: `addr_${Date.now()}` };
-    const updatedAddresses = [...user.addresses, newAddress];
-    return await updateProfile({ addresses: updatedAddresses });
+    if (!user) return { success: false, error: 'Not authenticated' };
+    const { data, error } = await supabase.from('addresses').insert([{ ...address, user_id: user.id }]).select().single();
+    if (error) return { success: false, error: error.message };
+    
+    setUser((prevUser: AppUser | null) => prevUser ? { ...prevUser, addresses: [...(prevUser.addresses || []), data as Address] } : null);
+    return { success: true };
   };
 
   const removeAddress = async (addressId: string) => {
-    if (!user || !user.addresses) return { success: false, error: 'User or addresses not loaded' };
-    const updatedAddresses = user.addresses.filter(addr => addr.id !== addressId);
-    return await updateProfile({ addresses: updatedAddresses });
+    if (!user) return { success: false, error: 'Not authenticated' };
+    const { error } = await supabase.from('addresses').delete().eq('id', addressId);
+    if (error) return { success: false, error: error.message };
+
+    setUser((prevUser: AppUser | null) => prevUser ? { ...prevUser, addresses: (prevUser.addresses || []).filter((a: Address) => a.id !== addressId) } : null);
+    return { success: true };
   };
 
   const addToWishlist = async (product: Product) => {
     if (!user) return { success: false, error: 'Not authenticated' };
-    const currentWishlist = user.wishlist || [];
-    if (currentWishlist.includes(product.id)) return { success: true };
-    const newWishlist = [...currentWishlist, product.id];
-    const { error } = await supabase.from('profiles').update({ wishlist: newWishlist }).eq('id', user.id);
+    if (user.wishlist?.includes(product.id)) return { success: true }; // Already in wishlist
+
+    const { error } = await supabase.from('wishlist').insert([{ user_id: user.id, product_id: product.id }]);
     if (error) return { success: false, error: error.message };
-    setUser(prev => prev ? { 
+
+    setUser((prev: AppUser | null) => prev ? { 
         ...prev, 
-        wishlist: newWishlist,
+        wishlist: [...(prev.wishlist || []), product.id],
         wishlistProducts: [...(prev.wishlistProducts || []), product]
     } : null);
     return { success: true };
@@ -199,12 +170,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const removeFromWishlist = async (productId: string) => {
     if (!user) return { success: false, error: 'Not authenticated' };
-    const newWishlist = (user.wishlist || []).filter(id => id !== productId);
-    const { error } = await supabase.from('profiles').update({ wishlist: newWishlist }).eq('id', user.id);
+    const { error } = await supabase.from('wishlist').delete().match({ user_id: user.id, product_id: productId });
     if (error) return { success: false, error: error.message };
-    setUser(prev => prev ? { 
+
+    setUser((prev: AppUser | null) => prev ? { 
         ...prev, 
-        wishlist: newWishlist,
+        wishlist: (prev.wishlist || []).filter((id: string) => id !== productId),
         wishlistProducts: (prev.wishlistProducts || []).filter((p: Product) => p.id !== productId)
     } : null);
     return { success: true };
@@ -214,9 +185,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     isLoading,
     isAuthenticated: !!user && !isLoading,
-    loading: isLoading,
-    login,
-    register,
     logout,
     updateProfile,
     addAddress,

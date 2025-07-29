@@ -28,6 +28,7 @@ interface ProductFiltersProps {
   sortOption: string;
   setSortOption: (value: string) => void;
   handleResetFilters: () => void;
+  categories: string[];
 }
 
 export default function ProductFilters({
@@ -39,7 +40,8 @@ export default function ProductFilters({
   setPriceRange,
   sortOption,
   setSortOption,
-  handleResetFilters
+  handleResetFilters,
+  categories = []
 }: ProductFiltersProps) {
 
   return (
@@ -52,14 +54,15 @@ export default function ProductFilters({
       <TextField fullWidth label="Search products..." value={search} onChange={e => setSearch(e.target.value)} size="small" sx={{ mb: 2 }}/>
 
       <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-  <InputLabel>Category</InputLabel>
-  <Select value={selectedCategory} label="Category" onChange={e => setSelectedCategory(e.target.value)}>
-    <MenuItem value="All">All Products</MenuItem>
-    <MenuItem value="Men">Men</MenuItem>
-    <MenuItem value="Women">Women</MenuItem>
-    {/* Add more categories as needed */}
-  </Select>
-</FormControl>
+        <InputLabel>Category</InputLabel>
+        <Select value={selectedCategory} label="Category" onChange={e => setSelectedCategory(e.target.value)}>
+          {categories.map((category) => (
+            <MenuItem key={category} value={category}>
+              {category === 'All' ? 'All Products' : category}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -71,7 +74,7 @@ export default function ProductFilters({
             onChange={(_, val) => setPriceRange(val as number[])} 
             valueLabelDisplay="auto" 
             min={0} 
-            max={5000} 
+            max={10000} 
             step={100} 
           />
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
