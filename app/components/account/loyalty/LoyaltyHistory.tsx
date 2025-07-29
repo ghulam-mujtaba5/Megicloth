@@ -1,6 +1,6 @@
 import { getLoyaltyHistory } from '@/app/lib/actions/loyalty';
 import { 
-  Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip 
+  Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip 
 } from '@mui/material';
 
 export default async function LoyaltyHistory() {

@@ -9,7 +9,7 @@ import {
 
 import { Add, Edit, Delete } from '@mui/icons-material';
 import { deleteCampaign } from '@/app/lib/actions/campaigns';
-import type { Campaign } from '@/app/types';
+import type { Campaign } from '@/app/types'; // Unified Campaign interface
 
 
 interface CampaignsClientPageProps {
@@ -78,13 +78,13 @@ export default function CampaignsClientPage({ initialCampaigns }: CampaignsClien
                 <TableCell>{campaign.slug}</TableCell>
                 <TableCell>
                   <Chip 
-                    label={campaign.is_published ? 'Published' : 'Draft'}
-                    color={campaign.is_published ? 'success' : 'default'}
+                    label={campaign.isPublished ? 'Published' : 'Draft'}
+                    color={campaign.isPublished ? 'success' : 'default'}
                     size="small"
                   />
                 </TableCell>
-                <TableCell>{new Date(campaign.start_date).toLocaleDateString()}</TableCell>
-                <TableCell>{new Date(campaign.end_date).toLocaleDateString()}</TableCell>
+                <TableCell>{campaign.startDate ? new Date(campaign.startDate).toLocaleDateString() : 'N/A'}</TableCell>
+                <TableCell>{campaign.endDate ? new Date(campaign.endDate).toLocaleDateString() : 'N/A'}</TableCell>
                 <TableCell align="right">
                   <IconButton size="small" onClick={() => handleEdit(campaign.id)}>
                     <Edit />

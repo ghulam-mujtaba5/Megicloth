@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useAuth } from '@/app/context/AuthContext';
+import { Product } from '@/app/types';
 import { Box, Typography, Grid, Button } from '@mui/material';
 import ProductCard from '../product/ProductCard';
 import Link from 'next/link';
@@ -31,7 +32,7 @@ const Wishlist = () => {
     <Box>
       <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold' }}>My Wishlist</Typography>
       <Grid container spacing={3}>
-        {wishlistItems.map((product) => (
+        {wishlistItems.map((product: Product) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
             <ProductCard product={product} />
           </Grid>

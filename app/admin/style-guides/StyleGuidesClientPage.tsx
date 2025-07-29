@@ -73,12 +73,12 @@ export default function StyleGuidesClientPage({ initialGuides }: StyleGuidesClie
                 <TableCell>{guide.title}</TableCell>
                 <TableCell>
                   <Chip 
-                    label={guide.is_published ? 'Published' : 'Draft'}
-                    color={guide.is_published ? 'success' : 'default'}
+                    label={guide.isPublished ? 'Published' : 'Draft'}
+                    color={guide.isPublished ? 'success' : 'default'}
                     size="small"
                   />
                 </TableCell>
-                <TableCell>{new Date(guide.created_at).toLocaleDateString()}</TableCell>
+                <TableCell>{guide.createdAt ? new Date(guide.createdAt).toLocaleDateString() : 'N/A'}</TableCell>
                 <TableCell align="right">
                   <IconButton size="small" onClick={() => handleEdit(guide.id)}>
                     <Edit />

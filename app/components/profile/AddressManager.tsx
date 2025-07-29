@@ -27,8 +27,20 @@ export default function AddressManager() {
   const { user, addAddress, removeAddress, updateAddress, setDefaultAddress } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
-  const [formData, setFormData] = useState({
-    type: 'home' as const,
+  const [formData, setFormData] = useState<{
+    type: 'home' | 'work';
+    firstName: string;
+    lastName: string;
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    phone: string;
+    isDefault: boolean;
+    id?: string;
+  }>({
+    type: 'home',
     firstName: '',
     lastName: '',
     address: '',
@@ -44,7 +56,14 @@ export default function AddressManager() {
     setEditingAddress(address);
     setFormData(
       address
-        ? { ...address }
+        ? { 
+            ...address, 
+            type: address.type || 'home',
+            firstName: address.firstName || '',
+            lastName: address.lastName || '',
+            phone: address.phone || '',
+            isDefault: address.isDefault || false,
+          }
         : {
             id: '',
             type: 'home' as const,

@@ -1,0 +1,7 @@
+.tableRowHover:hover {
+  background-color: var(--mui-palette-action-hover, #f5f5f5);
+}
+
+.stockInput {
+  width: 100px;
+}

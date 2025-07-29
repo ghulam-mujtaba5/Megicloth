@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createCampaign, updateCampaign } from '../../../../lib/actions/campaigns';
 import type { Campaign } from '@/app/types';
 import { 
-  Box, TextField, Button, Paper, Grid, FormControlLabel, Switch 
+  TextField, Button, Paper, Grid, FormControlLabel, Switch
 } from '@mui/material';
 
 interface EditCampaignFormProps {
@@ -13,19 +13,26 @@ interface EditCampaignFormProps {
   campaignId?: string;
 }
 
-const emptyState: Omit<Campaign, 'id' | 'created_at' | 'updated_at'> = {
+const emptyState: Partial<Campaign> = {
   title: '',
   slug: '',
   description: '',
-  hero_image_url: '',
-  start_date: new Date().toISOString(),
-  end_date: new Date().toISOString(),
-  is_published: false,
+  heroImageUrl: '',
+  startDate: new Date().toISOString().split('T')[0],
+  endDate: new Date().toISOString().split('T')[0],
+  isPublished: false,
 };
 
 export default function EditCampaignForm({ initialData, campaignId }: EditCampaignFormProps) {
   const router = useRouter();
-  const [formState, setFormState] = useState(initialData || emptyState);
+  const [formState, setFormState] = useState(() => {
+    if (!initialData) return emptyState;
+    return {
+        ...initialData,
+        startDate: initialData.startDate ? new Date(initialData.startDate).toISOString().split('T')[0] : emptyState.startDate,
+        endDate: initialData.endDate ? new Date(initialData.endDate).toISOString().split('T')[0] : emptyState.endDate,
+    };
+  });
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const isNew = !campaignId;
@@ -42,9 +49,15 @@ export default function EditCampaignForm({ initialData, campaignId }: EditCampai
     setSaving(true);
     setErrors({});
 
+    const payload = {
+      ...formState,
+      startDate: new Date(formState.startDate!),
+      endDate: new Date(formState.endDate!),
+    };
+
     const result = isNew
-      ? await createCampaign(formState)
-      : await updateCampaign(campaignId as string, formState);
+      ? await createCampaign(payload as any)
+      : await updateCampaign(campaignId as string, payload as any);
 
     if (result.success) {
       router.push('/admin/campaigns');
@@ -69,19 +82,19 @@ export default function EditCampaignForm({ initialData, campaignId }: EditCampai
           <TextField name="slug" label="URL Slug" fullWidth value={formState.slug} onChange={handleChange} error={!!errors.slug} helperText={errors.slug?.[0]} />
         </Grid>
         <Grid item xs={12}>
-          <TextField name="hero_image_url" label="Hero Image URL" fullWidth value={formState.hero_image_url || ''} onChange={handleChange} error={!!errors.hero_image_url} helperText={errors.hero_image_url?.[0]} />
+          <TextField name="heroImageUrl" label="Hero Image URL" fullWidth value={formState.heroImageUrl || ''} onChange={handleChange} error={!!errors.heroImageUrl} helperText={errors.heroImageUrl?.[0]} />
         </Grid>
         <Grid item xs={12}>
           <TextField name="description" label="Description" fullWidth multiline rows={4} value={formState.description || ''} onChange={handleChange} error={!!errors.description} helperText={errors.description?.[0]} />
         </Grid>
         <Grid item xs={12} md={6}>
-          <TextField name="start_date" label="Start Date" type="date" fullWidth value={formState.start_date.split('T')[0]} onChange={handleChange} InputLabelProps={{ shrink: true }} error={!!errors.start_date} helperText={errors.start_date?.[0]} />
+          <TextField name="startDate" label="Start Date" type="date" fullWidth value={formState.startDate?.split('T')[0] || ''} onChange={handleChange} InputLabelProps={{ shrink: true }} error={!!errors.startDate} helperText={errors.startDate?.[0]} />
         </Grid>
         <Grid item xs={12} md={6}>
-          <TextField name="end_date" label="End Date" type="date" fullWidth value={formState.end_date.split('T')[0]} onChange={handleChange} InputLabelProps={{ shrink: true }} error={!!errors.end_date} helperText={errors.end_date?.[0]} />
+          <TextField name="endDate" label="End Date" type="date" fullWidth value={formState.endDate?.split('T')[0] || ''} onChange={handleChange} InputLabelProps={{ shrink: true }} error={!!errors.endDate} helperText={errors.endDate?.[0]} />
         </Grid>
         <Grid item xs={12}>
-          <FormControlLabel control={<Switch checked={formState.is_published} onChange={handleChange} name="is_published" />} label="Publish Campaign" />
+          <FormControlLabel control={<Switch checked={formState.isPublished} onChange={handleChange} name="isPublished" />} label="Publish Campaign" />
         </Grid>
         <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button onClick={() => router.push('/admin/campaigns')} sx={{ mr: 2 }}>Cancel</Button>

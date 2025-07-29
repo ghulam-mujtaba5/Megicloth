@@ -64,20 +64,33 @@ export async function fetchProducts(
     throw new Error('Could not fetch products.');
   }
 
-  return data || [];
+  // Manually map snake_case from DB to camelCase in the application
+  const products: Product[] = (data || []).map(p => ({
+    ...p,
+    salePrice: p.sale_price,
+    isPublished: p.is_published,
+    isNew: p.is_new,
+    onSale: p.on_sale,
+    hasVariants: p.has_variants,
+    reviewsCount: p.reviews_count,
+    createdAt: p.created_at,
+    updatedAt: p.updated_at,
+    stitchingCost: p.stitching_cost,
+    stitchingAvailable: p.stitching_available
+  }));
+
+  return products;
 }
 
 export async function fetchProductById(id: string): Promise<Product | null> {
   const { data, error } = await supabase
     .from('products')
-    .select('*')
+    .select('*, reviews:reviews(*)')
     .eq('id', id)
     .single();
 
   if (error) {
     console.error(`Error fetching product with id ${id}:`, error);
-    // In a real app, you might want to handle different errors differently
-    // For now, we return null if not found or on error
     return null;
   }
 

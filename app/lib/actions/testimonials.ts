@@ -65,11 +65,16 @@ export async function createTestimonial(values: z.infer<typeof TestimonialSchema
 }
 
 // Action for an admin to update a testimonial (e.g., publish it)
-export async function updateTestimonial(id: string, values: Partial<z.infer<typeof TestimonialSchema>>) {
+export async function updateTestimonial(id: string, values: { isPublished?: boolean }) {
     const supabase = createClient();
     
     // We don't need to validate the whole object, just the parts being updated
-    const { data, error } = await supabase.from('testimonials').update(values).eq('id', id).select().single();
+    const updateData: { is_published?: boolean } = {};
+    if (values.isPublished !== undefined) {
+      updateData.is_published = values.isPublished;
+    }
+
+    const { data, error } = await supabase.from('testimonials').update(updateData).eq('id', id).select().single();
 
     if (error) {
         return { success: false, error: error.message };

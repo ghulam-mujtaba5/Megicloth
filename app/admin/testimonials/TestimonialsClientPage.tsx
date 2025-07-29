@@ -19,11 +19,11 @@ export default function TestimonialsClientPage({ initialTestimonials }: Testimon
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedTestimonialId, setSelectedTestimonialId] = useState<string | null>(null);
 
-  const handleTogglePublish = async (id: string, is_published: boolean) => {
-    const result = await updateTestimonial(id, { is_published: !is_published });
+  const handleTogglePublish = async (id: string, isPublished: boolean) => {
+    const result = await updateTestimonial(id, { isPublished: !isPublished });
     if (result.success) {
       setTestimonials(prev => 
-        prev.map(t => t.id === id ? { ...t, is_published: !is_published } : t)
+        prev.map(t => t.id === id ? { ...t, isPublished: !isPublished } : t)
       );
     } else {
       // TODO: Replace with a more robust notification system (e.g., Snackbar)
@@ -75,19 +75,19 @@ export default function TestimonialsClientPage({ initialTestimonials }: Testimon
                 <TableCell>
                   {testimonial.rating != null && <Rating value={testimonial.rating} readOnly />}
                 </TableCell>
-                <TableCell>{new Date(testimonial.created_at).toLocaleDateString()}</TableCell>
+                <TableCell>{testimonial.createdAt ? new Date(testimonial.createdAt).toLocaleDateString() : 'N/A'}</TableCell>
                 <TableCell>
                   <Chip 
-                    icon={testimonial.is_published ? <CheckCircle /> : <Cancel />}
-                    label={testimonial.is_published ? 'Published' : 'Pending'}
-                    color={testimonial.is_published ? 'success' : 'default'}
+                    icon={testimonial.isPublished ? <CheckCircle /> : <Cancel />}
+                    label={testimonial.isPublished ? 'Published' : 'Pending'}
+                    color={testimonial.isPublished ? 'success' : 'default'}
                     size="small"
                   />
                 </TableCell>
                 <TableCell align="right">
                   <Switch
-                    checked={testimonial.is_published}
-                    onChange={() => handleTogglePublish(testimonial.id, testimonial.is_published)}
+                    checked={!!testimonial.isPublished}
+                    onChange={() => handleTogglePublish(testimonial.id, !!testimonial.isPublished)}
                     color="success"
                   />
                   <IconButton size="small" onClick={() => handleDeleteClick(testimonial.id)}>

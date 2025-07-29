@@ -1,8 +1,4 @@
-import type { Product } from '@/app/types';
-
-export interface OrderItem extends Product {
-  quantity: number;
-}
+import type { OrderItem } from '@/app/types';
 
 export interface Order {
   id: string;
@@ -44,6 +40,8 @@ export const orders: Order[] = [
         onSale: true,
         hasVariants: false,
         tags: ['lawn', 'mens-fashion', 'summer', 'unstitched'],
+        isPublished: true,
+        updatedAt: '2024-07-20T10:00:00Z',
       },
       {
         id: '2',
@@ -68,6 +66,8 @@ export const orders: Order[] = [
         onSale: true,
         hasVariants: false,
         tags: ['lawn', 'womens-fashion', 'luxury', 'unstitched', '3-piece'],
+        isPublished: true,
+        updatedAt: '2024-07-22T11:30:00Z',
       },
     ],
   },
@@ -96,6 +96,8 @@ export const orders: Order[] = [
         onSale: false,
         hasVariants: false,
         tags: ['wash-and-wear', 'mens-fashion', 'formal', 'unstitched'],
+        isPublished: true,
+        updatedAt: '2024-07-18T09:00:00Z',
       },
     ],
   },

@@ -105,7 +105,7 @@ export default function AdminOrdersPage() {
           (order.users?.first_name || '').toLowerCase().includes(searchLower) ||
           (order.users?.last_name || '').toLowerCase().includes(searchLower) ||
           (order.users?.email || '').toLowerCase().includes(searchLower) ||
-          (order.shipping_name || '').toLowerCase().includes(searchLower);
+          (order.shippingName || '').toLowerCase().includes(searchLower);
         
         const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
 
@@ -180,11 +180,11 @@ export default function AdminOrdersPage() {
                 <TableRow key={order.id}>
                   <TableCell>{order.id}</TableCell>
                   <TableCell>
-                    {order.users?.first_name || order.shipping_name || '-'} {order.users?.last_name || ''}
+                    {order.users?.first_name || order.shippingName || '-'} {order.users?.last_name || ''}
                     <br />
-                    <span className={styles.customerSubtext}>{order.users?.email || order.shipping_email || '-'}</span>
+                    <span className={styles.customerSubtext}>{order.users?.email || order.shippingEmail || '-'}</span>
                   </TableCell>
-                  <TableCell>{order.created_at ? new Date(order.created_at).toLocaleDateString() : '-'}</TableCell>
+                  <TableCell>{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '-'}</TableCell>
                   <TableCell>Rs. {order.total?.toLocaleString?.() ?? '-'}</TableCell>
                   <TableCell>
                     <Select

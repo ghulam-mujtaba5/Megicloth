@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import type { Product } from '../../types';
+import type { Product } from '@/app/types';
 import ProductCard from '../product/ProductCard';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';

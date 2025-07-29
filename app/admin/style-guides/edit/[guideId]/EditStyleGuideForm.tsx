@@ -19,8 +19,8 @@ export default function EditStyleGuideForm({ guide }: EditStyleGuideFormProps) {
   const router = useRouter();
   const [formState, setFormState] = useState({
     title: guide?.title || '',
-    description: guide?.description || '',
-    is_published: guide?.is_published || false,
+    content: guide?.content || '',
+    isPublished: guide?.isPublished || false,
   });
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -76,25 +76,25 @@ export default function EditStyleGuideForm({ guide }: EditStyleGuideFormProps) {
           </Grid>
           <Grid item xs={12}>
             <TextField
-              name="description"
-              label="Description"
+              name="content"
+              label="Content"
               fullWidth
               multiline
               rows={6}
               variant="outlined"
-              value={formState.description}
+              value={formState.content}
               onChange={handleChange}
-              error={!!errors.description}
-              helperText={errors.description?.[0]}
+              error={!!errors.content}
+              helperText={errors.content?.[0]}
             />
           </Grid>
           <Grid item xs={12}>
             <FormControlLabel
               control={
                 <Switch
-                  checked={formState.is_published}
+                  checked={formState.isPublished}
                   onChange={handleChange}
-                  name="is_published"
+                  name="isPublished"
                   color="primary"
                 />
               }

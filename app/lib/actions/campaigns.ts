@@ -9,10 +9,10 @@ const CampaignSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters.'),
   slug: z.string().min(3, 'Slug must be at least 3 characters.').regex(/^[a-z0-9-]+$/, 'Slug can only contain lowercase letters, numbers, and hyphens.'),
   description: z.string().optional(),
-  hero_image_url: z.string().url('Must be a valid URL.').optional(),
-  start_date: z.date(),
-  end_date: z.date(),
-  is_published: z.boolean().default(false),
+  heroImageUrl: z.string().url('Must be a valid URL.').optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  isPublished: z.boolean().default(false),
 });
 
 // Action to get a campaign by its slug for the public-facing page
@@ -72,7 +72,16 @@ export async function createCampaign(values: z.infer<typeof CampaignSchema>) {
         return { success: false, error: validated.error.flatten().fieldErrors };
     }
 
-    const { data, error } = await supabase.from('campaigns').insert([validated.data]).select().single();
+    const { slug, title, description, heroImageUrl, startDate, endDate, isPublished } = validated.data;
+    const { data, error } = await supabase.from('campaigns').insert([{
+      slug,
+      title,
+      description,
+      hero_image_url: heroImageUrl,
+      start_date: startDate,
+      end_date: endDate,
+      is_published: isPublished,
+    }]).select().single();
 
     if (error) {
         return { success: false, error: error.message };
@@ -92,7 +101,16 @@ export async function updateCampaign(id: string, values: z.infer<typeof Campaign
         return { success: false, error: validated.error.flatten().fieldErrors };
     }
 
-    const { data, error } = await supabase.from('campaigns').update(validated.data).eq('id', id).select().single();
+    const { slug, title, description, heroImageUrl, startDate, endDate, isPublished } = validated.data;
+    const { data, error } = await supabase.from('campaigns').update({
+      slug,
+      title,
+      description,
+      hero_image_url: heroImageUrl,
+      start_date: startDate,
+      end_date: endDate,
+      is_published: isPublished,
+    }).eq('id', id).select().single();
 
     if (error) {
         return { success: false, error: error.message };

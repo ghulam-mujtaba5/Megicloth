@@ -52,14 +52,30 @@ export default function AdminProductsPage() {
 
   const handleSave = async (productData: Partial<Product>) => {
     if (selectedProduct) {
-      const res = await updateProduct(selectedProduct.id, productData);
+            const updatedProductData = {
+        name: productData.name || selectedProduct.name,
+        description: productData.description || selectedProduct.description,
+        category: productData.category || selectedProduct.category,
+        price: productData.price ?? selectedProduct.price,
+        stock: productData.stock ?? selectedProduct.stock,
+        image: productData.images?.[0] || selectedProduct.images?.[0],
+      };
+      const res = await updateProduct(selectedProduct.id, updatedProductData);
       if (res.success && res.product) {
         setProducts(products.map(p => p.id === selectedProduct.id ? res.product : p));
       } else {
         alert(res.error || 'Failed to update product.');
       }
     } else {
-      const res = await createProduct(productData as any);
+            const newProductData = {
+        name: productData.name || 'New Product',
+        description: productData.description || 'No description',
+        price: productData.price || 0,
+        category: productData.category || 'Uncategorized',
+        stock: productData.stock || 0,
+        image: productData.images?.[0] || undefined,
+      };
+      const res = await createProduct(newProductData);
       if (res.success && res.product) {
         setProducts([res.product, ...products]);
       } else {

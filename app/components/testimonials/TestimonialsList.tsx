@@ -2,7 +2,7 @@
 
 import { Box, Typography, Paper, Grid, Rating, Avatar } from '@mui/material';
 import { FormatQuote } from '@mui/icons-material';
-import type { Testimonial } from '@/app/types';
+import type { Testimonial } from '@/app/types'; // Unified Testimonial interface
 
 // A simple function to generate a color from a string for the avatar
 function stringToColor(string: string) {

@@ -38,7 +38,7 @@ export default function UsersClientPage({ initialUsers }: UsersClientPageProps) 
   const handleRoleChange = async (userId: string, newRole: string) => {
     const res = await updateUserRole(userId, newRole);
     if (res.success) {
-      setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
+      setUsers(users.map(u => u.id === userId ? { ...u, role: newRole as 'admin' | 'user' } : u));
     } else {
       // TODO: Replace with a more robust notification system (e.g., Snackbar)
       alert(res.error || 'Failed to update user role.');
@@ -164,7 +164,7 @@ export default function UsersClientPage({ initialUsers }: UsersClientPageProps) 
         count={filteredUsers.length}
         rowsPerPage={rowsPerPage}
         page={page}
-        onPageChange={(e, newPage) => setPage(newPage)}
+        onPageChange={(_, newPage) => setPage(newPage)}
         onRowsPerPageChange={(e) => {
           setRowsPerPage(parseInt(e.target.value, 10));
           setPage(0);

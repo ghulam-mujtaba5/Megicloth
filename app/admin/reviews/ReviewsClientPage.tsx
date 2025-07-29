@@ -23,7 +23,7 @@ export default function ReviewsClientPage({ initialReviews }: ReviewsClientPageP
   const handleStatusChange = async (reviewId: string, isApproved: boolean) => {
     const result = await updateReviewStatus(reviewId, isApproved);
     if (result.success) {
-      setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, is_approved: isApproved } : r));
+      setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, isApproved: isApproved } : r));
     } else {
       // TODO: Replace with a more robust notification system (e.g., Snackbar)
       alert(result.error || 'Failed to update status.');
@@ -44,8 +44,8 @@ export default function ReviewsClientPage({ initialReviews }: ReviewsClientPageP
   const filteredReviews = useMemo(() => {
     return reviews.filter(review => {
       if (filter === 'all') return true;
-      if (filter === 'approved') return review.is_approved;
-      if (filter === 'pending') return !review.is_approved;
+      if (filter === 'approved') return review.isApproved;
+      if (filter === 'pending') return !review.isApproved;
       return true;
     });
   }, [reviews, filter]);
@@ -92,27 +92,27 @@ export default function ReviewsClientPage({ initialReviews }: ReviewsClientPageP
             {paginatedReviews.map((review) => (
               <TableRow key={review.id}>
                 <TableCell>
-                  {review.products ? (
-                    <Link href={`/products/${review.products.slug}`} passHref>
+                  {review.product ? (
+                    <Link href={`/products/${review.product.slug}`} passHref>
                       <Typography component="a" color="primary" sx={{ textDecoration: 'none' }}>
-                        {review.products.name || 'N/A'}
+                        {review.product.name || 'N/A'}
                       </Typography>
                     </Link>
                   ) : 'N/A'}
                 </TableCell>
                 <TableCell>{review.author}</TableCell>
                 <TableCell>{review.rating}/5</TableCell>
-                <TableCell sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{review.text}</TableCell>
+                <TableCell sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{review.content}</TableCell>
                 <TableCell>
                   <Chip 
-                    label={review.is_approved ? 'Approved' : 'Pending'}
-                    color={review.is_approved ? 'success' : 'warning'}
+                    label={review.isApproved ? 'Approved' : 'Pending'}
+                    color={review.isApproved ? 'success' : 'warning'}
                     size="small"
                   />
                 </TableCell>
                 <TableCell align="center">
                   <Switch
-                    checked={review.is_approved}
+                    checked={review.isApproved}
                     onChange={(e) => handleStatusChange(review.id, e.target.checked)}
                     color="success"
                   />
@@ -133,7 +133,7 @@ export default function ReviewsClientPage({ initialReviews }: ReviewsClientPageP
         count={filteredReviews.length}
         rowsPerPage={rowsPerPage}
         page={page}
-        onPageChange={(e, newPage) => setPage(newPage)}
+        onPageChange={(_, newPage) => setPage(newPage)}
         onRowsPerPageChange={(e) => {
           setRowsPerPage(parseInt(e.target.value, 10));
           setPage(0);

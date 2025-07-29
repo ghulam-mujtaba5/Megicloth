@@ -3,20 +3,22 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBlogPost, updateBlogPost } from '../../../../lib/actions/blog';
-import type { Post } from '@/app/types';
-import { Box, Typography, TextField, Button, Paper, Grid } from '@mui/material';
+import { Post } from '@/app/types';
+import { TextField, Button, Paper, Grid } from '@mui/material';
 
 interface EditPostFormProps {
-  initialData: Omit<Post, 'id' | 'date'> | null;
+  initialData: Partial<Post> | null;
   postId?: string;
 }
 
-const emptyState: Omit<Post, 'id' | 'date'> = {
+const emptyState: Partial<Post> = {
   title: '',
+  slug: '',
   content: '',
   author: '',
-  imageUrl: '',
+  date: new Date().toISOString(),
   tags: [],
+  imageUrl: '',
 };
 
 export default function EditPostForm({ initialData, postId }: EditPostFormProps) {
@@ -40,8 +42,8 @@ export default function EditPostForm({ initialData, postId }: EditPostFormProps)
     setErrors({});
 
     const result = isNewPost
-      ? await createBlogPost(formState)
-      : await updateBlogPost(postId as string, formState);
+      ? await createBlogPost(formState as Post)
+      : await updateBlogPost(postId as string, formState as Post);
 
     if (result.success) {
       router.push('/admin/blog');
@@ -104,7 +106,7 @@ export default function EditPostForm({ initialData, postId }: EditPostFormProps)
             label="Image URL"
             fullWidth
             variant="outlined"
-            value={formState.imageUrl}
+            value={formState.imageUrl || ''}
             onChange={handleChange}
             error={!!errors.imageUrl}
             helperText={errors.imageUrl?.[0]}
@@ -116,7 +118,7 @@ export default function EditPostForm({ initialData, postId }: EditPostFormProps)
             label="Tags (comma-separated)"
             fullWidth
             variant="outlined"
-            value={formState.tags.join(', ')}
+            value={(formState.tags || []).join(', ')}
             onChange={handleChange}
           />
         </Grid>

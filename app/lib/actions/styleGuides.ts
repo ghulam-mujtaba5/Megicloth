@@ -6,8 +6,8 @@ import { z } from 'zod';
 
 const StyleGuideSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters long.'),
-  description: z.string().min(10, 'Description must be at least 10 characters long.'),
-  is_published: z.boolean().default(false),
+  content: z.string().min(10, 'Content must be at least 10 characters long.'),
+  isPublished: z.boolean().default(false),
   // You can add more fields like author, cover_image, etc.
 });
 
@@ -47,7 +47,10 @@ export async function createStyleGuide(values: z.infer<typeof StyleGuideSchema>)
     return { success: false, error: validated.error.flatten().fieldErrors };
   }
 
-  const { data, error } = await supabase.from('style_guides').insert([validated.data]).select().single();
+  const { title, content, isPublished } = validated.data;
+  const { data, error } = await supabase.from('style_guides').insert([
+    { title, content, is_published: isPublished, slug: title.toLowerCase().replace(/\s+/g, '-') }
+  ]).select().single();
 
   if (error) {
     return { success: false, error: error.message };
@@ -65,7 +68,10 @@ export async function updateStyleGuide(id: string, values: z.infer<typeof StyleG
     return { success: false, error: validated.error.flatten().fieldErrors };
   }
 
-  const { data, error } = await supabase.from('style_guides').update(validated.data).eq('id', id).select().single();
+  const { title, content, isPublished } = validated.data;
+  const { data, error } = await supabase.from('style_guides').update(
+    { title, content, is_published: isPublished, slug: title.toLowerCase().replace(/\s+/g, '-') }
+  ).eq('id', id).select().single();
 
   if (error) {
     return { success: false, error: error.message };
