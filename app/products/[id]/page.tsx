@@ -55,9 +55,20 @@ export async function generateMetadata(
 
 export default async function ProductDetailPage({ params }: Props) {
   const product = await getProductById(params.id);
-  const relatedProducts = product
-    ? await getRelatedProducts(product.category, product.id)
-    : [];
-
+  if (!product) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <h2>Product Not Found</h2>
+        <p>The product you are looking for does not exist or could not be loaded.</p>
+      </div>
+    );
+  }
+  let relatedProducts = [];
+  try {
+    relatedProducts = await getRelatedProducts(product.category, product.id);
+  } catch (error) {
+    console.error('Error loading related products:', error);
+    relatedProducts = [];
+  }
   return <ProductClientPage product={product} relatedProducts={relatedProducts} />;
 }

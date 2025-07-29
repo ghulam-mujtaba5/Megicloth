@@ -4,10 +4,13 @@ import { createClient } from '@/app/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { registerFormSchema } from '@/app/lib/schemas';
 
-export async function registerWithEmailPassword(_prevState: any, formData: FormData) {
-    const validatedFields = registerFormSchema.safeParse(
-        Object.fromEntries(formData.entries())
-    );
+import type { z } from 'zod';
+import type { registerFormSchema } from './schemas';
+
+type RegisterFormValues = z.infer<typeof registerFormSchema>;
+
+export async function registerWithEmailPassword(_prevState: any, values: RegisterFormValues) {
+    const validatedFields = registerFormSchema.safeParse(values);
 
     if (!validatedFields.success) {
         return {

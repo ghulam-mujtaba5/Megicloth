@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useFormState } from 'react-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
@@ -44,7 +44,7 @@ export default function RegisterPage() {
     },
   });
 
-  const { register, formState: { errors, isSubmitting } } = form;
+  const { register, control, formState: { errors, isSubmitting } } = form;
 
   const getFieldError = (fieldName: keyof RegisterFormValues) => {
     if (state.errors && fieldName in state.errors) {
@@ -108,7 +108,7 @@ export default function RegisterPage() {
               </Typography>
             </Box>
 
-            <form action={formAction}>
+            <form onSubmit={form.handleSubmit(formAction)}>
               {formErrors && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                   {formErrors.join(', ')}
@@ -125,14 +125,28 @@ export default function RegisterPage() {
                 <TextField {...register('confirmPassword')} label="Confirm Password" type={showConfirmPassword ? 'text' : 'password'} fullWidth error={!!getFieldError('confirmPassword')} helperText={getFieldError('confirmPassword')} InputProps={{ startAdornment: <InputAdornment position="start"><Lock color="action" /></InputAdornment>, endAdornment: <InputAdornment position="end"><IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">{showConfirmPassword ? <VisibilityOff /> : <Visibility />}</IconButton></InputAdornment> }} />
                 
                 <FormControl error={!!getFieldError('termsAccepted')}>
-                    <FormControlLabel
-                        control={<Checkbox {...register('termsAccepted')} color="primary" />}
-                        label={
-                            <Typography variant="body2" sx={{ color: '#475569' }}>
-                                I agree to the{' '}
-                                <Link href="/terms" style={{ color: '#2563eb', fontWeight: 'bold' }}>Terms of Service</Link>{' '}and{' '}
-                                <Link href="/privacy" style={{ color: '#2563eb', fontWeight: 'bold' }}>Privacy Policy</Link>.
-                            </Typography>}
+                    <Controller
+                        name="termsAccepted"
+                        control={control}
+                        render={({ field }) => (
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        {...field}
+                                        checked={!!field.value}
+                                        onChange={e => field.onChange(e.target.checked)}
+                                        color="primary"
+                                    />
+                                }
+                                label={
+                                    <Typography variant="body2" sx={{ color: '#475569' }}>
+                                        I agree to the{' '}
+                                        <Link href="/terms" style={{ color: '#2563eb', fontWeight: 'bold' }}>Terms of Service</Link>{' '}and{' '}
+                                        <Link href="/privacy" style={{ color: '#2563eb', fontWeight: 'bold' }}>Privacy Policy</Link>.
+                                    </Typography>
+                                }
+                            />
+                        )}
                     />
                     {getFieldError('termsAccepted') && <FormHelperText>{getFieldError('termsAccepted')}</FormHelperText>}
                 </FormControl>

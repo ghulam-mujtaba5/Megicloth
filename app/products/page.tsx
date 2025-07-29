@@ -13,22 +13,32 @@ export default async function ProductsPage({
     sort?: string;
   };
 }) {
-  // Fetch initial products based on search params
-  const products = await getProducts({
-    query: searchParams.q,
-    category: searchParams.category,
-    minPrice: searchParams.minPrice ? parseInt(searchParams.minPrice) : undefined,
-    maxPrice: searchParams.maxPrice ? parseInt(searchParams.maxPrice) : undefined,
-    sort: searchParams.sort,
-  });
+  try {
+    // Fetch initial products based on search params
+    const products = await getProducts({
+      query: searchParams.q,
+      category: searchParams.category,
+      minPrice: searchParams.minPrice ? parseInt(searchParams.minPrice) : undefined,
+      maxPrice: searchParams.maxPrice ? parseInt(searchParams.maxPrice) : undefined,
+      sort: searchParams.sort,
+    });
 
-  // Fetch all available categories for the filter dropdown
-  const categories = await getCategories();
+    // Fetch all available categories for the filter dropdown
+    const categories = await getCategories();
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ProductsClient initialProducts={products} categories={['All', ...categories]} />
-    </Suspense>
-  );
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <ProductsClient initialProducts={products} categories={['All', ...categories]} />
+      </Suspense>
+    );
+  } catch (error) {
+    console.error('Products page error:', error);
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <h2>Something went wrong loading products.</h2>
+        <p>Please try again later or contact support if the problem persists.</p>
+      </div>
+    );
+  }
 }
 
