@@ -3,6 +3,8 @@ import styles from './ProductsPage.module.css';
 import ProductsClient from "./ProductsClient";
 import { getProducts, getCategories } from "@/app/lib/data/products";
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProductsPage({ 
   searchParams,
 }: {
