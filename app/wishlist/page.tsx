@@ -147,7 +147,7 @@ export default function WishlistPage() {
                   lineHeight: 1.6,
                 }}
               >
-                Start adding your favorite products to your wishlist. You can save items for later and get notified when they're back in stock.
+                Start adding your favorite products to your wishlist. You can save items for later and get notified when they&apos;re back in stock.
               </Typography>
               
               <Button
@@ -267,7 +267,7 @@ export default function WishlistPage() {
             icon={<Refresh />}
           >
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              <strong>Wishlist Features:</strong> Save your favorite products, get notified when they're back in stock, and easily move items to your cart when you're ready to purchase.
+              <strong>Wishlist Features:</strong> Save your favorite products, get notified when they&apos;re back in stock, and easily move items to your cart when you&apos;re ready to purchase.
             </Typography>
           </Alert>
         </Slide>
@@ -527,7 +527,7 @@ export default function WishlistPage() {
                     Easy Shopping
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Move items to cart with one click when you're ready to buy
+                    Move items to cart with one click when you&apos;re ready to buy
                   </Typography>
                 </Box>
               </Grid>

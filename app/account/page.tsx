@@ -56,7 +56,7 @@ const OrdersPage = () => {
         </TableContainer>
       ) : (
         <Box sx={{ textAlign: 'center', py: 5 }}>
-          <Typography variant="h6">You haven't placed any orders yet.</Typography>
+          <Typography variant="h6">You haven&#39;t placed any orders yet.</Typography>
           <Typography color="text.secondary">When you do, your orders will appear here.</Typography>
           <Link href="/products" passHref>
             <Button variant="contained" sx={{ mt: 2 }}>Start Shopping</Button>

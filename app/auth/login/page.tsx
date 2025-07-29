@@ -278,7 +278,7 @@ export default function LoginPage() {
 
             <Box sx={{ textAlign: 'center', mt: 2 }}>
               <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 500 }}>
-                Don't have an account?{' '}
+                Don&#39;t have an account?{' '}
                 <Link href="/auth/register" style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'none' }}>
                   Register
                 </Link>

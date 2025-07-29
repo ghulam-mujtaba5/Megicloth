@@ -82,7 +82,7 @@ export default function ContactForm({ onSubmit, isLoading, isSuccess, error }: C
           minRows={5}
         />
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {isSuccess && <Alert severity="success" sx={{ mb: 2 }}>Thank you for your message! We'll be in touch soon.</Alert>}
+        {isSuccess && <Alert severity="success" sx={{ mb: 2 }}>Thank you for your message! We&apos;ll be in touch soon.</Alert>}
         <Button
           type="submit"
           variant="contained"

@@ -65,7 +65,7 @@ export default function ContactPage() {
                 Get In Touch
               </Typography>
               <Typography variant="h6" sx={{ color: '#334155', mb: 3, fontWeight: 400, fontSize: { xs: '1.1rem', md: '1.25rem' }, maxWidth: '800px', mx: 'auto' }}>
-                Have a question, comment, or feedback? Our team is here to help. Reach out to us through any of the channels below, and we'll get back to you as soon as possible.
+                Have a question, comment, or feedback? Our team is here to help. Reach out to us through any of the channels below, and we&apos;ll get back to you as soon as possible.
               </Typography>
             </Box>
           </Fade>

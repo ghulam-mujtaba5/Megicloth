@@ -60,7 +60,7 @@ const TrendingProducts = () => {
             Top Trending Products
           </Typography>
           <Typography variant="body1" className={styles.subtitle}>
-            Discover what's popular right now.
+            Discover what&apos;s popular right now.
           </Typography>
         </div>
         <Swiper

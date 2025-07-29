@@ -27,7 +27,7 @@ const SalePage = () => {
             Season Sale
           </Typography>
           <Typography variant="h6" color="text.secondary" component="p">
-            Grab the best deals on your favorite collections before they're gone!
+            Grab the best deals on your favorite collections before they&apos;re gone!
           </Typography>
         </Box>
 

@@ -21,7 +21,7 @@ export default function EmptyCart() {
         Your Cart is Empty
       </Typography>
       <Typography color="text.secondary" sx={{ mb: 3 }}>
-        Looks like you haven't added anything to your cart yet.
+        Looks like you haven&#39;t added anything to your cart yet.
       </Typography>
       <Link href="/products" passHref>
         <Button variant="contained" size="large">

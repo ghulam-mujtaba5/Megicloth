@@ -130,7 +130,7 @@ export default function OrderSuccessPage() {
                 fontSize: { xs: '1.1rem', md: '1.25rem' },
               }}
             >
-              Thank you for your order! We've received your payment and your order is being processed.
+              Thank you for your order! We&apos;ve received your payment and your order is being processed.
             </Typography>
             <Chip
               label={`Order #${orderNumber}`}
@@ -239,7 +239,7 @@ export default function OrderSuccessPage() {
               {/* What's Next */}
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                  What's Next?
+                  What&apos;s Next?
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6} md={3}>
@@ -265,7 +265,7 @@ export default function OrderSuccessPage() {
                         Order Processing
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        We'll prepare your order
+                        We&apos;ll prepare your order
                       </Typography>
                     </Box>
                   </Grid>
@@ -292,7 +292,7 @@ export default function OrderSuccessPage() {
                         Shipped
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        We'll ship your order
+                        We&apos;ll ship your order
                       </Typography>
                     </Box>
                   </Grid>
@@ -319,7 +319,7 @@ export default function OrderSuccessPage() {
                         Delivered
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        You'll receive your order
+                        You&apos;ll receive your order
                       </Typography>
                     </Box>
                   </Grid>
@@ -451,7 +451,7 @@ export default function OrderSuccessPage() {
                 Important Information
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                • You'll receive an email confirmation shortly<br/>
+                • You&apos;ll receive an email confirmation shortly<br/>
                 • Track your order using the order number<br/>
                 • Contact us if you have any questions
               </Typography>
