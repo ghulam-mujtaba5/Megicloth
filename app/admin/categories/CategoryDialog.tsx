@@ -16,12 +16,14 @@ export default function CategoryDialog({ open, onClose, category }: CategoryDial
   
   const getInitialFormData = () => {
     if (category) {
-      return { ...category };
+      // Ensure imageUrl is included even if missing from older data
+      return { ...category, imageUrl: category.imageUrl ?? '' };
     }
     return {
       id: '',
       name: '',
       description: '',
+      imageUrl: '',
       createdAt: '',
     };
   };

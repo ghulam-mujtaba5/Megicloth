@@ -3,13 +3,12 @@
 import { Box, Button, TextField, Typography, Rating } from "@mui/material";
 import { useState } from "react";
 
-const ReviewForm = ({ productId, onSubmit }: { productId: string, onSubmit: (review: any) => void }) => {
+const ReviewForm = ({ onSubmit }: { onSubmit: (review: any) => void }) => {
   const [name, setName] = useState('');
   const [rating, setRating] = useState<number | null>(5);
   const [comment, setComment] = useState('');
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = () => {
     const newReview = {
       id: Date.now(),
       name,
@@ -39,7 +38,7 @@ const ReviewForm = ({ productId, onSubmit }: { productId: string, onSubmit: (rev
         <Rating
           name="rating"
           value={rating}
-          onChange={(event, newValue) => {
+          onChange={(_, newValue) => {
             setRating(newValue);
           }}
         />

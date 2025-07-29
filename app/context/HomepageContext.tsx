@@ -24,6 +24,8 @@ interface HomepageSettings {
 interface HomepageContextType {
   settings: HomepageSettings;
   setSettings: React.Dispatch<React.SetStateAction<HomepageSettings>>;
+  updateHeroBanner: (banner: HeroSlide) => void;
+  updateFeaturedCategories: (categoryIds: string[]) => void;
 }
 
 // 3. Create the context with a default value
@@ -61,8 +63,23 @@ export const HomepageProvider = ({ children }: { children: ReactNode }) => {
     featuredBrands: ['1', '2', '3', '4', '6'], // Default brand IDs
   });
 
+  // Update only the first hero slide (main banner)
+  const updateHeroBanner = (banner: HeroSlide) => {
+    setSettings(prev => ({
+      ...prev,
+      heroSlides: [banner, ...prev.heroSlides.slice(1)]
+    }));
+  };
+
+  const updateFeaturedCategories = (categoryIds: string[]) => {
+    setSettings(prev => ({
+      ...prev,
+      featuredCategories: categoryIds
+    }));
+  };
+
   return (
-    <HomepageContext.Provider value={{ settings, setSettings }}>
+    <HomepageContext.Provider value={{ settings, setSettings, updateHeroBanner, updateFeaturedCategories }}>
       {children}
     </HomepageContext.Provider>
   );

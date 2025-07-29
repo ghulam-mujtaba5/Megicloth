@@ -25,6 +25,7 @@ export default function ProductDialog({ open, onClose, product }: ProductDialogP
       description: '',
       price: 0,
       image: '',
+      images: [],
       group: '',
       category: '',
       stock: 0,
@@ -47,16 +48,15 @@ export default function ProductDialog({ open, onClose, product }: ProductDialogP
   };
 
   const handleSubmit = () => {
-    const { id, rating, ...productData } = formData;
     if (product) {
-      updateProduct({ ...productData, id: product.id, rating: product.rating || 0 });
+      updateProduct({ ...formData });
     } else {
-      addProduct(productData);
+      // Only pass allowed fields to addProduct
+      const { id, rating, reviews, ...newProductData } = formData;
+      addProduct(newProductData);
     }
     onClose();
-  };
-
-  return (
+  };  return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{product ? 'Edit Product' : 'Add New Product'}</DialogTitle>
       <DialogContent>

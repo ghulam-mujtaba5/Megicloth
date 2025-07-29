@@ -66,8 +66,7 @@ function TabPanel(props: TabPanelProps) {
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading, updateProfile, addAddress, removeAddress } = useAuth();
-  const { getOrdersForCurrentUser } = useOrders();
-  const orders = getOrdersForCurrentUser();
+  const { orders } = useOrders();
   const router = useRouter();
   const [tabValue, setTabValue] = useState(0);
   const [addAddressDialog, setAddAddressDialog] = useState(false);

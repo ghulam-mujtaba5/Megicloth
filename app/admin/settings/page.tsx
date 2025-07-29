@@ -8,11 +8,11 @@ import { Box, Typography, TextField, Button, Paper, Grid, FormControl, InputLabe
 export default function HomepageSettingsPage() {
   const { settings, updateHeroBanner, updateFeaturedCategories } = useHomepage();
   const { categories } = useCategories();
-  const [banner, setBanner] = useState(settings.heroBanner);
+  const [banner, setBanner] = useState(settings.heroSlides[0]);
   const [featured, setFeatured] = useState(settings.featuredCategories);
 
   useEffect(() => {
-    setBanner(settings.heroBanner);
+    setBanner(settings.heroSlides[0]);
     setFeatured(settings.featuredCategories);
   }, [settings]);
 

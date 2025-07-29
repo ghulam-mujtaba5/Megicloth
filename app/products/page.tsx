@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { products, Product } from "../data/products";
+import { products } from "../data/products";
 import { categoryData } from "../data/categories";
 import ProductCard from "../components/product/ProductCard";
 import {

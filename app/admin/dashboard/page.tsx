@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Typography, Container, Paper, Grid } from "@mui/material";
+import { Box, Typography, Paper, Grid } from "@mui/material";
 
 export default function AdminDashboard() {
   return (
