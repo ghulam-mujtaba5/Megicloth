@@ -14,8 +14,14 @@ import Zoom from '@mui/material/Zoom';
 import MuiLink from '@mui/material/Link';
 import Link from 'next/link';
 import NewsletterForm from '@/app/components/newsletter/NewsletterForm';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function Footer() {
+  const { user } = useAuth();
+  
+  // Debug logging
+  console.log('Footer - user object:', user);
+  console.log('Footer - user role:', user?.role);
 
   const renderFooterLink = ({ href, label }: { href: string; label: string }) => (
     <Link key={href} href={href} passHref legacyBehavior>
@@ -111,6 +117,30 @@ export default function Footer() {
                     { href: '/privacy', label: 'Privacy Policy' },
                     { href: '/terms', label: 'Terms of Service' },
                   ].map(renderFooterLink)}
+                  {/* DEBUG INFO - REMOVE LATER */}
+                  <Typography variant="caption" sx={{ color: '#666', fontStyle: 'italic', mt: 1 }}>
+                    DEBUG: User logged in: {user ? 'Yes' : 'No'} | Role: {user?.role || 'None'}
+                  </Typography>
+                  
+                  {user?.role === 'admin' && (
+                    <Link href="/admin" passHref legacyBehavior>
+                      <Typography
+                        component="a"
+                        sx={{
+                          color: '#dc2626',
+                          fontWeight: 700,
+                          textDecoration: 'none',
+                          outline: 'none',
+                          '&:hover': {
+                            textDecoration: 'underline',
+                            color: '#b91c1c',
+                          },
+                        }}
+                      >
+                        Admin Dashboard
+                      </Typography>
+                    </Link>
+                  )}
                 </Box>
               </Grid>
             </Grid>
