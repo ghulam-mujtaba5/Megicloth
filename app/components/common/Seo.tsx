@@ -13,7 +13,7 @@ export default function Seo({
   title,
   description,
   canonical,
-  ogImage = "https://images.unsplash.com/photo-1596799325352-2a43d2452791?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+  ogImage = "https://picsum.photos/seed/ogImage/1200/630",
   ogType = "website",
   twitterCardType = "summary_large_image",
 }: SeoProps) {

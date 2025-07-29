@@ -19,13 +19,15 @@ import {
   FormControlLabel,
   Switch,
 } from '@mui/material';
-import { Add, Delete, Home, Work } from '@mui/icons-material';
+import { Add, Delete, Edit, Home, Work, Star } from '@mui/icons-material';
 import toast from 'react-hot-toast';
+import type { Address } from '@/app/types';
 
 export default function AddressManager() {
-  const { user, addAddress, removeAddress } = useAuth();
-  const [addAddressDialog, setAddAddressDialog] = useState(false);
-  const [newAddress, setNewAddress] = useState({
+  const { user, addAddress, removeAddress, updateAddress, setDefaultAddress } = useAuth();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [formData, setFormData] = useState({
     type: 'home' as const,
     firstName: '',
     lastName: '',
@@ -38,30 +40,43 @@ export default function AddressManager() {
     isDefault: false,
   });
 
-  const handleAddAddress = async () => {
-    if (!newAddress.address || !newAddress.city || !newAddress.phone) {
+  const handleOpenDialog = (address: Address | null = null) => {
+    setEditingAddress(address);
+    setFormData(
+      address
+        ? { ...address }
+        : {
+            id: '',
+            type: 'home' as const,
+            firstName: user?.firstName || '',
+            lastName: user?.lastName || '',
+            address: '',
+            city: '',
+            state: '',
+            postalCode: '',
+            country: 'Pakistan',
+            phone: '',
+            isDefault: false,
+          }
+    );
+    setDialogOpen(true);
+  };
+
+  const handleDialogSubmit = async () => {
+    if (!formData.address || !formData.city || !formData.phone) {
         toast.error('Please fill in all required fields.');
         return;
     }
     try {
-      const result = await addAddress(newAddress);
+      const result = editingAddress
+        ? await updateAddress({ ...formData, id: editingAddress.id })
+        : await addAddress(formData);
+
       if (result.success) {
-        toast.success('Address added successfully!');
-        setAddAddressDialog(false);
-        setNewAddress({
-          type: 'home',
-          firstName: user?.firstName || '',
-          lastName: user?.lastName || '',
-          address: '',
-          city: '',
-          state: '',
-          postalCode: '',
-          country: 'Pakistan',
-          phone: '',
-          isDefault: false,
-        });
+        toast.success(`Address ${editingAddress ? 'updated' : 'added'} successfully!`);
+        setDialogOpen(false);
       } else {
-        toast.error(result.error || 'Failed to add address');
+        toast.error(result.error || `Failed to ${editingAddress ? 'update' : 'add'} address`);
       }
     } catch (error) {
       toast.error('An error occurred while adding address');
@@ -83,7 +98,20 @@ export default function AddressManager() {
 
   const handleDialogInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked, type } = e.target;
-    setNewAddress(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  const handleSetDefault = async (id: string) => {
+    try {
+      const result = await setDefaultAddress(id);
+      if (result.success) {
+        toast.success('Default address updated!');
+      } else {
+        toast.error(result.error || 'Failed to update default address');
+      }
+    } catch (error) {
+      toast.error('An error occurred while updating default address');
+    }
   };
 
   return (
@@ -93,7 +121,7 @@ export default function AddressManager() {
           <Typography variant="h5" sx={{ fontWeight: 700 }}>
             My Addresses
           </Typography>
-          <Button variant="contained" startIcon={<Add />} onClick={() => setAddAddressDialog(true)}>
+          <Button variant="contained" startIcon={<Add />} onClick={() => handleOpenDialog()}>
             Add New
           </Button>
         </Box>
@@ -110,7 +138,15 @@ export default function AddressManager() {
                             <Typography variant="h6" sx={{textTransform: 'capitalize'}}>{addr.type}</Typography>
                             {addr.isDefault && <Chip label="Default" size="small" color="primary" sx={{ml: 1}}/>}
                         </Box>
-                        <IconButton size="small" onClick={() => handleRemoveAddress(addr.id)}><Delete /></IconButton>
+                        <div>
+                          {!addr.isDefault && (
+                            <Button size="small" startIcon={<Star />} onClick={() => handleSetDefault(addr.id)} sx={{ mr: 1 }}>
+                              Set as Default
+                            </Button>
+                          )}
+                          <IconButton size="small" onClick={() => handleOpenDialog(addr)}><Edit /></IconButton>
+                          <IconButton size="small" onClick={() => handleRemoveAddress(addr.id)}><Delete /></IconButton>
+                        </div>
                     </Box>
                     <Typography sx={{fontWeight: 600}}>{addr.firstName} {addr.lastName}</Typography>
                     <Typography color="text.secondary">{addr.address}, {addr.city}</Typography>
@@ -129,23 +165,23 @@ export default function AddressManager() {
         </Grid>
       </CardContent>
 
-      <Dialog open={addAddressDialog} onClose={() => setAddAddressDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{fontWeight: 700}}>Add New Address</DialogTitle>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700 }}>{editingAddress ? 'Edit Address' : 'Add New Address'}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{py: 1}}>
-            <Grid item xs={12} sm={6}><TextField name="firstName" label="First Name" value={newAddress.firstName} onChange={handleDialogInputChange} fullWidth /></Grid>
-            <Grid item xs={12} sm={6}><TextField name="lastName" label="Last Name" value={newAddress.lastName} onChange={handleDialogInputChange} fullWidth /></Grid>
-            <Grid item xs={12}><TextField name="address" label="Address" value={newAddress.address} onChange={handleDialogInputChange} fullWidth required/></Grid>
-            <Grid item xs={12} sm={6}><TextField name="city" label="City" value={newAddress.city} onChange={handleDialogInputChange} fullWidth required/></Grid>
-            <Grid item xs={12} sm={6}><TextField name="state" label="State / Province" value={newAddress.state} onChange={handleDialogInputChange} fullWidth /></Grid>
-            <Grid item xs={12} sm={6}><TextField name="postalCode" label="Postal Code" value={newAddress.postalCode} onChange={handleDialogInputChange} fullWidth /></Grid>
-            <Grid item xs={12} sm={6}><TextField name="phone" label="Phone Number" value={newAddress.phone} onChange={handleDialogInputChange} fullWidth required/></Grid>
-            <Grid item xs={12}><FormControlLabel control={<Switch name="isDefault" checked={newAddress.isDefault} onChange={handleDialogInputChange} />} label="Set as default address" /></Grid>
+            <Grid item xs={12} sm={6}><TextField name="firstName" label="First Name" value={formData.firstName} onChange={handleDialogInputChange} fullWidth /></Grid>
+            <Grid item xs={12} sm={6}><TextField name="lastName" label="Last Name" value={formData.lastName} onChange={handleDialogInputChange} fullWidth /></Grid>
+            <Grid item xs={12}><TextField name="address" label="Address" value={formData.address} onChange={handleDialogInputChange} fullWidth required/></Grid>
+            <Grid item xs={12} sm={6}><TextField name="city" label="City" value={formData.city} onChange={handleDialogInputChange} fullWidth required/></Grid>
+            <Grid item xs={12} sm={6}><TextField name="state" label="State / Province" value={formData.state} onChange={handleDialogInputChange} fullWidth /></Grid>
+            <Grid item xs={12} sm={6}><TextField name="postalCode" label="Postal Code" value={formData.postalCode} onChange={handleDialogInputChange} fullWidth /></Grid>
+            <Grid item xs={12} sm={6}><TextField name="phone" label="Phone Number" value={formData.phone} onChange={handleDialogInputChange} fullWidth required/></Grid>
+            <Grid item xs={12}><FormControlLabel control={<Switch name="isDefault" checked={formData.isDefault} onChange={handleDialogInputChange} />} label="Set as default address" /></Grid>
           </Grid>
         </DialogContent>
-        <DialogActions sx={{p: 2}}>
-          <Button onClick={() => setAddAddressDialog(false)}>Cancel</Button>
-          <Button onClick={handleAddAddress} variant="contained">Save Address</Button>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleDialogSubmit} variant="contained">Save Address</Button>
         </DialogActions>
       </Dialog>
     </Card>

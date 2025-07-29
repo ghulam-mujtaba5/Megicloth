@@ -11,6 +11,7 @@ import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import StarsOutlinedIcon from '@mui/icons-material/StarsOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import Seo from '../components/common/Seo';
 
@@ -19,6 +20,7 @@ const accountNavLinks = [
   { text: 'Wishlist', href: '/account/wishlist', icon: <FavoriteBorderOutlinedIcon /> },
   { text: 'Address Book', href: '/account/addresses', icon: <HomeOutlinedIcon /> },
   { text: 'Profile Settings', href: '/account/settings', icon: <PersonOutlineOutlinedIcon /> },
+  { text: 'Loyalty Program', href: '/account/loyalty', icon: <StarsOutlinedIcon /> },
 ];
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {

@@ -1,6 +1,7 @@
 export interface Product {
   id: string;
   name: string;
+  slug: string;
   description: string;
   price: number;
   salePrice?: number;
@@ -18,6 +19,7 @@ export interface Product {
   tags: string[];
   stitchingCost?: number;
   fabric?: string;
+  color?: string;
   collection?: string;
   reviews?: Review[];
   quantity?: number; // for cart
@@ -72,3 +74,28 @@ export interface User {
 }
 
 export type CartItem = Product & { quantity: number };
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+}
+
+export interface AdminOrder {
+  id: string;
+  created_at: string;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  total: number;
+  items: CartItem[];
+  shipping_address: Address;
+  users: {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+  } | null;
+  // Fallbacks for guest checkouts
+  shipping_name?: string;
+  shipping_email?: string;
+  user_id: string;
+}

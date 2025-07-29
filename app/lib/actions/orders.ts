@@ -2,6 +2,7 @@
 
 import { createClient } from '@/app/lib/supabase/server';
 import { z } from 'zod';
+import { addLoyaltyPoints } from './loyalty';
 
 const OrderItemSchema = z.object({
   id: z.string(),
@@ -38,12 +39,32 @@ export async function getAllOrders() {
 
 export async function updateOrderStatus(orderId: string, status: string) {
   const supabase = createClient();
-  const { error } = await supabase.from('orders').update({ status }).eq('id', orderId);
+  const { data: order, error } = await supabase
+    .from('orders')
+    .update({ status })
+    .eq('id', orderId)
+    .select()
+    .single();
+
   if (error) {
-    return { error: error.message };
+    console.error('Error updating order status:', error);
+    return { success: false, error: error.message };
   }
-  // Optionally revalidate admin orders page
-  // revalidatePath('/admin/orders');
+  return { success: true, order };
+}
+
+export async function deleteOrder(orderId: string) {
+  const supabase = createClient();
+  
+  // Assuming cascade delete is enabled on the 'order_id' foreign key in 'order_items'.
+  // If not, you must delete items first.
+  const { error } = await supabase.from('orders').delete().eq('id', orderId);
+
+  if (error) {
+    console.error('Error deleting order:', error);
+    return { success: false, error: error.message };
+  }
+
   return { success: true };
 }
 
@@ -84,7 +105,32 @@ export async function createOrder(_prevState: any, values: z.infer<typeof OrderS
   }));
   const { error: itemsError } = await supabase.from('order_items').insert(items);
   if (itemsError) {
+    // In a real-world scenario, you might want to roll back the order creation here.
     return { error: 'Failed to add order items.' };
   }
+
+  // If the order was successful and created by a logged-in user, award loyalty points.
+  if (userId) {
+    // Simple logic: 1 point for every dollar spent, rounded down.
+    const pointsToAward = Math.floor(total);
+    if (pointsToAward > 0) {
+      // This is a fire-and-forget call; we don't want to block the checkout
+      // process if awarding points fails for some reason.
+      addLoyaltyPoints(userId, pointsToAward, `Purchase - Order #${order.id.substring(0, 8)}`, order.id);
+    }
+
+    // After awarding points for the purchase, check if this order completes a referral.
+    // This is also a fire-and-forget call.
+    supabase.rpc('process_first_order_referral', {
+      p_user_id: userId,
+      p_order_id: order.id,
+    }).then(({ error }) => {
+      if (error) {
+        // Log the error but don't fail the checkout process.
+        console.error('Error processing referral bonus:', error);
+      }
+    });
+  }
+
   return { success: true, orderId: order.id };
 }

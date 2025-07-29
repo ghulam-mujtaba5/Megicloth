@@ -14,8 +14,11 @@ interface AuthContextType {
   updateProfile: (data: Partial<AppUser>) => Promise<{ success: boolean; error?: string; }>;
   addAddress: (address: Omit<Address, 'id'>) => Promise<{ success: boolean; error?: string; }>;
   removeAddress: (addressId: string) => Promise<{ success: boolean; error?: string; }>;
+  updateAddress: (address: Address) => Promise<{ success: boolean; error?: string; }>;
+  setDefaultAddress: (addressId: string) => Promise<{ success: boolean; error?: string; }>;
   addToWishlist: (product: Product) => Promise<{ success: boolean; error?: string; }>;
   removeFromWishlist: (productId: string) => Promise<{ success: boolean; error?: string; }>;
+  changePassword: (password: string) => Promise<{ success: boolean; error?: string; }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -153,6 +156,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true };
   };
 
+  const updateAddress = async (address: Address) => {
+    if (!user) return { success: false, error: 'Not authenticated' };
+    const { error } = await supabase.from('addresses').update(address).eq('id', address.id);
+    if (error) return { success: false, error: error.message };
+
+    setUser((prevUser: AppUser | null) => {
+      if (!prevUser) return null;
+      const updatedAddresses = (prevUser.addresses || []).map((a: Address) => a.id === address.id ? address : a);
+      return { ...prevUser, addresses: updatedAddresses };
+    });
+    return { success: true };
+  };
+
+  const setDefaultAddress = async (addressId: string) => {
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    const currentDefault = user.addresses?.find(a => a.isDefault);
+    if (currentDefault && currentDefault.id !== addressId) {
+      const { error: unsetError } = await supabase.from('addresses').update({ isDefault: false }).eq('id', currentDefault.id);
+      if (unsetError) return { success: false, error: `Failed to unset current default: ${unsetError.message}` };
+    }
+
+    const { error: setError } = await supabase.from('addresses').update({ isDefault: true }).eq('id', addressId);
+    if (setError) return { success: false, error: `Failed to set new default: ${setError.message}` };
+
+    setUser((prevUser: AppUser | null) => {
+        if (!prevUser) return null;
+        const updatedAddresses = (prevUser.addresses || []).map((a: Address) => ({
+            ...a,
+            isDefault: a.id === addressId,
+        }));
+        return { ...prevUser, addresses: updatedAddresses };
+    });
+
+    return { success: true };
+  };
+
   const addToWishlist = async (product: Product) => {
     if (!user) return { success: false, error: 'Not authenticated' };
     if (user.wishlist?.includes(product.id)) return { success: true }; // Already in wishlist
@@ -181,6 +221,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true };
   };
 
+  const changePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  };
+
   const value: AuthContextType = {
     user,
     isLoading,
@@ -189,8 +237,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     updateProfile,
     addAddress,
     removeAddress,
+    updateAddress,
+    setDefaultAddress,
     addToWishlist,
     removeFromWishlist,
+    changePassword,
   };
 
   return (

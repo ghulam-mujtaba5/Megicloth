@@ -152,6 +152,7 @@ export default function CartClientPage({ initialCart }: CartClientPageProps) {
             subtotal={subtotal}
             shippingCost={shippingCost}
             onApplyPromoCode={handleApplyPromoCode}
+            cartItems={cart}
           />
         </Grid>
       </Grid>

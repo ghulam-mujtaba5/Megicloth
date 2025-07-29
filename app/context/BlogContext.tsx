@@ -37,7 +37,7 @@ const mockPosts: Post[] = [
     content: 'Summer is here, and it\'s time to update your wardrobe...',
     author: 'Jane Doe',
     date: '2024-06-15T10:00:00Z',
-    imageUrl: 'https://images.unsplash.com/photo-1591047139829-d91620649947',
+    imageUrl: 'https://picsum.photos/seed/blogA/800/600',
     tags: ['Fashion', 'Summer', 'Style Guide'],
   },
   {
@@ -46,7 +46,7 @@ const mockPosts: Post[] = [
     content: 'Accessories can make or break an outfit...',
     author: 'John Smith',
     date: '2024-07-02T14:30:00Z',
-    imageUrl: 'https://images.unsplash.com/photo-1588117269371-abfa4a949614',
+    imageUrl: 'https://picsum.photos/seed/blogB/800/600',
     tags: ['Accessories', 'Fashion Tips'],
   },
 ];

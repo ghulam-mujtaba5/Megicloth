@@ -14,19 +14,19 @@ const testimonials = [
   {
     name: 'Ayesha Khan',
     location: 'Lahore',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+    avatar: 'https://picsum.photos/seed/avatarA/256/256',
     testimonial: "The fabric quality is exceptional! I'm so impressed with the vibrant colors and the softness of the material. Will definitely be shopping here again.",
   },
   {
     name: 'Bilal Ahmed',
     location: 'Karachi',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+    avatar: 'https://picsum.photos/seed/avatarB/256/256',
     testimonial: 'Fast delivery and excellent customer service. The unstitched suit I ordered was exactly as described. Highly recommended!',
   },
   {
     name: 'Fatima Ali',
     location: 'Islamabad',
-    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+    avatar: 'https://picsum.photos/seed/avatarC/256/256',
     testimonial: "I love the unique designs Megicloth offers. It's my go-to store for finding beautiful, high-quality fabrics for every season.",
   },
 ];

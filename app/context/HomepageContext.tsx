@@ -36,21 +36,21 @@ export const HomepageProvider = ({ children }: { children: ReactNode }) => {
   const [settings, setSettings] = useState<HomepageSettings>({
     heroSlides: [
       {
-        imageUrl: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=500&q=80',
+        imageUrl: 'https://picsum.photos/seed/heroA/1200/500',
         title: 'New Summer Collection',
         subtitle: 'Discover the latest trends in unstitched fabrics.',
         buttonText: 'Shop Now',
         link: '/products',
       },
       {
-        imageUrl: 'https://images.unsplash.com/photo-1445205170230-053b83016050?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=500&q=80',
+        imageUrl: 'https://picsum.photos/seed/heroB/1200/500',
         title: 'Exquisite Lawn Prints',
         subtitle: 'Perfect for every occasion, crafted with elegance.',
         buttonText: 'Explore Designs',
         link: '/products?category=lawn',
       },
       {
-        imageUrl: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=500&q=80',
+        imageUrl: 'https://picsum.photos/seed/heroC/1200/500',
         title: 'Festive Season Specials',
         subtitle: 'Get ready for the celebrations with our exclusive festive range.',
         buttonText: 'View Collection',

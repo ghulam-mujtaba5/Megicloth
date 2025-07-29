@@ -142,7 +142,7 @@ const Newsletter = () => {
                 }}
               >
                 <Image
-                  src="https://images.unsplash.com/photo-1551803091-e3e85b604c54?auto=format&fit=crop&w=800&q=80"
+                  src="https://picsum.photos/seed/newsletter/800/600"
                   alt="Fashionable clothes on a rack"
                   fill
                   style={{ objectFit: 'cover' }}

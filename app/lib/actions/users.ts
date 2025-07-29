@@ -1,5 +1,6 @@
 import { createClient } from '../supabase/server';
 import type { User } from '@/app/types';
+import { revalidatePath } from 'next/cache';
 
 export async function getAllUsers(): Promise<User[]> {
   const supabase = createClient();
@@ -20,4 +21,26 @@ export async function deleteUser(userId: string): Promise<{ success: boolean; er
   const { error } = await supabase.from('users').delete().eq('id', userId);
   if (error) return { success: false, error: error.message };
   return { success: true };
+}
+
+export async function updateUser(userId: string, userData: Partial<User>): Promise<{ success: boolean; user?: User; error?: string }> {
+  const supabase = createClient();
+
+  // Ensure non-editable fields are not passed to update
+  const { id, email, role, ...updatableData } = userData;
+
+  const { data, error } = await supabase
+    .from('users')
+    .update(updatableData)
+    .eq('id', userId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating user:', error);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath('/admin/users');
+  return { success: true, user: data as User };
 }

@@ -1,22 +1,55 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { loadStripe } from '@stripe/stripe-js';
+import { createCheckoutSession } from '@/app/lib/actions/payments';
+import type { CartItem } from '@/app/types';
 import { Box, Button, Paper, TextField, Typography, Divider } from '@mui/material';
 
 interface OrderSummaryProps {
   subtotal: number;
   shippingCost: number;
   onApplyPromoCode: (code: string) => number; // Returns discount amount
+  cartItems: CartItem[];
 }
 
-export default function OrderSummary({ subtotal, shippingCost, onApplyPromoCode }: OrderSummaryProps) {
-  const [promoCode, setPromoCode] = useState('');
+const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
+
+export default function OrderSummary({ subtotal, shippingCost, onApplyPromoCode, cartItems }: OrderSummaryProps) {
+    const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const handleApplyPromo = () => {
-    const discountAmount = onApplyPromoCode(promoCode);
+        const discountAmount = onApplyPromoCode(promoCode);
     setDiscount(discountAmount);
+  };
+
+    const handleCheckout = async () => {
+    if (!stripePromise) {
+      alert('Payment processing is not configured.');
+      return;
+    }
+    setIsCheckingOut(true);
+    const { sessionId, error } = await createCheckoutSession(cartItems);
+
+    if (error) {
+      alert(`Error: ${error}`);
+      setIsCheckingOut(false);
+      return;
+    }
+
+    if (sessionId) {
+        const stripe = await stripePromise;
+        if (stripe) {
+            const { error: stripeError } = await stripe.redirectToCheckout({ sessionId });
+            if (stripeError) {
+                alert(`Stripe Error: ${stripeError.message}`);
+            }
+        }
+    }
+    setIsCheckingOut(false);
   };
 
   const total = subtotal - discount + shippingCost;
@@ -58,11 +91,16 @@ export default function OrderSummary({ subtotal, shippingCost, onApplyPromoCode 
         <Typography sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Total</Typography>
         <Typography sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Rs. {total.toLocaleString()}</Typography>
       </Box>
-      <Link href="/checkout" passHref style={{ textDecoration: 'none' }}>
-        <Button fullWidth variant="contained" size="large" sx={{ mt: 2 }}>
-          Proceed to Checkout
-        </Button>
-      </Link>
+            <Button 
+        fullWidth 
+        variant="contained" 
+        size="large" 
+        sx={{ mt: 2 }} 
+        onClick={handleCheckout}
+        disabled={isCheckingOut || cartItems.length === 0 || !stripePromise}
+      >
+        {isCheckingOut ? 'Processing...' : !stripePromise ? 'Payments Unavailable' : 'Proceed to Checkout'}
+      </Button>
     </Paper>
   );
 }

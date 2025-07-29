@@ -17,7 +17,7 @@ import {
   InputAdornment, Checkbox, FormControlLabel, FormHelperText, FormControl
 } from '@mui/material';
 import {
-  Visibility, VisibilityOff, Email, Lock, Person, Phone, Google, Facebook
+  Visibility, VisibilityOff, Email, Lock, Person, Phone, Google, Facebook, CardGiftcard
 } from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
 import { registerFormSchema } from '@/app/lib/schemas';
@@ -40,6 +40,7 @@ export default function RegisterPage() {
       phone: '',
       password: '',
       confirmPassword: '',
+      referralCode: '',
       termsAccepted: true,
     },
   });
@@ -123,6 +124,7 @@ export default function RegisterPage() {
                 <TextField {...register('phone')} label="Phone Number (Optional)" fullWidth error={!!getFieldError('phone')} helperText={getFieldError('phone')} InputProps={{ startAdornment: <InputAdornment position="start"><Phone color="action" /></InputAdornment> }} />
                 <TextField {...register('password')} label="Password" type={showPassword ? 'text' : 'password'} fullWidth error={!!getFieldError('password')} helperText={getFieldError('password')} InputProps={{ startAdornment: <InputAdornment position="start"><Lock color="action" /></InputAdornment>, endAdornment: <InputAdornment position="end"><IconButton onClick={() => setShowPassword(!showPassword)} edge="end">{showPassword ? <VisibilityOff /> : <Visibility />}</IconButton></InputAdornment> }} />
                 <TextField {...register('confirmPassword')} label="Confirm Password" type={showConfirmPassword ? 'text' : 'password'} fullWidth error={!!getFieldError('confirmPassword')} helperText={getFieldError('confirmPassword')} InputProps={{ startAdornment: <InputAdornment position="start"><Lock color="action" /></InputAdornment>, endAdornment: <InputAdornment position="end"><IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">{showConfirmPassword ? <VisibilityOff /> : <Visibility />}</IconButton></InputAdornment> }} />
+                <TextField {...register('referralCode')} label="Referral Code (Optional)" fullWidth error={!!getFieldError('referralCode')} helperText={getFieldError('referralCode')} InputProps={{ startAdornment: <InputAdornment position="start"><CardGiftcard color="action" /></InputAdornment> }} />
                 
                 <FormControl error={!!getFieldError('termsAccepted')}>
                     <Controller

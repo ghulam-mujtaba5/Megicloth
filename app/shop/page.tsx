@@ -22,9 +22,13 @@ const ShopPageContent = () => {
   const { filters, sortOrder } = useMemo(() => {
     const params = new URLSearchParams(searchParams.toString());
     const filters = {
-      categories: params.get('categories')?.split(',') || [],
+      categories: params.get('categories')?.split(',').filter(Boolean) || [],
       priceRange: (params.get('price')?.split(',').map(Number) || [500, 15000]) as [number, number],
       availability: params.get('availability') || 'in-stock',
+      colors: params.get('colors')?.split(',').filter(Boolean) || [],
+      brands: params.get('brands')?.split(',').filter(Boolean) || [],
+      fabrics: params.get('fabrics')?.split(',').filter(Boolean) || [],
+      tags: params.get('tags')?.split(',').filter(Boolean) || [],
     };
     const sortOrder = params.get('sort') || 'newest';
     return { filters, sortOrder };
@@ -49,11 +53,16 @@ const ShopPageContent = () => {
 
   const handleFilterChange = (newFilters: any) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (newFilters.categories.length > 0) {
-      params.set('categories', newFilters.categories.join(','));
-    } else {
-      params.delete('categories');
-    }
+
+    // Handle all array-based filters dynamically
+    ['categories', 'colors', 'brands', 'fabrics', 'tags'].forEach(filterKey => {
+      if (newFilters[filterKey] && newFilters[filterKey].length > 0) {
+        params.set(filterKey, newFilters[filterKey].join(','));
+      } else {
+        params.delete(filterKey);
+      }
+    });
+
     params.set('price', newFilters.priceRange.join(','));
     params.set('availability', newFilters.availability);
     router.push(`${pathname}?${params.toString()}`);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import ProductForm from './ProductForm';
+import ProductDialog from './ProductDialog';
 import type { Product } from '@/app/types';
 import { getAllProducts, createProduct, updateProduct, deleteProduct } from '../../lib/actions/product';
 import { 
@@ -15,7 +15,8 @@ import {
   TableHead, 
   TableRow, 
   Paper, 
-  IconButton 
+  IconButton,
+  Avatar
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
 
@@ -39,9 +40,43 @@ export default function AdminProductsPage() {
       });
   }, []);
 
-  const handleOpen = (product: Product | null) => {
+  const handleOpen = (product: Product | null = null) => {
     setSelectedProduct(product);
     setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleSave = async (productData: Partial<Product>) => {
+    if (selectedProduct) {
+      const res = await updateProduct(selectedProduct.id, productData);
+      if (res.success && res.product) {
+        setProducts(products.map(p => p.id === selectedProduct.id ? res.product : p));
+      } else {
+        alert(res.error || 'Failed to update product.');
+      }
+    } else {
+      const res = await createProduct(productData as any);
+      if (res.success && res.product) {
+        setProducts([res.product, ...products]);
+      } else {
+        alert(res.error || 'Failed to create product.');
+      }
+    }
+    handleClose();
+  };
+
+  const handleDelete = async (productId: string) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
+    const res = await deleteProduct(productId);
+    if (res.success) {
+      setProducts(products.filter(p => p.id !== productId));
+    } else {
+      alert(res.error || 'Failed to delete product.');
+    }
   };
 
 
@@ -52,43 +87,16 @@ export default function AdminProductsPage() {
         <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
           Manage Products
         </Typography>
-        <Button variant="contained" startIcon={<Add />} onClick={() => setOpen(true)}>
+        <Button variant="contained" startIcon={<Add />} onClick={() => handleOpen()}>
           Add Product
         </Button>
       </Box>
-      {/* Product Creation/Edit Modal */}
-      {open && (
-        <Box sx={{ mb: 3, p: 3, border: '1px solid #e0e0e0', borderRadius: 2, background: '#fafbfc' }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>{selectedProduct ? 'Edit Product' : 'Add Product'}</Typography>
-          <ProductForm
-            initialValues={selectedProduct}
-            // ProductForm expects only the minimal fields for product creation/update
-            onSubmit={async (values: { name: string; description: string; category: string; price: number; stock: number; image?: string }) => {
-              if (selectedProduct) {
-                // Edit
-                const res = await updateProduct(selectedProduct.id, values);
-                if (res.success) {
-                  setProducts(products.map(p => p.id === selectedProduct.id ? res.product : p));
-                  setOpen(false);
-                  setSelectedProduct(null);
-                } else {
-                  alert(res.error ? JSON.stringify(res.error) : 'Failed to update product.');
-                }
-              } else {
-                // Add
-                const res = await createProduct(values);
-                if (res.success) {
-                  setProducts([res.product, ...products]);
-                  setOpen(false);
-                } else {
-                  alert(res.error ? JSON.stringify(res.error) : 'Failed to create product.');
-                }
-              }
-            }}
-            onCancel={() => { setOpen(false); setSelectedProduct(null); }}
-          />
-        </Box>
-      )}
+      <ProductDialog 
+        open={open} 
+        onClose={handleClose} 
+        onSave={handleSave} 
+        product={selectedProduct} 
+      />
 
       {/* Loading/Error States */}
       {loading && (
@@ -107,6 +115,7 @@ export default function AdminProductsPage() {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell>Image</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Category</TableCell>
                 <TableCell>Price</TableCell>
@@ -117,23 +126,18 @@ export default function AdminProductsPage() {
             <TableBody>
               {products.map((product) => (
                 <TableRow key={product.id}>
+                  <TableCell>
+                    <Avatar src={product.images?.[0]} alt={product.name} variant="rounded" />
+                  </TableCell>
                   <TableCell>{product.name}</TableCell>
                   <TableCell>{product.category}</TableCell>
-                  <TableCell>Rs. {product.price}</TableCell>
+                  <TableCell>Rs. {product.price.toLocaleString()}</TableCell>
                   <TableCell>{product.stock}</TableCell>
                   <TableCell align="right">
                     <IconButton size="small" color="primary" onClick={() => handleOpen(product)}>
                       <Edit />
                     </IconButton>
-                    <IconButton size="small" color="error" onClick={async () => {
-                      if (!window.confirm('Delete this product?')) return;
-                      const res = await deleteProduct(product.id);
-                      if (res.success) {
-                        setProducts(products.filter(p => p.id !== product.id));
-                      } else {
-                        alert(res.error || 'Failed to delete product.');
-                      }
-                    }}>
+                    <IconButton size="small" color="error" onClick={() => handleDelete(product.id)}>
                       <Delete />
                     </IconButton>
                   </TableCell>

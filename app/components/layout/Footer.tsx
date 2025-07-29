@@ -4,41 +4,18 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
-import EmailIcon from "@mui/icons-material/Email";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import LockIcon from "@mui/icons-material/Lock";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import Fade from '@mui/material/Fade';
 import Zoom from '@mui/material/Zoom';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CelebrationIcon from '@mui/icons-material/Celebration';
 import MuiLink from '@mui/material/Link';
 import Link from 'next/link';
-import { useState } from 'react';
+import NewsletterForm from '@/app/components/newsletter/NewsletterForm';
 
 export default function Footer() {
-  // Newsletter state/logic (mirrored from homepage)
-  const [newsletterEmail, setNewsletterEmail] = useState("");
-  const [newsletterStatus, setNewsletterStatus] = useState<'idle'|'success'|'error'>('idle');
-  const [showConfetti, setShowConfetti] = useState(false);
-
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newsletterEmail.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
-      setNewsletterStatus('error');
-      return;
-    }
-    setNewsletterStatus('success');
-    setShowConfetti(true);
-    setTimeout(() => setShowConfetti(false), 1800);
-    setTimeout(() => setNewsletterStatus('idle'), 2500);
-    setNewsletterEmail("");
-  };
 
   const renderFooterLink = ({ href, label }: { href: string; label: string }) => (
     <Link key={href} href={href} passHref legacyBehavior>
@@ -59,6 +36,7 @@ export default function Footer() {
       </Typography>
     </Link>
   );
+
   return (
     <Box sx={{ background: 'rgba(255,255,255,0.85)', borderTop: '1.5px solid #e2e8f0', mt: 8, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
       <Container maxWidth="xl" sx={{ py: { xs: 6, md: 10 } }}>
@@ -88,59 +66,12 @@ export default function Footer() {
               <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
                 Premium Unstitched Fabrics. Elevate your wardrobe with quality and style.
               </Typography>
-              <Box component="form" aria-label="Newsletter signup" role="form" onSubmit={handleNewsletterSubmit} sx={{ display: 'flex', gap: 1, maxWidth: 340 }}>
-                <TextField
-                  type="email"
-                  placeholder="Your email"
-                  size="small"
-                  sx={{ background: '#f7fafc', borderRadius: 2, flex: 1 }}
-                  InputProps={{
-                    startAdornment: (
-                      <EmailIcon color="action" sx={{ mr: 1 }} />
-                    ),
-                    'aria-label': 'Email address',
-                  }}
-                  value={newsletterEmail}
-                  onChange={e => setNewsletterEmail(e.target.value)}
-                  required
-                />
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    background: 'linear-gradient(45deg, #2563eb, #10b981)',
-                    color: '#fff',
-                    fontWeight: 700,
-                    borderRadius: 2,
-                    px: 3,
-                    '&:hover, &:focus': {
-                      background: 'linear-gradient(45deg, #10b981, #2563eb)',
-                      boxShadow: '0 4px 16px #2563eb22',
-                    },
-                  }}
-                >
-                  Subscribe
-                </Button>
+              <NewsletterForm />
+              <Box aria-label="Social links" role="navigation" sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                <Zoom in={true}><IconButton component="a" href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook" sx={{ color: '#2563eb', transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.15)', background: '#e0e7ef' } }}><FacebookIcon /></IconButton></Zoom>
+                <Zoom in={true}><IconButton component="a" href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram" sx={{ color: '#10b981', transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.15)', background: '#e0e7ef' } }}><InstagramIcon /></IconButton></Zoom>
+                <Zoom in={true}><IconButton component="a" href="https://twitter.com" target="_blank" rel="noopener" aria-label="Twitter" sx={{ color: '#64748b', transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.15)', background: '#e0e7ef' } }}><TwitterIcon /></IconButton></Zoom>
               </Box>
-              {newsletterStatus === 'success' && (
-                <Fade in={newsletterStatus === 'success'} unmountOnExit>
-                  <Box sx={{ display: 'flex', alignItems: 'center', color: '#10b981', mt: 2 }}>
-                    <CheckCircleIcon sx={{ mr: 1 }} />
-                    <Typography>Thank you for subscribing!</Typography>
-                    {showConfetti && <CelebrationIcon sx={{ ml: 1, color: '#f59e0b', fontSize: 32, animation: 'spin 1.2s linear' }} />}
-                  </Box>
-                </Fade>
-              )}
-              {newsletterStatus === 'error' && (
-                <Fade in={newsletterStatus === 'error'} unmountOnExit>
-                  <Typography sx={{ color: '#ef4444', mt: 2 }}>Please enter a valid email address.</Typography>
-                </Fade>
-              )}
-            </Box>
-            <Box aria-label="Social links" role="navigation" sx={{ display: 'flex', gap: 1, mt: 2 }}>
-              <Zoom in={true}><IconButton component="a" href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook" sx={{ color: '#2563eb', transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.15)', background: '#e0e7ef' } }}><FacebookIcon /></IconButton></Zoom>
-              <Zoom in={true}><IconButton component="a" href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram" sx={{ color: '#10b981', transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.15)', background: '#e0e7ef' } }}><InstagramIcon /></IconButton></Zoom>
-              <Zoom in={true}><IconButton component="a" href="https://twitter.com" target="_blank" rel="noopener" aria-label="Twitter" sx={{ color: '#64748b', transition: 'transform 0.2s', '&:hover, &:focus': { transform: 'scale(1.15)', background: '#e0e7ef' } }}><TwitterIcon /></IconButton></Zoom>
             </Box>
           </Grid>
 

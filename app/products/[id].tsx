@@ -18,8 +18,8 @@ export default function ProductDetail({ params }: Props) {
   const product = products.find((p) => p.id === params.id);
   if (!product) return notFound();
   const imageUrl = Array.isArray(product.images) && product.images.length > 0
-    ? (product.images[0].startsWith('http') ? product.images[0] : 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80')
-    : 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80';
+    ? (product.images[0].startsWith('http') ? product.images[0] : 'https://picsum.photos/seed/productPlaceholder/400/400')
+    : 'https://picsum.photos/seed/productPlaceholder/400/400';
   return (
     <Container maxWidth="md" sx={{ minHeight: "80vh", py: { xs: 2, sm: 4 } }}>
       <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: { xs: 3, md: 6 }, alignItems: { xs: "center", md: "flex-start" }, background: "#fff", borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", p: { xs: 2, sm: 4 } }}>

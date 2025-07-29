@@ -63,6 +63,50 @@ export async function updateProduct(id: string, values: z.infer<typeof ProductSc
   return { success: true, product: data };
 }
 
+export async function updateStock(id: string, newStock: number) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('products')
+    .update({ stock: newStock })
+    .eq('id', id)
+    .select('id, stock')
+    .single();
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath('/admin/inventory');
+  return { success: true, product: data };
+}
+
+export async function bulkUpdateStock(updates: { id: string; stock: number }[]) {
+  const supabase = createClient();
+
+  // Supabase JS client doesn't have a native bulk update method, 
+  // so we process updates in a loop within a single server action.
+  // This is more efficient than making multiple requests from the client.
+  const updatePromises = updates.map(update =>
+    supabase
+      .from('products')
+      .update({ stock: update.stock })
+      .eq('id', update.id)
+  );
+
+  const results = await Promise.all(updatePromises);
+
+  const errors = results.filter(result => result.error);
+
+  if (errors.length > 0) {
+    console.error('Errors during bulk stock update:', errors);
+    // Returning a generic error message to the client for security
+    return { success: false, error: `Failed to update ${errors.length} of ${updates.length} products.` };
+  }
+
+  revalidatePath('/admin/inventory');
+  return { success: true, updatedCount: updates.length };
+}
+
 export async function deleteProduct(id: string) {
   const supabase = createClient();
   const { error } = await supabase.from('products').delete().eq('id', id);

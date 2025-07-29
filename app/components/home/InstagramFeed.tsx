@@ -7,12 +7,12 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import Image from 'next/image';
 
 const feedItems = [
-  { img: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80', alt: 'A stylish fabric layout', likes: '1.2k', comments: '45' },
-  { img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80', alt: 'Close-up of a textured fabric', likes: '876', comments: '23' },
-  { img: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80', alt: 'A model wearing a custom outfit', likes: '2.1k', comments: '88' },
-  { img: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80', alt: 'A stack of colorful fabrics', likes: '980', comments: '31' },
-  { img: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=400&q=80', alt: 'Detailed embroidery work', likes: '1.5k', comments: '56' },
-  { img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80', alt: 'A person sewing with our fabric', likes: '750', comments: '19' },
+  { img: 'https://picsum.photos/seed/instaA/400/400', alt: 'A stylish fabric layout', likes: '1.2k', comments: '45' },
+  { img: 'https://picsum.photos/seed/instaB/400/400', alt: 'Close-up of a textured fabric', likes: '876', comments: '23' },
+  { img: 'https://picsum.photos/seed/instaC/400/400', alt: 'A model wearing a custom outfit', likes: '2.1k', comments: '88' },
+  { img: 'https://picsum.photos/seed/instaD/400/400', alt: 'A stack of colorful fabrics', likes: '980', comments: '31' },
+  { img: 'https://picsum.photos/seed/instaE/400/400', alt: 'Detailed embroidery work', likes: '1.5k', comments: '56' },
+  { img: 'https://picsum.photos/seed/instaF/400/400', alt: 'A person sewing with our fabric', likes: '750', comments: '19' },
 ];
 
 const InstagramFeed = () => {

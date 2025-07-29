@@ -20,10 +20,10 @@ interface CategoryContextType {
 const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
 
 const initialCategories: Category[] = [
-  { id: '1', name: 'Apparel', description: 'All types of clothing for men, women, and children.', imageUrl: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=800&q=60', createdAt: new Date().toISOString() },
-  { id: '2', name: 'Accessories', description: 'Belts, scarves, hats, and more.', imageUrl: 'https://images.unsplash.com/photo-1523268755815-fe7c3ba3a574?auto=format&fit=crop&w=800&q=60', createdAt: new Date().toISOString() },
-  { id: '3', name: 'Footwear', description: 'Shoes, sandals, and boots.', imageUrl: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=800&q=60', createdAt: new Date().toISOString() },
-  { id: '4', name: 'Home Goods', description: 'Bedding, towels, and other home textiles.', imageUrl: 'https://images.unsplash.com/photo-1556955112-28cde3817b0a?auto=format&fit=crop&w=800&q=60', createdAt: new Date().toISOString() },
+  { id: '1', name: 'Apparel', description: 'All types of clothing for men, women, and children.', imageUrl: 'https://picsum.photos/seed/catContextA/800/600', createdAt: new Date().toISOString() },
+  { id: '2', name: 'Accessories', description: 'Belts, scarves, hats, and more.', imageUrl: 'https://picsum.photos/seed/catContextB/800/600', createdAt: new Date().toISOString() },
+  { id: '3', name: 'Footwear', description: 'Shoes, sandals, and boots.', imageUrl: 'https://picsum.photos/seed/catContextC/800/600', createdAt: new Date().toISOString() },
+  { id: '4', name: 'Home Goods', description: 'Bedding, towels, and other home textiles.', imageUrl: 'https://picsum.photos/seed/catContextD/800/600', createdAt: new Date().toISOString() },
 ];
 
 export const CategoryProvider = ({ children }: { children: ReactNode }) => {

@@ -4,12 +4,12 @@ import { Box, Container, Grid, Typography } from '@mui/material';
 import Image from 'next/image';
 
 const brands = [
-  { name: 'Nike', src: 'https://images.unsplash.com/photo-1555952494-0408982e3e1b?w=150&h=80&fit=crop' },
-  { name: 'Adidas', src: 'https://images.unsplash.com/photo-1519068916283-e28c74422002?w=150&h=80&fit=crop' },
-  { name: 'Social Media', src: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=150&h=80&fit=crop' },
-  { name: 'Apple', src: 'https://images.unsplash.com/photo-1570751057628-64941a54d20d?w=150&h=80&fit=crop' },
-  { name: 'Instagram', src: 'https://images.unsplash.com/photo-1611262588024-d12430b98920?w=150&h=80&fit=crop' },
-  { name: 'Spotify', src: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=150&h=80&fit=crop' },
+  { name: 'Nike', src: 'https://picsum.photos/seed/brandA/150/80' },
+  { name: 'Adidas', src: 'https://picsum.photos/seed/brandB/150/80' },
+  { name: 'Social Media', src: 'https://picsum.photos/seed/brandC/150/80' },
+  { name: 'Apple', src: 'https://picsum.photos/seed/brandD/150/80' },
+  { name: 'Instagram', src: 'https://picsum.photos/seed/brandE/150/80' },
+  { name: 'Spotify', src: 'https://picsum.photos/seed/brandF/150/80' },
 ];
 
 const FeaturedBrands = () => {

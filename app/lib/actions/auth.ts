@@ -3,6 +3,7 @@
 import { createClient } from '@/app/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { registerFormSchema } from '@/app/lib/schemas';
+import { processReferral } from './loyalty';
 
 import type { z } from 'zod';
 
@@ -40,6 +41,10 @@ export async function registerWithEmailPassword(_prevState: any, values: Registe
     }
 
     if (data.user) {
+        // Process referral code if provided, but don't block registration flow
+        if (validatedFields.data.referralCode) {
+            await processReferral(data.user.id, validatedFields.data.referralCode);
+        }
         redirect('/auth/login?message=Registration successful. Please check your email to verify your account.');
     }
 

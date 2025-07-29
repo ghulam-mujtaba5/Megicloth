@@ -2,20 +2,8 @@
 
 import { useOrders } from '../../context/OrderContext';
 import { Order } from '../../context/OrderContext';
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  List,
-  Divider,
-  Chip,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Grid,
-  Avatar
-} from '@mui/material';
+import { Box, Typography, Card, CardContent, List, Divider, Chip, Accordion, AccordionSummary, AccordionDetails, Grid, Avatar, Button } from '@mui/material';
+import Link from 'next/link';
 import { ShoppingBag, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 
 const getStatusColor = (status: string) => {
@@ -60,13 +48,16 @@ const OrderItem = ({ order }: { order: Order }) => (
                     <Typography variant="subtitle2" color="text.secondary">Total</Typography>
                     <Typography sx={{ fontWeight: 700, color: 'primary.main' }}>Rs. {order.total.toLocaleString()}</Typography>
                 </Grid>
-                <Grid item xs={12} sm={12} md={3} sx={{ textAlign: { md: 'right' } }}>
+                                <Grid item xs={12} sm={12} md={3} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 2, mt: { xs: 1, md: 0 } }}>
                     <Chip
                         label={order.status}
                         color={getStatusColor(order.status) as any}
                         size="small"
                         sx={{ textTransform: 'capitalize', fontWeight: 600 }}
                     />
+                    <Button component={Link} href={`/profile/orders/${order.id}`} variant="outlined" size="small">
+                        View Details
+                    </Button>
                 </Grid>
             </Grid>
         </AccordionSummary>
@@ -77,7 +68,11 @@ const OrderItem = ({ order }: { order: Order }) => (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Avatar src={item.images[0]} alt={item.name} variant="rounded" />
                         <Box>
-                            <Typography sx={{ fontWeight: 500 }}>{item.name}</Typography>
+                                                        <Link href={`/product/${item.slug}`} passHref>
+                              <Typography component="a" sx={{ fontWeight: 500, textDecoration: 'none', color: 'inherit', '&:hover': { textDecoration: 'underline' } }}>
+                                {item.name}
+                              </Typography>
+                            </Link>
                             <Typography variant="body2" color="text.secondary">Qty: {item.quantity}</Typography>
                         </Box>
                     </Box>

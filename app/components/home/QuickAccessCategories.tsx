@@ -11,22 +11,22 @@ const categories = [
   {
     name: 'Cotton',
     href: '/products?category=cotton',
-    imageUrl: 'https://images.unsplash.com/photo-1620799140408-edc6d5f9435a?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://picsum.photos/seed/quickCatA/800/600',
   },
   {
     name: 'Linen',
     href: '/products?category=linen',
-    imageUrl: 'https://images.unsplash.com/photo-1604935583329-639158913a34?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://picsum.photos/seed/quickCatB/800/600',
   },
   {
     name: 'Silk',
     href: '/products?category=silk',
-    imageUrl: 'https://images.unsplash.com/photo-1583209502004-3c888c6a3a9a?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://picsum.photos/seed/quickCatC/800/600',
   },
   {
     name: 'Wool',
     href: '/products?category=wool',
-    imageUrl: 'https://images.unsplash.com/photo-1593121924398-d42a284a4c33?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://picsum.photos/seed/quickCatD/800/600',
   },
 ];
 

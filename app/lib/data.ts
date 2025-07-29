@@ -6,6 +6,10 @@ export async function fetchProducts(
     categories: string[];
     priceRange: [number, number];
     availability: string;
+    colors?: string[];
+    brands?: string[];
+    fabrics?: string[];
+    tags?: string[];
   },
   sortOrder: string
 ): Promise<Product[]> {
@@ -23,6 +27,20 @@ export async function fetchProducts(
     query = query.gt('stock', 0);
   } else if (filters.availability === 'out-of-stock') {
     query = query.eq('stock', 0);
+  }
+
+  // Handle new array-based filters
+  if (filters.colors && filters.colors.length > 0) {
+    query = query.in('color', filters.colors);
+  }
+  if (filters.brands && filters.brands.length > 0) {
+    query = query.in('brand', filters.brands);
+  }
+  if (filters.fabrics && filters.fabrics.length > 0) {
+    query = query.in('fabric', filters.fabrics);
+  }
+  if (filters.tags && filters.tags.length > 0) {
+    query = query.overlaps('tags', filters.tags);
   }
 
   // Apply sorting
