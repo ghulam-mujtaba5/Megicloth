@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
 import type { Product, CartItem } from "../types";
 import { useAuth } from './AuthContext';
-import { supabase } from '../lib/supabaseClient';
+import { createClient } from "@/app/lib/supabase/client";
 
 interface CartContextType {
   cart: CartItem[];
@@ -31,6 +31,7 @@ export function useCart() {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const supabase = createClient();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -149,7 +150,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           if (existing) {
             return prev.map(item => item.id === product.id ? { ...item, quantity: newQuantity } : item);
           } else {
-            return [...prev, { ...product, quantity }];
+            return [...prev, { ...product, quantity: newQuantity }];
           }
         });
       }

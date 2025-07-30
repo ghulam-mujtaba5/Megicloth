@@ -1,36 +1,18 @@
-'use client';
-
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './QuickAccessCategories.module.css';
+import { getCategories } from '@/app/lib/data/products';
 
-const categories = [
-  {
-    name: 'Cotton',
-    href: '/products?category=cotton',
-    imageUrl: 'https://picsum.photos/seed/quickCatA/800/600',
-  },
-  {
-    name: 'Linen',
-    href: '/products?category=linen',
-    imageUrl: 'https://picsum.photos/seed/quickCatB/800/600',
-  },
-  {
-    name: 'Silk',
-    href: '/products?category=silk',
-    imageUrl: 'https://picsum.photos/seed/quickCatC/800/600',
-  },
-  {
-    name: 'Wool',
-    href: '/products?category=wool',
-    imageUrl: 'https://picsum.photos/seed/quickCatD/800/600',
-  },
-];
+const QuickAccessCategories = async () => {
+  const categories = await getCategories();
 
-const QuickAccessCategories = () => {
+  if (!categories || categories.length === 0) {
+    return null; // Don't render the section if there are no categories
+  }
+
   return (
     <section className={styles.section}>
       <Container maxWidth="lg">
@@ -40,10 +22,10 @@ const QuickAccessCategories = () => {
         <Grid container spacing={4}>
           {categories.map((category) => (
             <Grid item xs={12} sm={6} md={3} key={category.name}>
-              <Link href={category.href} passHref className={styles.cardLink}>
+              <Link href={`/products?category=${category.slug}`} passHref className={styles.cardLink}>
                 <div className={styles.card}>
                   <Image
-                    src={category.imageUrl}
+                    src={category.imageUrl || 'https://picsum.photos/seed/placeholder/800/600'}
                     alt={category.name}
                     width={400}
                     height={350}

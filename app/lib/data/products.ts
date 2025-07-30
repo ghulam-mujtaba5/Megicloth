@@ -1,5 +1,6 @@
 import { createClient } from '@/app/lib/supabase/server';
 import { type Product } from '@/app/types';
+import { ProductSchema } from "@/app/lib/schemas";
 
 export async function getProducts({
   query: searchQuery = '',
@@ -69,21 +70,28 @@ export async function getProductById(id: string) {
         return null;
     }
 
-    return data as Product;
+    const validation = ProductSchema.safeParse(data);
+
+    if (!validation.success) {
+        console.error(`Product data validation failed for ID: ${id}`, validation.error.flatten());
+        return null;
+    }
+
+    return validation.data;
 }
 
 export async function getCategories() {
     const supabase = createClient();
     const { data, error } = await supabase
         .from('categories')
-        .select('name');
+        .select('name, slug, imageUrl');
 
     if (error) {
         console.error('Error fetching categories:', error);
         return [];
     }
 
-    return data.map(c => c.name);
+    return data;
 }
 
 export async function getRelatedProducts(category: string, currentProductId: string) {

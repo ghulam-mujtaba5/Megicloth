@@ -71,11 +71,8 @@ export async function deleteOrder(orderId: string) {
 export async function createOrder(_prevState: any, values: z.infer<typeof OrderSchema>) {
   const supabase = createClient();
   const { cart, total, shipping, paymentMethod, orderNotes } = values;
-  const { data: { session } } = await supabase.auth.getSession();
-  let userId: string | null = null;
-  if (session) {
-    userId = session.user.id;
-  }
+  const { data: { user } } = await supabase.auth.getUser();
+  const userId = user?.id ?? null;
   // For guests, require name and email
   if (!userId && (!shipping.email || !shipping.name)) {
     return { error: 'Email and name are required for guest checkout.' };

@@ -1,11 +1,11 @@
 .section {
   padding: var(--space-8) 0;
-  background-color: var(--neutral-50);
+  background-color: var(--neutral-white);
 }
 
 .title {
   text-align: center;
-  margin-bottom: var(--space-6) !important; /* Overriding MUI default */
+  margin-bottom: var(--space-6) !important;
   font-family: var(--font-poppins) !important;
   font-weight: 700 !important;
   color: var(--neutral-800);
@@ -16,44 +16,61 @@
   display: block;
   border-radius: var(--rounded-lg);
   overflow: hidden;
-  transition: transform 0.3s var(--transition-ease), box-shadow 0.3s var(--transition-ease);
+  transition: transform 0.35s var(--transition-ease), box-shadow 0.35s var(--transition-ease);
 }
 
 .cardLink:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-xl);
 }
 
 .card {
   position: relative;
-  border: none !important; /* Override MUI default */
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--rounded-lg);
 }
 
 .cardImage {
   width: 100%;
   height: 350px;
   object-fit: cover;
-  transition: transform 0.4s var(--transition-ease);
+  transition: transform 0.4s var(--transition-ease), filter 0.4s var(--transition-ease);
 }
 
 .cardLink:hover .cardImage {
-  transform: scale(1.1);
+  transform: scale(1.05);
+  filter: brightness(0.8);
 }
 
 .overlay {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
-  color: var(--neutral-white);
-  padding: var(--space-4);
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
+  opacity: 0;
+  transition: opacity 0.4s var(--transition-ease);
   z-index: 1;
-  pointer-events: none;
+}
+
+.cardLink:hover .overlay {
+  opacity: 1;
 }
 
 .categoryName {
   font-weight: 700 !important;
   color: var(--neutral-white) !important;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+  transform: translateY(10px);
+  opacity: 0;
+  transition: transform 0.4s var(--transition-ease), opacity 0.4s var(--transition-ease);
+}
+
+.cardLink:hover .categoryName {
+  transform: translateY(0);
+  opacity: 1;
 }

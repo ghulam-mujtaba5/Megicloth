@@ -31,7 +31,7 @@ export default async function ProductsPage({
 
     return (
       <Suspense fallback={<div>Loading...</div>}>
-        <ProductsClient initialProducts={products} categories={['All', ...categories]} />
+        <ProductsClient initialProducts={products} categories={['All', ...categories.map(cat => cat.name)]} />
       </Suspense>
     );
   } catch (error) {

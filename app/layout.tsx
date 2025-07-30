@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Poppins } from 'next/font/google';
 import ClientLayout from "./ClientLayout";
-import { AppProviders } from './providers';
+import AppProviders from './components/AppProviders';
 
 
 const inter = Inter({
