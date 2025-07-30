@@ -103,6 +103,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setUser(null);
       }
+      // Refresh the router to ensure all components have the latest auth state
+      router.refresh();
     });
 
     return () => {
