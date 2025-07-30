@@ -34,8 +34,8 @@ const UserSchemaBase = z.object({
 const ProductSchemaBase = z.object({
     id: z.string(),
     name: z.string(),
-    slug: z.string().optional().nullable(),
-    description: z.string().optional().nullable(),
+    slug: z.string(),
+    description: z.string(),
     price: z.number(),
     salePrice: z.number().optional().nullable(),
     category: z.string(),

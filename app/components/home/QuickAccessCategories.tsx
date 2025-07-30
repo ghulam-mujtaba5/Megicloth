@@ -25,7 +25,7 @@ const QuickAccessCategories = async () => {
               <Link href={`/products?category=${category.slug}`} passHref className={styles.cardLink}>
                 <div className={styles.card}>
                   <Image
-                    src={category.imageUrl || 'https://picsum.photos/seed/placeholder/800/600'}
+                    src={category.imageurl || 'https://picsum.photos/seed/placeholder/800/600'}
                     alt={category.name}
                     width={400}
                     height={350}

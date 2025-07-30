@@ -23,25 +23,29 @@ export async function generateMetadata(
 
   const previousImages = (await parent).openGraph?.images || [];
 
+  // Ensure we have a valid description and images array
+  const description = product.description || 'Check out this product on Megicloth';
+  const images = product.images || [];
+  
   return {
     title: `${product.name} | Megicloth`,
-    description: product.description,
+    description: description,
     alternates: {
       canonical: `/products/${product.id}`,
     },
     openGraph: {
       title: product.name,
-      description: product.description,
+      description: description,
       url: `/products/${product.id}`,
       siteName: 'Megicloth',
       images: [
-        {
-          url: product.images[0],
+        ...(images[0] ? [{
+          url: images[0],
           width: 800,
           height: 600,
           alt: product.name,
-        },
-        ...product.images.slice(1, 4).map(img => ({
+        }] : []),
+        ...images.slice(1, 4).map(img => ({
           url: img,
           width: 800,
           height: 600,
@@ -68,7 +72,10 @@ export default async function ProductDetailPage({ params }: Props) {
   
   let relatedProducts: Product[] = [];
   try {
-    relatedProducts = await getRelatedProducts(product.category, product.id);
+    // Ensure we have a valid category before trying to fetch related products
+    if (product.category) {
+      relatedProducts = await getRelatedProducts(product.category, product.id);
+    }
   } catch (error) {
     console.error('Error loading related products:', error);
     relatedProducts = [];
