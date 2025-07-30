@@ -6,6 +6,7 @@ import { ThemeProvider as MuiThemeProvider, createTheme } from "@mui/material/st
 import { Box } from '@mui/material';
 import CssBaseline from "@mui/material/CssBaseline";
 import { ReactNode, useMemo } from "react";
+import { useAuth } from './context/AuthContext';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import { Toaster } from 'react-hot-toast';
@@ -242,15 +243,18 @@ interface ClientLayoutProps {
 export default function ClientLayout({ children }: ClientLayoutProps) {
   const theme = useMemo(() => createAppTheme(), []);
   const emotionCache = useMemo(() => createEmotionCache(), []);
+  const { user } = useAuth();
 
   return (
     <MuiThemeProvider theme={theme}>
       <CacheProvider value={emotionCache}>
         <CssBaseline />
-        <Header />
-        <Box component="main" sx={{ minHeight: '70vh' }}>{children}</Box>
-        <Footer />
         <Toaster position="top-center" toastOptions={{ duration: 3500 }} />
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <Header key={user ? user.id : 'logged-out'} />
+          <Box component="main" sx={{ flexGrow: 1, minHeight: '70vh' }}>{children}</Box>
+          <Footer />
+        </Box>
       </CacheProvider>
     </MuiThemeProvider>
   );

@@ -28,6 +28,7 @@ const loginSchema = z.object({
 });
 
 export async function loginWithEmailPassword(_prevState: any, formData: FormData) {
+  console.log("\n--- [Action] loginWithEmailPassword ---");
   const supabase = createClient();
 
   const validatedFields = loginSchema.safeParse(
@@ -35,11 +36,13 @@ export async function loginWithEmailPassword(_prevState: any, formData: FormData
   );
 
   if (!validatedFields.success) {
+    console.error("[Action] Validation failed:", validatedFields.error.flatten().fieldErrors);
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Invalid form data. Please check your entries.',
     };
   }
+  console.log("[Action] Validation successful for:", validatedFields.data.email);
 
   const { email, password } = validatedFields.data;
 
@@ -49,14 +52,16 @@ export async function loginWithEmailPassword(_prevState: any, formData: FormData
   });
 
   if (error) {
+    console.error("[Action] Supabase sign-in error:", error.message);
     return {
       errors: { _form: [error.message] },
       message: error.message,
     };
   }
 
-  revalidatePath('/', 'layout');
-  redirect('/');
+  console.log("[Action] Supabase sign-in successful. Returning success state.");
+  revalidatePath('/', 'layout'); // Keep revalidation for server components
+  return { success: true };
 }
 
 export async function loginWithGoogle() {

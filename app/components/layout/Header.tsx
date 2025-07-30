@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
-
 import { useState, useEffect, useCallback } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -18,18 +17,12 @@ import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Badge from "@mui/material/Badge";
-// ...existing imports...
-// ...existing imports...
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CloseIcon from "@mui/icons-material/Close";
-
 import Button from "@mui/material/Button";
-
-// ...existing imports...
 import SearchIcon from "@mui/icons-material/Search";
 import PersonIcon from "@mui/icons-material/Person";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-// ...existing imports...
 import Tooltip from "@mui/material/Tooltip";
 import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
@@ -39,7 +32,6 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-
 import { alpha } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -55,11 +47,12 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { wishlist } = useWishlist();
 
+  console.log("\n--- [Header] Rendering ---");
+  console.log("[Header] Auth context state:", { user, isAuthenticated });
+
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  // ...existing code...
   const wishlistCount = wishlist.length;
   
-  // ...existing code...
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -70,14 +63,12 @@ export default function Header() {
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-  // Mobile drawer search state
   const [mobileSearch, setMobileSearch] = useState("");
   const [mobileSearchResults, setMobileSearchResults] = useState<typeof products>([]);
   const [mobileSearchFocused, setMobileSearchFocused] = useState(false);
   const [mobileHighlightedIndex, setMobileHighlightedIndex] = useState(-1);
   const [mobileRecentSearches, setMobileRecentSearches] = useState<string[]>([]);
 
-  // Load recent searches from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
@@ -85,7 +76,6 @@ export default function Header() {
     }
   }, []);
 
-  // Load recent searches for mobile
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
@@ -93,7 +83,6 @@ export default function Header() {
     }
   }, [drawerOpen]);
 
-  // Save recent search
   const saveRecentSearch = (term: string) => {
     if (!term.trim()) return;
     const updated = [term, ...recentSearches.filter(s => s !== term)].slice(0, 6);
@@ -103,7 +92,6 @@ export default function Header() {
     }
   };
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -112,7 +100,6 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Live search logic
   useEffect(() => {
     if (search.trim().length > 0) {
       const results = products.filter(p =>
@@ -127,7 +114,6 @@ export default function Header() {
     }
   }, [search]);
 
-  // Live search for mobile
   useEffect(() => {
     if (mobileSearch.trim().length > 0) {
       const results = products.filter(p =>
@@ -142,7 +128,6 @@ export default function Header() {
     }
   }, [mobileSearch]);
 
-  // Keyboard navigation for search
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!searchResults.length && !recentSearches.length) return;
     if (e.key === 'ArrowDown') {
@@ -167,7 +152,6 @@ export default function Header() {
     }
   };
 
-  // Keyboard navigation for mobile search
   const handleMobileSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!mobileSearchResults.length && !mobileRecentSearches.length) return;
     if (e.key === 'ArrowDown') {
@@ -226,7 +210,6 @@ export default function Header() {
     }).format(price);
   };
 
-  // Glassmorphism style for AppBar
   const glassAppBarSx = {
     background: 'rgba(255,255,255,0.75)',
     boxShadow: scrolled ? '0 4px 24px 0 rgba(31, 38, 135, 0.10)' : 'none',
@@ -236,7 +219,6 @@ export default function Header() {
     transition: 'box-shadow 0.3s',
   };
 
-  // Stylized brand name
   const brandName = (
     <Typography
       variant="h4"
@@ -260,7 +242,6 @@ export default function Header() {
     </Typography>
   );
 
-  // Nav links (desktop)
   const navLinksDesktop = (
     <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 3, alignItems: 'center', ml: 4 }}>
       {navLinks.map((link) => (
@@ -290,7 +271,6 @@ export default function Header() {
     </Box>
   );
 
-  // Search bar (desktop)
   const searchBarDesktop = (
     <Box sx={{ flex: 1, maxWidth: 600, ml: 4, display: { xs: 'none', md: 'flex' } }} ref={setSearchAnchorEl}>
       <TextField
@@ -375,7 +355,6 @@ export default function Header() {
     </Box>
   );
 
-  // Cart, wishlist, profile icons (desktop)
   const actionsDesktop = (
     <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2, ml: 4 }}>
       <Tooltip title="Wishlist">
@@ -392,6 +371,7 @@ export default function Header() {
           </Badge>
         </IconButton>
       </Tooltip>
+
       {isAuthenticated ? (
         <>
           <Tooltip title="Account">
@@ -404,7 +384,7 @@ export default function Header() {
               sx={{ color: '#1e293b', ml: 1 }}
             >
               <Avatar sx={{ width: 32, height: 32, bgcolor: '#2563eb', fontWeight: 700 }}>
-                {user?.firstName ? user.firstName[0] : <PersonIcon />}
+                {user?.firstName ? user.firstName[0].toUpperCase() : <PersonIcon />}
               </Avatar>
             </IconButton>
           </Tooltip>
@@ -416,38 +396,45 @@ export default function Header() {
             MenuListProps={{
               'aria-labelledby': 'user-menu-button',
             }}
+            sx={{ '& .MuiPaper-root': { borderRadius: 2, boxShadow: '0 8px 32px 0 rgba(31,38,135,0.10)' } }}
           >
             <MenuItem component={Link} href="/profile" onClick={handleUserMenuClose}>
-              <AccountCircleIcon sx={{ mr: 1 }} /> My Profile
+              <AccountCircleIcon sx={{ mr: 1.5 }} /> My Profile
             </MenuItem>
             <MenuItem component={Link} href="/profile?tab=orders" onClick={handleUserMenuClose}>
-              <ShoppingBagIcon sx={{ mr: 1 }} /> My Orders
+              <ShoppingBagIcon sx={{ mr: 1.5 }} /> My Orders
             </MenuItem>
             <MenuItem component={Link} href="/profile?tab=settings" onClick={handleUserMenuClose}>
-              <SettingsIcon sx={{ mr: 1 }} /> Account Settings
+              <SettingsIcon sx={{ mr: 1.5 }} /> Account Settings
             </MenuItem>
-            <Divider />
+            <Divider sx={{ my: 1 }} />
             <MenuItem onClick={handleLogout} sx={{ color: '#ef4444' }}>
-              <LogoutIcon sx={{ mr: 1 }} /> Logout
+              <LogoutIcon sx={{ mr: 1.5 }} /> Logout
             </MenuItem>
           </Menu>
         </>
       ) : (
-        <Tooltip title="Login">
-          <IconButton
-            component={Link}
-            href={'/auth/login'}
-            aria-label="Login"
-            sx={{ color: '#1e293b', ml: 1 }}
-          >
-            <PersonIcon />
-          </IconButton>
-        </Tooltip>
+        <Button
+          component={Link}
+          href="/auth/login"
+          variant="contained"
+          startIcon={<PersonIcon />}
+          sx={{
+            boxShadow: 'none',
+            bgcolor: 'primary.main',
+            color: 'white',
+            '&:hover': {
+              bgcolor: 'primary.dark',
+              boxShadow: '0 2px 8px rgba(37,99,235,0.4)',
+            },
+          }}
+        >
+          Login
+        </Button>
       )}
     </Box>
   );
 
-  // Mobile drawer toggle
   const mobileMenuButton = (
     <IconButton
       edge="start"
@@ -460,8 +447,6 @@ export default function Header() {
     </IconButton>
   );
 
-  // ...existing code...
-
   return (
     <AppBar position="sticky" elevation={0} sx={glassAppBarSx}>
       <Toolbar sx={{ minHeight: { xs: 64, md: 80 }, px: { xs: 2, md: 6 }, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -471,7 +456,6 @@ export default function Header() {
         {actionsDesktop}
         {mobileMenuButton}
       </Toolbar>
-      {/* Mobile Drawer */}
       <Drawer
         anchor="left"
         open={drawerOpen}
@@ -490,7 +474,6 @@ export default function Header() {
               Megicloth
             </Typography>
           </Box>
-          {/* Mobile search bar */}
           <TextField
             size="small"
             placeholder="Search products..."
@@ -513,7 +496,6 @@ export default function Header() {
             }}
             autoComplete="off"
           />
-          {/* Mobile search results dropdown */}
           {mobileSearchFocused && (mobileSearchResults.length > 0 || mobileRecentSearches.length > 0) && (
             <Paper elevation={3} sx={{ mt: 0.5, mb: 2, borderRadius: 2, boxShadow: '0 8px 32px 0 rgba(31,38,135,0.10)' }}>
               <List dense id="mobile-search-autocomplete-list" role="listbox">
@@ -548,7 +530,6 @@ export default function Header() {
               </List>
             </Paper>
           )}
-          {/* Navigation links */}
           <List aria-label="Main navigation" sx={{ flex: 1 }}>
             {navLinks.map((link) => (
               <ListItem key={link.href} disablePadding>
@@ -558,7 +539,6 @@ export default function Header() {
               </ListItem>
             ))}
           </List>
-          {/* ... existing drawer content ... */}
         </Box>
       </Drawer>
     </AppBar>

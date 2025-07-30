@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext';
 import { useFormState } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,6 +19,7 @@ import {
   IconButton,
   InputAdornment,
   Alert,
+  CircularProgress,
 } from '@mui/material';
 import {
   Visibility,
@@ -39,8 +42,14 @@ const loginSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const { user, isLoading, revalidateUser } = useAuth();
+  const router = useRouter();
   const [state, formAction] = useFormState(loginWithEmailPassword, null);
   const [showPassword, setShowPassword] = useState(false);
+
+  console.log("\n--- [LoginPage] Rendering ---");
+  console.log("[LoginPage] Auth context state:", { user, isLoading });
+  console.log("[LoginPage] Server action form state:", state);
 
   const formErrors = state?.errors && '_form' in state.errors ? state.errors._form : undefined;
   const emailErrors = state?.errors && 'email' in state.errors ? state.errors.email : undefined;
@@ -58,13 +67,37 @@ export default function LoginPage() {
     },
   });
 
+  
+
+
+
+  // Redirect already authenticated users to profile page
   useEffect(() => {
-    if (state?.message && state.errors) {
+    if (user && !isLoading) {
+      window.location.href = '/profile';
+    }
+  }, [user, isLoading]);
+
+  useEffect(() => {
+    if (state?.success) {
+      const performRedirect = async () => {
+        try {
+          console.log("[LoginPage] Login successful! Revalidating user session...");
+          toast.success('Logged in successfully! Redirecting...');
+          await revalidateUser();
+          console.log("[LoginPage] Session revalidated. Reloading the page to update auth state.");
+          window.location.href = '/';
+        } catch (error) {
+          console.error("[LoginPage] Error during post-login redirect:", error);
+          toast.error("An error occurred after login. Please try again.");
+        }
+      };
+      performRedirect();
+    } else if (state?.message && state.errors) {
+      console.error("[LoginPage] Form error detected:", state.message);
       toast.error(state.message);
     }
-  }, [state]);
-
-  
+  }, [state, router, revalidateUser]);
 
   const glassCardSx = {
     borderRadius: 4,
@@ -102,6 +135,15 @@ export default function LoginPage() {
       boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
     },
   };
+
+  // Show a loading spinner while checking auth status to prevent flashing the login form
+  if (isLoading || user) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+        <CircularProgress sx={{ color: 'white' }} />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -157,7 +199,6 @@ export default function LoginPage() {
                 label="Email Address"
                 type="email"
                 {...register('email')}
-                error={!!emailErrors || !!errors.email}
                 helperText={emailErrors?.[0] || errors.email?.message}
                 InputProps={{
                   startAdornment: (

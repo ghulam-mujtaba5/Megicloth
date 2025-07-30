@@ -19,6 +19,7 @@ interface AuthContextType {
   addToWishlist: (product: Product) => Promise<{ success: boolean; error?: string; }>;
   removeFromWishlist: (productId: string) => Promise<{ success: boolean; error?: string; }>;
   changePassword: (password: string) => Promise<{ success: boolean; error?: string; }>;
+  revalidateUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,6 +35,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
+
+  console.log("\n--- [AuthProvider] Mounting ---");
 
   const fetchFullUserProfile = useCallback(async (supabaseUser: SupabaseUser): Promise<AppUser | null> => {
     try {
@@ -83,34 +86,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   useEffect(() => {
+    console.log("[AuthProvider] useEffect running to get session and set up listener.");
+
     const getSession = async () => {
+      console.log("[AuthProvider] getSession: Fetching initial session...");
       const { data: { session } } = await supabase.auth.getSession();
+      console.log("[AuthProvider] getSession: Initial session object:", session);
+
       if (session?.user) {
+        console.log("[AuthProvider] getSession: User found in session. Fetching full profile.");
         const fullUser = await fetchFullUserProfile(session.user);
+        console.log("[AuthProvider] getSession: Setting user:", fullUser);
         setUser(fullUser);
       } else {
+        console.log("[AuthProvider] getSession: No user in session. Setting user to null.");
         setUser(null);
       }
-      setIsLoading(false); // This should be called regardless of session status
+      setIsLoading(false);
+      console.log("[AuthProvider] getSession: Finished. isLoading set to false.");
     };
 
     getSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: AuthChangeEvent, session: Session | null) => {
+      console.log(`\n--- [AuthProvider] onAuthStateChange event: ${_event} ---`);
+      console.log("[AuthProvider] onAuthStateChange: Session object:", session);
+
       if (session?.user) {
+        console.log("[AuthProvider] onAuthStateChange: User found. Fetching full profile.");
         const fullUser = await fetchFullUserProfile(session.user);
+        console.log("[AuthProvider] onAuthStateChange: Setting user:", fullUser);
         setUser(fullUser);
       } else {
+        console.log("[AuthProvider] onAuthStateChange: No user. Setting user to null.");
         setUser(null);
       }
-      // Refresh the router to ensure all components have the latest auth state
-      router.refresh();
+      setIsLoading(false);
+      console.log("[AuthProvider] onAuthStateChange: Finished. isLoading set to false.");
     });
 
     return () => {
-      subscription?.unsubscribe();
+      console.log("[AuthProvider] Unsubscribing from onAuthStateChange.");
+      subscription.unsubscribe();
     };
-  }, [fetchFullUserProfile, supabase]);
+  }, [fetchFullUserProfile, supabase.auth]);
 
   const logout = async () => {
     await supabase.auth.signOut();
@@ -126,7 +145,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data.lastName !== undefined) updateData.last_name = data.lastName;
     if (data.phone !== undefined) updateData.phone = data.phone;
     if (data.avatarUrl !== undefined) updateData.avatar_url = data.avatarUrl;
-    // Address updates should be handled by their own functions for clarity
     if (data.preferences !== undefined) updateData.preferences = data.preferences;
 
     const { error } = await supabase.from('profiles').update(updateData).eq('id', user.id);
@@ -197,7 +215,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const addToWishlist = async (product: Product) => {
     if (!user) return { success: false, error: 'Not authenticated' };
-    if (user.wishlist?.includes(product.id)) return { success: true }; // Already in wishlist
+    if (user.wishlist?.includes(product.id)) return { success: true };
 
     const { error } = await supabase.from('wishlist').insert([{ user_id: user.id, product_id: product.id }]);
     if (error) return { success: false, error: error.message };
@@ -231,6 +249,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true };
   };
 
+  const revalidateUser = async () => {
+    console.log("[AuthProvider] revalidateUser: Forcing session refresh.");
+    await supabase.auth.getSession();
+  };
+
   const value: AuthContextType = {
     user,
     isLoading,
@@ -244,7 +267,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     addToWishlist,
     removeFromWishlist,
     changePassword,
+    revalidateUser,
   };
+
+  console.log("[AuthProvider] Providing value:", { user: value.user, isLoading: value.isLoading, isAuthenticated: value.isAuthenticated });
 
   return (
     <AuthContext.Provider value={value}>
