@@ -37,7 +37,7 @@ const ProductSchemaBase = z.object({
     slug: z.string(),
     description: z.string(),
     price: z.number(),
-    salePrice: z.number().optional().nullable(),
+    salePrice: z.number().optional(),
     category: z.string(),
     stock: z.number(),
     images: z.array(z.string().url()).optional().nullable(),
