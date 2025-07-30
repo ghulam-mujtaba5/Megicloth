@@ -51,8 +51,29 @@ export async function getProducts({
     throw new Error('Could not fetch products.');
   }
 
-  // Validate each product and filter out any that don't match the schema
-  const validatedProducts = data.map(p => ProductSchema.safeParse(p)).filter(p => p.success).map(p => (p as { success: true; data: Product }).data);
+  // Map snake_case to camelCase and provide default values for missing fields
+  const mapProduct = (p: any) => ({
+    ...p,
+    salePrice: p.sale_price ?? undefined,
+    isPublished: p.is_published ?? undefined,
+    isNew: p.is_new ?? undefined,
+    onSale: p.on_sale ?? undefined,
+    hasVariants: p.has_variants ?? undefined,
+    reviewsCount: p.reviews_count ?? undefined,
+    createdAt: p.created_at ?? p.createdAt ?? '',
+    updatedAt: p.updated_at ?? p.updatedAt ?? undefined,
+    stitchingCost: p.stitching_cost ?? undefined,
+    stitchingAvailable: p.stitching_available ?? undefined,
+    fabric: p.fabric_type ?? p.fabric ?? undefined,
+    slug: p.slug ?? '', // Default to empty string if not present
+    brand: p.brand ?? '', // Default to empty string if not present
+  });
+
+  const validatedProducts = data
+    .map(mapProduct)
+    .map(p => ProductSchema.safeParse(p))
+    .filter(p => p.success)
+    .map(p => (p as { success: true; data: Product }).data);
 
   return validatedProducts;
 }
@@ -75,7 +96,26 @@ export async function getProductById(id: string) {
 
     console.log('Raw product data from Supabase:', JSON.stringify(data, null, 2));
 
-    const validation = ProductSchema.safeParse(data);
+    // Map snake_case to camelCase and provide default values for missing fields
+    const mapProduct = (p: any) => ({
+        ...p,
+        salePrice: p.sale_price ?? undefined,
+        isPublished: p.is_published ?? undefined,
+        isNew: p.is_new ?? undefined,
+        onSale: p.on_sale ?? undefined,
+        hasVariants: p.has_variants ?? undefined,
+        reviewsCount: p.reviews_count ?? undefined,
+        createdAt: p.created_at ?? p.createdAt ?? '',
+        updatedAt: p.updated_at ?? p.updatedAt ?? undefined,
+        stitchingCost: p.stitching_cost ?? undefined,
+        stitchingAvailable: p.stitching_available ?? undefined,
+        fabric: p.fabric_type ?? p.fabric ?? undefined,
+        slug: p.slug ?? '', // Default to empty string if not present
+        brand: p.brand ?? '', // Default to empty string if not present
+    });
+
+    const mappedData = mapProduct(data);
+    const validation = ProductSchema.safeParse(mappedData);
 
     if (!validation.success) {
         console.error(`Product data validation failed for ID: ${id}`, validation.error.flatten());
