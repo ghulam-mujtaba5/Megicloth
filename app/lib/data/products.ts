@@ -16,7 +16,7 @@ export async function getProducts({
   sort?: string;
 }) {
   const supabase = createClient();
-  let queryBuilder = supabase.from('products').select('*');
+  let queryBuilder = supabase.from('products').select('*, reviews (*)');
 
   // Search filter
   if (searchQuery) {
@@ -51,7 +51,10 @@ export async function getProducts({
     throw new Error('Could not fetch products.');
   }
 
-  return data as Product[];
+  // Validate each product and filter out any that don't match the schema
+  const validatedProducts = data.map(p => ProductSchema.safeParse(p)).filter(p => p.success).map(p => (p as { success: true; data: Product }).data);
+
+  return validatedProducts;
 }
 
 export async function getProductById(id: string) {
@@ -70,6 +73,8 @@ export async function getProductById(id: string) {
         return null;
     }
 
+    console.log('Raw product data from Supabase:', JSON.stringify(data, null, 2));
+
     const validation = ProductSchema.safeParse(data);
 
     if (!validation.success) {
@@ -84,7 +89,7 @@ export async function getCategories() {
     const supabase = createClient();
     const { data, error } = await supabase
         .from('categories')
-        .select('name, slug, imageUrl');
+        .select('name, slug, imageurl');
 
     if (error) {
         console.error('Error fetching categories:', error);
@@ -98,7 +103,7 @@ export async function getRelatedProducts(category: string, currentProductId: str
     const supabase = createClient();
     const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select('*, reviews (*)')
         .eq('category', category)
         .neq('id', currentProductId)
         .limit(4);
