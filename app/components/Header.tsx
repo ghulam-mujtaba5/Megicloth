@@ -363,8 +363,8 @@ export default function Header() {
               ))
             ) : (
               recentSearches.map((term, idx) => (
-                <ListItem key={term} disablePadding selected={highlightedIndex === idx} role="option" aria-selected={highlightedIndex === idx}>
-                  <ListItemButton onClick={() => { setSearch(term); setSearchFocused(false); }}>
+                <ListItem key={term} component="li" disablePadding>
+                  <ListItemButton component="div" selected={highlightedIndex === idx} role="option" aria-selected={highlightedIndex === idx}>
                     <ListItemText primary={term} primaryTypographyProps={{ fontWeight: 700, color: '#2563eb' }} />
                   </ListItemButton>
                 </ListItem>

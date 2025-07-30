@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import styles from './AdminLogin.module.css';
 
 const ADMIN_USERNAME = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123';
@@ -14,7 +15,6 @@ export default function AdminLoginPage() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      // Set a simple session in localStorage (not secure, for demo only)
       localStorage.setItem('admin_logged_in', 'true');
       router.push('/admin/dashboard');
     } else {
@@ -23,19 +23,41 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <form onSubmit={handleSubmit} style={{ padding: 32, border: '1px solid #ccc', borderRadius: 8, background: '#fff', minWidth: 320 }}>
+    <div className={styles.container}>
+      <form onSubmit={handleSubmit} className={styles.form} aria-label="Admin Login Form">
         <h2>Admin Login</h2>
-        <div style={{ marginBottom: 16 }}>
-          <label>Username</label>
-          <input type="text" value={username} onChange={e => setUsername(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 4 }} />
+        <div>
+          <label htmlFor="admin-username" className={styles.label}>Username</label>
+          <input
+            id="admin-username"
+            name="username"
+            type="text"
+            className={styles.input}
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            title="Admin username"
+            placeholder="Enter admin username"
+            autoComplete="username"
+            required
+          />
         </div>
-        <div style={{ marginBottom: 16 }}>
-          <label>Password</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 4 }} />
+        <div>
+          <label htmlFor="admin-password" className={styles.label}>Password</label>
+          <input
+            id="admin-password"
+            name="password"
+            type="password"
+            className={styles.input}
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            title="Admin password"
+            placeholder="Enter admin password"
+            autoComplete="current-password"
+            required
+          />
         </div>
-        {error && <div style={{ color: 'red', marginBottom: 12 }}>{error}</div>}
-        <button type="submit" style={{ width: '100%', padding: 10, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, fontWeight: 700 }}>Login</button>
+        {error && <div className={styles.error} role="alert">{error}</div>}
+        <button type="submit" className={styles.button}>Login</button>
       </form>
     </div>
   );

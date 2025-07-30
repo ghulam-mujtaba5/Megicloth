@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+
 import { useRouter } from 'next/navigation';
-import { Box, CircularProgress, Container, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, AppBar, CssBaseline } from '@mui/material';
+import { Box, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, AppBar, CssBaseline } from '@mui/material';
 import { CategoryProvider } from '../context/CategoryContext';
 import { DiscountProvider } from '../context/DiscountContext';
 import { BlogProvider } from '../context/BlogContext';
