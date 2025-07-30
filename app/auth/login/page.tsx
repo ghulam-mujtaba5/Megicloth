@@ -72,27 +72,28 @@ export default function LoginPage() {
 
 
   // Redirect already authenticated users to profile page
+  // Redirect already authenticated users to profile page
   useEffect(() => {
+    console.log(`[LoginPage] Auth-check effect fired. User: ${!!user}, isLoading: ${isLoading}`);
     if (user && !isLoading) {
+      console.log('[LoginPage] User is already authenticated. Redirecting to /profile...');
       window.location.href = '/profile';
     }
   }, [user, isLoading]);
 
   useEffect(() => {
     if (state?.success) {
-      const performRedirect = async () => {
-        try {
-          console.log("[LoginPage] Login successful! Revalidating user session...");
-          toast.success('Logged in successfully! Redirecting...');
-          await revalidateUser();
-          console.log("[LoginPage] Session revalidated. Reloading the page to update auth state.");
-          window.location.href = '/';
-        } catch (error) {
-          console.error("[LoginPage] Error during post-login redirect:", error);
-          toast.error("An error occurred after login. Please try again.");
-        }
-      };
-      performRedirect();
+      console.log("[LoginPage] Login successful! Redirecting...");
+      toast.success('Logged in successfully! Redirecting...');
+      
+      // Non-blocking call to update the context while the page reloads.
+      revalidateUser().catch(err => console.error("Background user revalidation failed:", err));
+      
+      // Use a timeout to ensure the toast is visible before redirecting
+      setTimeout(() => {
+        console.log('[LoginPage] Timeout finished. Executing redirect to /profile.');
+        window.location.href = '/profile';
+      }, 500); // 500ms delay
     } else if (state?.message && state.errors) {
       console.error("[LoginPage] Form error detected:", state.message);
       toast.error(state.message);

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useAuth } from '../../context/AuthContext';
+
 import { Box, Tabs, Tab, Typography, Container } from '@mui/material';
 import { Person, ShoppingBag, Favorite, LocationOn, Settings as SettingsIcon } from '@mui/icons-material';
 
@@ -12,6 +12,7 @@ import OrderHistory from './OrderHistory';
 import AddressManager from './AddressManager';
 import Wishlist from './Wishlist';
 import Settings from './Settings';
+import withAuth from '../auth/withAuth';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -46,29 +47,23 @@ const glassCardSx = {
   p: { xs: 2, md: 4 },
 };
 
-export default function ProfileClientPage() {
-  const { user, isLoading } = useAuth();
+const ProfileClientPage = () => {
   const searchParams = useSearchParams();
   const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab === 'orders') {
-      setTabValue(1);
+    const tabMap: { [key: string]: number } = {
+      'profile': 0,
+      'orders': 1,
+      'addresses': 2,
+      'wishlist': 3,
+      'settings': 4,
+    };
+    if (tab && tab in tabMap) {
+      setTabValue(tabMap[tab]);
     }
   }, [searchParams]);
-
-  if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-        <Typography>Loading...</Typography>
-      </Box>
-    );
-  }
-
-  if (!user) {
-    return null; // Or a redirect, handled by the parent page's useEffect
-  }
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -141,3 +136,5 @@ export default function ProfileClientPage() {
     </Box>
   );
 }
+
+export default withAuth(ProfileClientPage);

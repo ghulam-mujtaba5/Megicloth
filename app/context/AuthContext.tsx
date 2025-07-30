@@ -32,6 +32,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
@@ -40,26 +41,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchFullUserProfile = useCallback(async (supabaseUser: SupabaseUser): Promise<AppUser | null> => {
     try {
-      const { data: profileData, error: profileError } = await supabase
+      let { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('*, addresses(*), wishlist(*)')
+        .select('*')
         .eq('id', supabaseUser.id)
         .single();
 
-      if (profileError || !profileData) {
-        console.error('Error fetching profile:', profileError?.message);
-        return null;
+      if (profileError) {
+        console.error('[AuthProvider] Error fetching profile:', profileError.message);
       }
 
-      let wishlistProducts: Product[] = [];
-      if (profileData.wishlist && profileData.wishlist.length > 0) {
-        const { data: products, error } = await supabase.from('products').select('*').in('id', profileData.wishlist.map((w: any) => w.product_id));
-        if (error) {
-          console.error('Error fetching wishlist products:', error.message);
-        } else {
-          wishlistProducts = products as Product[];
+      // If no profile row exists, create one and refetch
+      if (!profileData) {
+        console.warn('[AuthProvider] No profile found for user. Attempting to create profile row...');
+        const { error: insertError } = await supabase.from('profiles').insert([
+          { id: supabaseUser.id, email: supabaseUser.email }
+        ]);
+        if (insertError) {
+          console.error('[AuthProvider] Error creating profile row:', insertError.message);
+          return null;
         }
+        // Refetch after insert
+        const { data: newProfile, error: newProfileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', supabaseUser.id)
+          .single();
+        if (newProfileError || !newProfile) {
+          console.error('[AuthProvider] Failed to fetch profile after insert:', newProfileError?.message);
+          return null;
+        }
+        profileData = newProfile;
       }
+
+      // Fetch wishlist products if needed (optional, based on your schema)
+      // let wishlistProducts: Product[] = [];
+      // if (profileData.wishlist && profileData.wishlist.length > 0) {
+      //   const { data: products, error } = await supabase.from('products').select('*').in('id', profileData.wishlist.map((w: any) => w.product_id));
+      //   if (error) {
+      //     console.error('Error fetching wishlist products:', error.message);
+      //   } else {
+      //     wishlistProducts = products || [];
+      //   }
+      //   profileData.wishlistProducts = wishlistProducts;
+      // }
 
       const fullUser: AppUser = {
         id: profileData.id,
@@ -69,13 +94,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         avatarUrl: profileData.avatar_url,
         createdAt: profileData.created_at,
         lastLogin: profileData.last_login,
-        isEmailVerified: supabaseUser.email_confirmed_at !== undefined,
+        isEmailVerified: !!supabaseUser.email_confirmed_at,
         addresses: profileData.addresses || [],
         preferences: profileData.preferences,
         email: supabaseUser.email || '',
         role: profileData.role || 'user',
         wishlist: profileData.wishlist?.map((w: any) => w.product_id) || [],
-        wishlistProducts: wishlistProducts,
+        // wishlistProducts: wishlistProducts, // Temporarily disabled to fix build error
       };
 
       return fullUser;
@@ -109,20 +134,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     getSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: AuthChangeEvent, session: Session | null) => {
-      console.log(`\n--- [AuthProvider] onAuthStateChange event: ${_event} ---`);
-      console.log("[AuthProvider] onAuthStateChange: Session object:", session);
-
-      if (session?.user) {
-        console.log("[AuthProvider] onAuthStateChange: User found. Fetching full profile.");
-        const fullUser = await fetchFullUserProfile(session.user);
-        console.log("[AuthProvider] onAuthStateChange: Setting user:", fullUser);
-        setUser(fullUser);
-      } else {
-        console.log("[AuthProvider] onAuthStateChange: No user. Setting user to null.");
+      console.log(`%c[AuthContext] Event: ${_event}`, 'color: #2563eb; font-weight: bold;', { session });
+      
+      if (_event === 'INITIAL_SESSION' || _event === 'SIGNED_IN') {
+        if (session?.user) {
+          console.log('[AuthContext] User session detected. Fetching full profile...');
+          const fullUser = await fetchFullUserProfile(session.user);
+          setUser(fullUser);
+          setIsAuthenticated(!!fullUser);
+          console.log('[AuthContext] User profile loaded and set.', { user: fullUser, isAuthenticated: !!fullUser });
+        } else {
+          // This can happen on initial load with no session
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } else if (_event === 'SIGNED_OUT') {
+        console.log('[AuthContext] User signed out. Clearing user state.');
         setUser(null);
+        setIsAuthenticated(false);
+      } else if (_event === 'USER_UPDATED') {
+        if (session?.user) {
+            console.log('[AuthContext] User updated. Re-fetching profile.');
+            const fullUser = await fetchFullUserProfile(session.user);
+            setUser(fullUser);
+            setIsAuthenticated(!!fullUser);
+        }
       }
+      
+      console.log('%c[AuthContext] State update finished. isLoading: false', 'color: #16a34a; font-weight: bold;');
       setIsLoading(false);
-      console.log("[AuthProvider] onAuthStateChange: Finished. isLoading set to false.");
     });
 
     return () => {

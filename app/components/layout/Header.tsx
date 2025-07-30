@@ -372,20 +372,21 @@ export default function Header() {
         </IconButton>
       </Tooltip>
 
-      {isAuthenticated ? (
+      {isAuthenticated && user ? (
         <>
-          <Tooltip title="Account">
-            <IconButton
-              onClick={handleUserMenuOpen}
-              aria-label="Open user menu"
-              aria-controls={Boolean(anchorEl) ? 'user-menu' : undefined}
+          <Tooltip title="Account Settings">
+            <IconButton 
+              onClick={handleUserMenuOpen} 
+              color="inherit"
+              aria-controls={anchorEl ? 'user-menu' : undefined}
               aria-haspopup="true"
-              aria-expanded={Boolean(anchorEl) ? 'true' : undefined}
-              sx={{ color: '#1e293b', ml: 1 }}
+              aria-expanded={anchorEl ? 'true' : undefined}
             >
-              <Avatar sx={{ width: 32, height: 32, bgcolor: '#2563eb', fontWeight: 700 }}>
-                {user?.firstName ? user.firstName[0].toUpperCase() : <PersonIcon />}
-              </Avatar>
+              <Avatar
+                alt={user.full_name || user.email}
+                src={user.avatar_url || undefined}
+                sx={{ width: 32, height: 32 }}
+              />
             </IconButton>
           </Tooltip>
           <Menu
