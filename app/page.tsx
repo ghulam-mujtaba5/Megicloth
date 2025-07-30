@@ -11,7 +11,6 @@ import FeaturedBrands from './components/home/FeaturedBrands';
 import ScrollTopButton from './components/common/ScrollTopButton';
 import TestimonialsList from './components/testimonials/TestimonialsList';
 import TestimonialForm from './components/testimonials/TestimonialForm';
-import ProductSearchSection from './components/home/ProductSearchSection';
 import { getPublishedTestimonials } from './lib/actions/testimonials';
 
 export default async function HomePage() {
@@ -24,7 +23,6 @@ export default async function HomePage() {
         <QuickAccessCategories />
         <TrendingProducts />
         <HighlightedFeatures />
-        <ProductSearchSection />
         <FeaturedBrands />
         <TestimonialsList testimonials={testimonials} />
         <InstagramFeed />

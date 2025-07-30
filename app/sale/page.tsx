@@ -17,7 +17,7 @@ const SalePage = () => {
     let isMounted = true;
     setLoading(true);
     const fetchSaleProducts = async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('products')
         .select('*')
         .eq('isPublished', true)
