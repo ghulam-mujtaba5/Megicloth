@@ -1,25 +1,49 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Container, Grid, Skeleton } from '@mui/material';
-import { products } from '../../data/products';
 import ProductCard from './ProductCard';
-
+import { supabase } from '@/app/lib/supabaseClient';
+import type { Product } from '@/app/types';
 
 interface ProductsGridProps {
   searchQuery: string;
-  loading: boolean;
 }
 
-const ProductsGrid = ({ searchQuery, loading }: ProductsGridProps) => {
-  const filteredProducts = useMemo(() => {
-    if (!searchQuery) {
-      return products; // Return all products if search query is empty
-    }
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [searchQuery]);
+const ProductsGrid = ({ searchQuery }: ProductsGridProps) => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    const fetchProducts = async () => {
+      let query = supabase
+        .from('products')
+        .select('*')
+        .eq('isPublished', true)
+        .order('createdAt', { ascending: false });
+      const { data, error } = await query;
+      if (isMounted) {
+        if (error) {
+          setProducts([]);
+        } else {
+          setProducts(data || []);
+        }
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const filteredProducts = searchQuery
+    ? products.filter((product) =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : products;
 
   return (
     <Box component="section" aria-label="Our Products" sx={{ pb: 8 }}>

@@ -7,13 +7,12 @@ import ProductsGrid from '../product/ProductsGrid';
 export default function ProductSearchSection() {
   const [searchQuery, setSearchQuery] = useState('');
 
-  // This will be replaced with real data fetching logic
-  const loading = false;
+
 
   return (
     <>
       <FabricSearch onSearchChange={setSearchQuery} />
-      <ProductsGrid searchQuery={searchQuery} loading={loading} />
+      <ProductsGrid searchQuery={searchQuery} />
     </>
   );
 }

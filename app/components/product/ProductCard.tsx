@@ -81,10 +81,10 @@ export default function ProductCard({ product }: ProductCardProps) {
       }}
     >
       <Box sx={{ position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden' }}>
-        <Link href={`/products/${product.id}`} passHref legacyBehavior>
+        <Link href={`/products/${product.slug}`} passHref legacyBehavior>
           <CardMedia
             component="img"
-            image={product.images[0]}
+            image={Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80"}
             alt={product.name}
             sx={{
               width: '100%',
@@ -146,7 +146,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </Box>
 
       <CardContent sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Link href={`/products/${product.id}`} passHref legacyBehavior>
+        <Link href={`/products/${product.slug}`} passHref legacyBehavior>
           <Box sx={{ textDecoration: 'none', color: 'inherit' }}>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textTransform: 'capitalize' }}>
               {product.category}
