@@ -1,123 +1,41 @@
 'use client';
 
-import { useState, useMemo, useTransition, useEffect } from 'react';
+import { useState } from 'react';
 import { Container, Grid, Typography, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Button, CircularProgress, Box } from '@mui/material';
-import type { CartItem } from '@/app/types';
-import { updateCartItem, removeFromCart, clearCart, addToCart, getCart } from '@/app/lib/actions/cart';
-import { useAuth } from '../context/AuthContext';
-
+import { useCart } from '../context/CartContext';
 import EmptyCart from '../components/cart/EmptyCart';
 import OrderSummary from '../components/cart/OrderSummary';
 import CartItemsTable from '../components/cart/CartItemsTable';
 
-interface CartClientPageProps {
-  initialCart: CartItem[];
-}
+export default function CartClientPage() {
+  const {
+    cart,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+    subtotal,
+    shippingCost,
+    loading
+  } = useCart();
 
-export default function CartClientPage({ initialCart }: CartClientPageProps) {
-  const { user } = useAuth();
-  const [cart, setCart] = useState<CartItem[]>(initialCart);
   const [snackbar, setSnackbar] = useState({ open: false, message: '' });
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
-
-  // Guest cart: load from localStorage on mount if not logged in
-  useEffect(() => {
-    if (!user) {
-      try {
-        const stored = localStorage.getItem('megicloth_cart');
-        if (stored) {
-          setCart(JSON.parse(stored));
-        }
-      } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
-        localStorage.removeItem('megicloth_cart');
-      }
-    } else {
-      setCart(initialCart);
-    }
-  }, [user, initialCart]);
-
-  // On login, merge guest cart with server cart
-  useEffect(() => {
-    if (user) {
-      const mergeGuestCart = async () => {
-        const stored = localStorage.getItem('megicloth_cart');
-        if (stored) {
-          try {
-            const guestCart: CartItem[] = JSON.parse(stored);
-            for (const item of guestCart) {
-              await addToCart(item.id, item.quantity);
-            }
-            localStorage.removeItem('megicloth_cart');
-            // Refresh cart from server
-            const updatedCart = await getCart();
-            setCart(updatedCart);
-          } catch (error) {
-            console.error('Error merging guest cart:', error);
-          }
-        }
-      };
-      mergeGuestCart();
-    }
-  }, [user]);
-
-  // Guest cart: persist to localStorage on change
-  useEffect(() => {
-    if (!user) {
-      localStorage.setItem('megicloth_cart', JSON.stringify(cart));
-    }
-  }, [cart, user]);
-
-  const { subtotal, shippingCost } = useMemo(() => {
-    const subtotal = cart.reduce((sum, item) => sum + (item.salePrice ?? item.price) * item.quantity, 0);
-    const shippingCost = subtotal > 50 ? 0 : 5; // Example shipping logic
-    return { subtotal, shippingCost };
-  }, [cart]);
-
-  const handleUpdateQuantity = (id: string, quantity: number) => {
-    if (!user) {
-      setCart(prev => prev.map(item => item.id === id ? { ...item, quantity } : item));
-    } else {
-      startTransition(async () => {
-        const updatedCart = await updateCartItem(id, quantity);
-        setCart(updatedCart);
-      });
-    }
-  };
 
   const handleRemoveItem = (id: string) => {
-    if (!user) {
-      setCart(prev => prev.filter(item => item.id !== id));
-      setSnackbar({ open: true, message: 'Item removed from cart' });
-    } else {
-      startTransition(async () => {
-        const updatedCart = await removeFromCart(id);
-        setCart(updatedCart);
-        setSnackbar({ open: true, message: 'Item removed from cart' });
-      });
-    }
+    removeFromCart(id);
+    setSnackbar({ open: true, message: 'Item removed from cart' });
   };
 
   const handleClearCart = () => {
-    if (!user) {
-      setCart([]);
-      setDialogOpen(false);
-      setSnackbar({ open: true, message: 'Cart has been cleared' });
-    } else {
-      startTransition(async () => {
-        const updatedCart = await clearCart();
-        setCart(updatedCart);
-        setDialogOpen(false);
-        setSnackbar({ open: true, message: 'Cart has been cleared' });
-      });
-    }
+    clearCart();
+    setDialogOpen(false);
+    setSnackbar({ open: true, message: 'Cart has been cleared' });
   };
-
 
   const handleApplyPromoCode = (code: string) => {
     if (code === 'MEGI10') {
       setSnackbar({ open: true, message: 'Promo code applied!' });
+      // This logic should ideally be moved into the CartContext as well
       return subtotal * 0.1; // 10% discount
     }
     setSnackbar({ open: true, message: 'Invalid promo code.' });
@@ -133,7 +51,7 @@ export default function CartClientPage({ initialCart }: CartClientPageProps) {
       <Typography variant="h4" component="h1" sx={{ mb: 4, fontWeight: 'bold', textAlign: 'center' }}>
         Your Shopping Cart
       </Typography>
-      {isPending && (
+      {loading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', my: 2 }}>
           <CircularProgress />
         </Box>
@@ -142,7 +60,7 @@ export default function CartClientPage({ initialCart }: CartClientPageProps) {
         <Grid item xs={12} md={8}>
           <CartItemsTable 
             items={cart} 
-            onUpdateQuantity={handleUpdateQuantity} 
+            onUpdateQuantity={updateQuantity} 
             onRemoveItem={handleRemoveItem}
             onClearCart={() => setDialogOpen(true)}
           />

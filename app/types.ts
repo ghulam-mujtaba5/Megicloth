@@ -66,8 +66,21 @@ export interface User {
   [key:string]: any; // For any other profile fields
 }
 
-export interface OrderItem extends Product {
+export interface Order {
+  id: string;
+  total: number;
+  status: string;
+  created_at?: string;
+  user_id?: string;
+  stripe_session_id?: string;
+  items?: OrderItem[];
+}
+
+export interface OrderItem {
+  id: string;
   quantity: number;
+  price: number; // Price at the time of purchase
+  product: Product; // Full product details
 }
 
 

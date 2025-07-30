@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useWishlist } from "../context/WishlistContext";
 import { getUserOrders } from "../lib/actions/orderTracking";
 import { useRouter } from "next/navigation";
 import {
@@ -29,6 +30,8 @@ import {
   MenuItem,
   Switch,
   FormControlLabel,
+  CardMedia,
+  CardActions,
 } from "@mui/material";
 import toast from "react-hot-toast";
 import {
@@ -66,12 +69,20 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export default function ProfilePage() {
-  const { user, isLoading, updateProfile, addAddress, removeAddress } = useAuth();
+  const { user, isLoading, changePassword, updateProfile, addAddress, removeAddress } = useAuth();
   const router = useRouter();
   const [tabValue, setTabValue] = useState(0);
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const { wishlist } = useWishlist();
   const [ordersError, setOrdersError] = useState<string | null>(null);
+
+  // State for Account Settings
+  const [password, setPassword] = useState({ new: "", confirm: "" });
+  const [notifications, setNotifications] = useState({
+    email: user?.user_metadata?.notifications?.email ?? true,
+    sms: user?.user_metadata?.notifications?.sms ?? false,
+  });
 
   useEffect(() => {
     if (tabValue === 1 && user) {
@@ -120,6 +131,40 @@ export default function ProfilePage() {
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+  };
+
+  const handleChangePassword = async () => {
+    if (password.new !== password.confirm) {
+      toast.error("New passwords do not match.");
+      return;
+    }
+    if (password.new.length < 6) {
+      toast.error("Password must be at least 6 characters long.");
+      return;
+    }
+
+    try {
+      const { error } = await changePassword(password.new);
+      if (error) {
+        toast.error(error);
+        return;
+      }
+      toast.success("Password updated successfully");
+      setPassword({ new: "", confirm: "" });
+    } catch (error: any) {
+      toast.error(error.toString());
+    }
+  };
+
+  const handleUpdateSettings = async () => {
+    toast.promise(
+      updateProfile({ data: { notifications } }),
+      {
+        loading: 'Saving settings...',
+        success: 'Settings saved successfully!',
+        error: (err) => err || 'Failed to save settings.',
+      }
+    );
   };
 
   const handleAddAddress = async () => {
@@ -417,24 +462,53 @@ export default function ProfilePage() {
           </TabPanel>
 
           {/* Wishlist Tab */}
+          {/* Wishlist Tab */}
           <TabPanel value={tabValue} index={2}>
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
               My Wishlist
             </Typography>
-            <Card>
-              <CardContent sx={{ textAlign: "center", py: 4 }}>
-                <Favorite sx={{ fontSize: 60, color: "text.secondary", mb: 2 }} />
-                <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-                  Your wishlist is empty
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Start adding products to your wishlist to see them here
-                </Typography>
-                <Button variant="contained" href="/products">
-                  Browse Products
-                </Button>
-              </CardContent>
-            </Card>
+            {wishlist.length === 0 ? (
+              <Card>
+                <CardContent sx={{ textAlign: "center", py: 4 }}>
+                  <Favorite sx={{ fontSize: 60, color: "text.secondary", mb: 2 }} />
+                  <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                    Your wishlist is empty
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    Start adding products to your wishlist to see them here
+                  </Typography>
+                  <Button variant="contained" href="/products">
+                    Browse Products
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <Grid container spacing={2}>
+                {wishlist.map((item) => (
+                  <Grid item xs={12} sm={6} md={4} key={item.id}>
+                    <Card>
+                      <CardMedia
+                        component="img"
+                        height="140"
+                        image={item.images[0]}
+                        alt={item.name}
+                      />
+                      <CardContent>
+                        <Typography gutterBottom variant="h6" component="div">
+                          {item.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          ${item.price}
+                        </Typography>
+                      </CardContent>
+                      <CardActions>
+                        <Button size="small" href={`/products/${item.id}`}>View</Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
           </TabPanel>
 
           {/* Addresses Tab */}
@@ -507,44 +581,11 @@ export default function ProfilePage() {
                 <Card>
                   <CardContent>
                     <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                      Notifications
+                      Change Password
                     </Typography>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={user.preferences?.emailNotifications || false}
-                          onChange={(e) => updateProfile({ preferences: { ...(user.preferences || {}), emailNotifications: e.target.checked } })}
-                        />
-                      }
-                      label="Email Notifications"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={user.preferences?.pushNotifications || false}
-                          onChange={(e) => updateProfile({ preferences: { ...(user.preferences || {}), pushNotifications: e.target.checked } })}
-                        />
-                      }
-                      label="Push Notifications"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={user.preferences?.newsletter || false}
-                          onChange={(e) => updateProfile({ preferences: { ...(user.preferences || {}), newsletter: e.target.checked } })}
-                        />
-                      }
-                      label="Newsletter"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={user.preferences?.marketing || false}
-                          onChange={(e) => updateProfile({ preferences: { ...(user.preferences || {}), marketing: e.target.checked } })}
-                        />
-                      }
-                      label="Marketing Emails"
-                    />
+                    <TextField label="New Password" type="password" value={password.new} onChange={(e) => setPassword(p => ({...p, new: e.target.value}))} fullWidth sx={{ mt: 2 }} />
+                    <TextField label="Confirm New Password" type="password" value={password.confirm} onChange={(e) => setPassword(p => ({...p, confirm: e.target.value}))} fullWidth sx={{ mt: 2 }} />
+                    <Button variant="contained" sx={{ mt: 2 }} onClick={handleChangePassword}>Change Password</Button>
                   </CardContent>
                 </Card>
               </Grid>
@@ -552,32 +593,17 @@ export default function ProfilePage() {
                 <Card>
                   <CardContent>
                     <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                      Security
+                      Notifications
                     </Typography>
-                    <Button
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      href="/auth/change-password"
-                    >
-                      Change Password
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      href="/auth/verify-email"
-                    >
-                      Verify Email
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      fullWidth
-                      color="error"
-                      href="/auth/logout"
-                    >
-                      Logout
-                    </Button>
+                    <FormControlLabel
+                      control={<Switch checked={notifications.email} onChange={(e) => setNotifications(n => ({...n, email: e.target.checked}))} />}
+                      label="Email Notifications"
+                    />
+                    <FormControlLabel
+                      control={<Switch checked={notifications.sms} onChange={(e) => setNotifications(n => ({...n, sms: e.target.checked}))} />}
+                      label="SMS Notifications"
+                    />
+                    <Button variant="contained" sx={{ mt: 2 }} onClick={handleUpdateSettings}>Save Settings</Button>
                   </CardContent>
                 </Card>
               </Grid>

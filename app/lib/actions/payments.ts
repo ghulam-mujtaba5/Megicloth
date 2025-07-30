@@ -64,3 +64,79 @@ export async function createCheckoutSession(cartItems: CartItem[]): Promise<{ se
     return { error: 'Could not create checkout session. Please try again.' };
   }
 }
+
+export async function verifyCheckoutSession(sessionId: string): Promise<{ order?: any; error?: string; }> {
+  if (!stripe) {
+    return { error: 'Stripe is not configured.' };
+  }
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    if (session.payment_status !== 'paid') {
+      return { error: 'Payment not successful.' };
+    }
+
+    const supabase = createClient();
+    const userId = session.metadata?.userId;
+
+    if (!userId) {
+      return { error: 'User ID not found in session metadata.' };
+    }
+
+    // Check if order already exists
+    const { data: existingOrder } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('stripe_session_id', sessionId)
+      .single();
+
+    if (existingOrder) {
+        const { data: orderData } = await supabase.from('orders').select('*').eq('id', existingOrder.id).single();
+        return { order: orderData };
+    }
+
+    const cartItems: CartItem[] = JSON.parse(session.metadata?.cart || '[]');
+    const total = session.amount_total ? session.amount_total / 100 : 0;
+
+    const { data: newOrder, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        user_id: userId,
+        total,
+        status: 'pending',
+        stripe_session_id: sessionId,
+      })
+      .select()
+      .single();
+
+    if (orderError) {
+      console.error('Error creating order:', orderError);
+      return { error: 'Failed to create order.' };
+    }
+
+    const orderItems = cartItems.map(item => ({
+      order_id: newOrder.id,
+      product_id: item.id,
+      quantity: item.quantity,
+      price: item.price,
+    }));
+
+    const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+
+    if (itemsError) {
+      console.error('Error creating order items:', itemsError);
+      // Optionally, handle order cleanup if items fail to be created
+      return { error: 'Failed to save order items.' };
+    }
+
+    // Clear user's cart
+    await supabase.from('cart_items').delete().eq('user_id', userId);
+
+    return { order: newOrder };
+
+  } catch (error) {
+    console.error('Error verifying checkout session:', error);
+    return { error: 'Failed to verify checkout session.' };
+  }
+}
