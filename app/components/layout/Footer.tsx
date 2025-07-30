@@ -116,12 +116,9 @@ export default function Footer() {
                     { href: '/about', label: 'About Us' },
                     { href: '/privacy', label: 'Privacy Policy' },
                     { href: '/terms', label: 'Terms of Service' },
-                    { href: '/admin', label: 'Admin Portal' },
+                    { href: '/admin/login', label: 'Admin Portal' },
                   ].map(renderFooterLink)}
                   {/* DEBUG INFO - REMOVE LATER */}
-                  <Typography variant="caption" sx={{ color: '#666', fontStyle: 'italic', mt: 1 }}>
-                    DEBUG: User logged in: {user ? 'Yes' : 'No'} | Role: {user?.role || 'None'}
-                  </Typography>
                   
                   {user?.role === 'admin' && (
                     <Link href="/admin" passHref legacyBehavior>
