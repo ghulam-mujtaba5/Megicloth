@@ -21,6 +21,11 @@ export default function ContactPage() {
   const [state, formAction] = useFormState(submitContactForm, initialState);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (state.message.startsWith('Success')) {
@@ -49,7 +54,7 @@ export default function ContactPage() {
       />
       <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)', py: { xs: 4, md: 8 } }}>
         <Container maxWidth="lg">
-          <Fade in={true} timeout={700}>
+          <Fade in={mounted} timeout={700}>
             <Box sx={{
               borderRadius: 4,
               background: 'rgba(255,255,255,0.65)',
@@ -71,7 +76,7 @@ export default function ContactPage() {
           </Fade>
           <Grid container spacing={6}>
             <Grid item xs={12} md={7}>
-              <Fade in={true} timeout={900}>
+              <Fade in={mounted} timeout={900}>
                 <ContactForm 
                   onSubmit={handleFormSubmit} 
                   isLoading={isLoading} 
@@ -81,7 +86,7 @@ export default function ContactPage() {
               </Fade>
             </Grid>
             <Grid item xs={12} md={5}>
-              <Fade in={true} timeout={1100}>
+              <Fade in={mounted} timeout={1100}>
                 <ContactInfo />
               </Fade>
             </Grid>
