@@ -14,10 +14,11 @@
   font-weight: 900;
   margin-bottom: 1rem;
   font-size: 2.5rem;
-  background: linear-gradient(45deg, var(--slate-800) 30%, var(--blue-600) 90%);
+  background: linear-gradient(45deg, #1e293b 30%, #2563eb 90%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
   letter-spacing: -1.5px;
 }
 
