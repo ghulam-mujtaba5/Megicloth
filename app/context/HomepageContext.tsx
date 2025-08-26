@@ -36,21 +36,21 @@ export const HomepageProvider = ({ children }: { children: ReactNode }) => {
   const [settings, setSettings] = useState<HomepageSettings>({
     heroSlides: [
       {
-        imageUrl: 'https://picsum.photos/seed/heroA/1200/500',
+        imageUrl: 'https://images.unsplash.com/photo-1520974735194-6c8a363b7f3a',
         title: 'New Summer Collection',
         subtitle: 'Discover the latest trends in unstitched fabrics.',
         buttonText: 'Shop Now',
         link: '/products',
       },
       {
-        imageUrl: 'https://picsum.photos/seed/heroB/1200/500',
+        imageUrl: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f',
         title: 'Exquisite Lawn Prints',
         subtitle: 'Perfect for every occasion, crafted with elegance.',
         buttonText: 'Explore Designs',
         link: '/products?category=lawn',
       },
       {
-        imageUrl: 'https://picsum.photos/seed/heroC/1200/500',
+        imageUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',
         title: 'Festive Season Specials',
         subtitle: 'Get ready for the celebrations with our exclusive festive range.',
         buttonText: 'View Collection',
