@@ -1,0 +1,37 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    - cron: '0 */12 * * *' # Runs every 12 hours
+  workflow_dispatch:     # Allow manual run
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase health endpoint
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          # Fail fast with a helpful message if secrets aren't set
+          if [ -z "$SUPABASE_URL" ]; then
+            echo "Error: SUPABASE_URL secret is not set"
+            exit 1
+          fi
+          if [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "Error: SUPABASE_ANON_KEY secret is not set"
+            exit 1
+          fi
+
+          # Ensure URL has no trailing slash, then call the health endpoint
+          HEALTH_URL="${SUPABASE_URL%/}/rest/v1/health"
+          echo "Pinging $HEALTH_URL"
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "apikey: $SUPABASE_ANON_KEY" "$HEALTH_URL")
+          echo "Health endpoint returned HTTP $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "Supabase ping successful"
+          else
+            echo "Supabase ping failed"
+            exit 1
+          fi
