@@ -9,7 +9,7 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase health endpoint
+      - name: Ping Supabase health endpoint (try multiple paths)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -24,14 +24,24 @@ jobs:
             exit 1
           fi
 
-          # Ensure URL has no trailing slash, then call the health endpoint
-          HEALTH_URL="${SUPABASE_URL%/}/rest/v1/health"
-          echo "Pinging $HEALTH_URL"
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "apikey: $SUPABASE_ANON_KEY" "$HEALTH_URL")
-          echo "Health endpoint returned HTTP $HTTP_STATUS"
-          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
-            echo "Supabase ping successful"
-          else
-            echo "Supabase ping failed"
+          BASEURL="${SUPABASE_URL%/}"
+
+          # Candidate endpoints to try (first match wins)
+          ENDPOINTS=("$BASEURL/health" "$BASEURL/rest/v1/health" "$BASEURL/auth/v1/health" "$BASEURL/")
+
+          SUCCESS=1
+          for EP in "${ENDPOINTS[@]}"; do
+            echo "Trying $EP"
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "apikey: $SUPABASE_ANON_KEY" "$EP")
+            echo " -> HTTP $HTTP_STATUS"
+            if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+              echo "Success: $EP returned $HTTP_STATUS"
+              SUCCESS=0
+              break
+            fi
+          done
+
+          if [ "$SUCCESS" -ne 0 ]; then
+            echo "All endpoints failed. See logs for details."
             exit 1
           fi
